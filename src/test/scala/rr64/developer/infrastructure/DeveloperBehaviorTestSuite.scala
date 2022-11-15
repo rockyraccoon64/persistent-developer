@@ -39,7 +39,7 @@ class DeveloperBehaviorTestSuite extends ScalaTestWithActorTestKit(EventSourcedB
 
   /** Когда разработчик свободен, он принимает задачу в работу */
   "The developer" should "accept the task he's given when he's free" in {
-    val task = Task()
+    val task = Task(5)
     val result = developerTestKit.runCommand(AddTask(task, _))
     result.reply shouldEqual Replies.TaskStarted
     result.event shouldEqual Event.TaskAdded

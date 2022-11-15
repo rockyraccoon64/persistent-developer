@@ -1,3 +1,3 @@
 package rr64.developer.domain
 
-case class Task()
+case class Task(difficulty: Int)
