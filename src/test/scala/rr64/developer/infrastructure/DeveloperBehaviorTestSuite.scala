@@ -14,7 +14,7 @@ class DeveloperBehaviorTestSuite extends ScalaTestWithActorTestKit(EventSourcedB
   with BeforeAndAfterEach
   with Matchers {
 
-  private val eventSourcedTestKit =
+  private val developerTestKit =
     EventSourcedBehaviorTestKit[
       DeveloperBehavior.Command,
       DeveloperBehavior.Event,
@@ -27,26 +27,26 @@ class DeveloperBehaviorTestSuite extends ScalaTestWithActorTestKit(EventSourcedB
 
   override protected def beforeEach(): Unit = {
     super.beforeEach()
-    eventSourcedTestKit.clear()
+    developerTestKit.clear()
   }
 
   /** Разработчик начинает в свободном состоянии */
   "The developer" should "start in a free state" in {
-    val state = eventSourcedTestKit.getState()
+    val state = developerTestKit.getState()
     state shouldEqual DeveloperBehavior.State.Free
   }
 
   /** Когда разработчик свободен, он принимает задачу */
   "The developer" should "accept the task he's given when he's free" in {
     val task = Task()
-    val result = eventSourcedTestKit.runCommand(AddTask(task, _))
+    val result = developerTestKit.runCommand(AddTask(task, _))
     result.reply shouldEqual Replies.TaskAdded
   }
 
   /** Когда разработчик получает задачу, его состояние меняется на "Работает" */
   "The developer" should "start working when he's given a task" in {
     val task = Task()
-    val result = eventSourcedTestKit.runCommand(AddTask(task, _))
+    val result = developerTestKit.runCommand(AddTask(task, _))
     result.state shouldEqual State.Working
   }
 
