@@ -55,7 +55,8 @@ class DeveloperBehaviorTestSuite extends ScalaTestWithActorTestKit(EventSourcedB
     val time = difficulty * factor
     val task = Task(difficulty)
     val result = developerTestKit.runCommand(AddTask(task, _))
-    Thread.sleep(time) // TODO
+    Thread.sleep(time + 100) // TODO TestProbe?
+    developerTestKit.snapshotTestKit
     developerTestKit.getState() shouldEqual State.Free
   }
 

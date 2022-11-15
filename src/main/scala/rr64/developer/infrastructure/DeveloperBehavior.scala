@@ -7,15 +7,19 @@ import akka.persistence.typed.scaladsl.{Effect, EventSourcedBehavior}
 import rr64.developer.domain.Task
 import rr64.developer.infrastructure.DeveloperBehavior.Replies.AddTaskResult
 
+import scala.concurrent.duration.DurationInt
+
 object DeveloperBehavior {
 
   sealed trait Command
   case class AddTask(task: Task, replyTo: ActorRef[AddTaskResult]) extends Command
+  private case class FinishTask(task: Task) extends Command
 
   sealed trait Event
 
   case object Event {
     case class TaskAdded(task: Task) extends Event
+    case class TaskFinished(task: Task) extends Event
   }
 
   sealed trait State {
@@ -30,7 +34,11 @@ object DeveloperBehavior {
       override def applyCommand(cmd: Command)(implicit timer: TimerScheduler[Command]): Effect[Event, State] =
         cmd match {
           case AddTask(task, replyTo) =>
-            Effect.persist(Event.TaskAdded(task)).thenReply(replyTo)(_ => Replies.TaskStarted)
+            Effect.persist(Event.TaskAdded(task))
+              .thenRun { _: State =>
+                timer.startSingleTimer(FinishTask(task), (task.difficulty * 10).millis) // TODO Factor
+              }
+              .thenReply(replyTo)(_ => Replies.TaskStarted)
         }
       override def applyEvent(evt: Event): State =
         evt match {
@@ -40,8 +48,16 @@ object DeveloperBehavior {
 
     /** Разработчик работает над задачей */
     case class Working(task: Task) extends State {
-      override def applyCommand(cmd: Command)(implicit timer: TimerScheduler[Command]): Effect[Event, State] = ???
-      override def applyEvent(evt: Event): State = ???
+      override def applyCommand(cmd: Command)(implicit timer: TimerScheduler[Command]): Effect[Event, State] =
+        cmd match {
+          case FinishTask(task) =>
+            Effect.persist(Event.TaskFinished(task))
+          case _ => Effect.stash
+        }
+      override def applyEvent(evt: Event): State =
+        evt match {
+          case Event.TaskFinished(_) => Free
+        }
     }
 
   }
