@@ -16,6 +16,8 @@ class DeveloperBehaviorTestSuite extends ScalaTestWithActorTestKit(EventSourcedB
   with BeforeAndAfterEach
   with Matchers {
 
+  private val timeFactor = 10
+
   private val developerTestKit =
     EventSourcedBehaviorTestKit[
       DeveloperBehavior.Command,
@@ -23,7 +25,10 @@ class DeveloperBehaviorTestSuite extends ScalaTestWithActorTestKit(EventSourcedB
       DeveloperBehavior.State
     ](
       system = system,
-      behavior = DeveloperBehavior(PersistenceId.ofUniqueId("dev-test")),
+      behavior = DeveloperBehavior(
+        persistenceId = PersistenceId.ofUniqueId("dev-test"),
+        timeFactor = timeFactor
+      ),
       SerializationSettings.disabled
     )
 
@@ -51,12 +56,10 @@ class DeveloperBehaviorTestSuite extends ScalaTestWithActorTestKit(EventSourcedB
   /** По окончании выполнения задачи разработчик снова свободен */
   "The developer" should "stop working when the task is done" in {
     val difficulty = 30
-    val factor = 10
-    val time = difficulty * factor
+    val time = difficulty * timeFactor
     val task = Task(difficulty)
     val result = developerTestKit.runCommand(AddTask(task, _))
     Thread.sleep(time + 100) // TODO TestProbe?
-    developerTestKit.snapshotTestKit
     developerTestKit.getState() shouldEqual State.Free
   }
 

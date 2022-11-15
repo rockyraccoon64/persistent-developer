@@ -36,7 +36,9 @@ object DeveloperBehavior {
           case AddTask(task, replyTo) =>
             Effect.persist(Event.TaskAdded(task))
               .thenRun { _: State =>
-                setup.timer.startSingleTimer(FinishTask(task), (task.difficulty * 10).millis) // TODO Factor
+                val timeNeeded = task.difficulty * setup.timeFactor
+                val message = FinishTask(task)
+                setup.timer.startSingleTimer(message, timeNeeded.millis)
               }
               .thenReply(replyTo)(_ => Replies.TaskStarted)
         }
@@ -71,9 +73,9 @@ object DeveloperBehavior {
 
   case class Setup(timeFactor: Int, timer: TimerScheduler[Command])
 
-  def apply(persistenceId: PersistenceId): Behavior[Command] =
+  def apply(persistenceId: PersistenceId, timeFactor: Int): Behavior[Command] =
     Behaviors.withTimers { timer =>
-      implicit val setup: Setup = Setup(10, timer)
+      implicit val setup: Setup = Setup(timeFactor, timer)
       EventSourcedBehavior[Command, Event, State](
         persistenceId = persistenceId,
         emptyState = State.Free,
