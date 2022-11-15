@@ -16,21 +16,23 @@ class DeveloperBehaviorTestSuite extends ScalaTestWithActorTestKit(EventSourcedB
   with BeforeAndAfterEach
   with Matchers {
 
-  private val timeFactor = 10
-
-  private val developerTestKit =
-    EventSourcedBehaviorTestKit[
-      DeveloperBehavior.Command,
-      DeveloperBehavior.Event,
-      DeveloperBehavior.State
-    ](
+  def testKit(persistenceId: String, timeFactor: Int): EventSourcedBehaviorTestKit[
+    DeveloperBehavior.Command,
+    DeveloperBehavior.Event,
+    DeveloperBehavior.State
+  ] = {
+    EventSourcedBehaviorTestKit(
       system = system,
       behavior = DeveloperBehavior(
-        persistenceId = PersistenceId.ofUniqueId("dev-test"),
+        persistenceId = PersistenceId.ofUniqueId(persistenceId),
         timeFactor = timeFactor
       ),
       SerializationSettings.disabled
     )
+  }
+
+  private val timeFactor = 10
+  private val developerTestKit = testKit("dev-test", timeFactor)
 
   override protected def beforeEach(): Unit = {
     super.beforeEach()
@@ -53,14 +55,22 @@ class DeveloperBehaviorTestSuite extends ScalaTestWithActorTestKit(EventSourcedB
     state.task shouldEqual task
   }
 
-  /** По окончании выполнения задачи разработчик снова свободен */
-  "The developer" should "stop working when the task is done" in {
-    val difficulty = 30
-    val time = difficulty * timeFactor
+  /** До выполнения задачи разработчик работает, по окончании снова свободен */
+  "The developer" should "work until the task is done" in {
+    val factor = 100
+    val difficulty = 10
     val task = Task(difficulty)
-    val result = developerTestKit.runCommand(AddTask(task, _))
-    Thread.sleep(time + 100) // TODO TestProbe?
-    developerTestKit.getState() shouldEqual State.Free
+    val firstCheckMs = 750
+    val secondCheckMs = 500
+    val kit = testKit("timer-test", factor)
+
+    kit.runCommand(AddTask(task, _))
+
+    Thread.sleep(firstCheckMs)
+    kit.getState() shouldEqual State.Working(task)
+
+    Thread.sleep(secondCheckMs)
+    kit.getState() shouldEqual State.Free
   }
 
 }
