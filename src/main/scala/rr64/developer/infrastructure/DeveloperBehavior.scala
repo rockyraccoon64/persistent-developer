@@ -4,7 +4,7 @@ import akka.actor.typed.ActorRef
 import akka.persistence.typed.PersistenceId
 import akka.persistence.typed.scaladsl.{Effect, EventSourcedBehavior}
 import rr64.developer.domain.Task
-import rr64.developer.infrastructure.DeveloperBehavior.Replies.{AddTaskResult, TaskAdded}
+import rr64.developer.infrastructure.DeveloperBehavior.Replies.AddTaskResult
 
 object DeveloperBehavior {
 
@@ -12,6 +12,9 @@ object DeveloperBehavior {
   case class AddTask(task: Task, replyTo: ActorRef[AddTaskResult]) extends Command
 
   sealed trait Event
+  case object Event {
+    case object TaskAdded extends Event // TODO Переименовать
+  }
 
   sealed trait State {
     def applyCommand(cmd: Command): Effect[Event, State]
@@ -27,7 +30,7 @@ object DeveloperBehavior {
     override def applyCommand(cmd: Command): Effect[Event, State] =
       cmd match {
         case AddTask(task, replyTo) =>
-          Effect.reply(replyTo)(TaskAdded)
+          Effect.persist(Event.TaskAdded).thenReply(replyTo)(_ => Replies.TaskAdded)
       }
   }
 
@@ -41,6 +44,6 @@ object DeveloperBehavior {
       persistenceId = PersistenceId.ofUniqueId("dev"),
       emptyState = Free,
       commandHandler = (state, cmd) => state.applyCommand(cmd),
-      eventHandler = (state, evt) => state
+      eventHandler = (state, evt) => State.Working // TODO В State
     )
 }
