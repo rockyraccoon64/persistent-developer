@@ -13,25 +13,27 @@ object DeveloperBehavior {
 
   sealed trait Event
   case object Event {
-    case object TaskAdded extends Event // TODO Переименовать
+    case object TaskAdded extends Event
   }
 
   sealed trait State {
     def applyCommand(cmd: Command): Effect[Event, State]
   }
 
-  case object State {
+  object State {
+
+    case object Free extends State {
+      override def applyCommand(cmd: Command): Effect[Event, State] =
+        cmd match {
+          case AddTask(task, replyTo) =>
+            Effect.persist(Event.TaskAdded).thenReply(replyTo)(_ => Replies.TaskAdded)
+        }
+    }
+
     case object Working extends State {
       override def applyCommand(cmd: Command): Effect[Event, State] = ???
     }
-  }
 
-  case object Free extends State { // TODO Перенести в State
-    override def applyCommand(cmd: Command): Effect[Event, State] =
-      cmd match {
-        case AddTask(task, replyTo) =>
-          Effect.persist(Event.TaskAdded).thenReply(replyTo)(_ => Replies.TaskAdded)
-      }
   }
 
   object Replies {
@@ -42,7 +44,7 @@ object DeveloperBehavior {
   def apply(): EventSourcedBehavior[Command, Event, State] =
     EventSourcedBehavior[Command, Event, State](
       persistenceId = PersistenceId.ofUniqueId("dev"),
-      emptyState = Free,
+      emptyState = State.Free,
       commandHandler = (state, cmd) => state.applyCommand(cmd),
       eventHandler = (state, evt) => State.Working // TODO В State
     )

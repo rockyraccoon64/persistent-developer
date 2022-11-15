@@ -33,7 +33,7 @@ class DeveloperBehaviorTestSuite extends ScalaTestWithActorTestKit(EventSourcedB
   /** Разработчик начинает в свободном состоянии */
   "The developer" should "start in a free state" in {
     val state = eventSourcedTestKit.getState()
-    state shouldEqual DeveloperBehavior.Free
+    state shouldEqual DeveloperBehavior.State.Free
   }
 
   /** Когда разработчик свободен, он принимает задачу */
