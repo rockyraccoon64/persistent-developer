@@ -13,4 +13,12 @@ class PersistentDeveloperTestSuite extends AnyFlatSpec with Matchers {
     state shouldEqual DeveloperState.Free
   }
 
+  /** Когда разработчик свободен, он принимает задачу */
+  "The developer" should "accept the task he's given when he's free" in {
+    val developer = PersistentDeveloper()
+    val task = Task()
+    val reply = developer.addTask(task)
+    reply shouldEqual DeveloperReply.TaskAccepted
+  }
+
 }
