@@ -23,7 +23,7 @@ object DeveloperBehavior {
   }
 
   sealed trait State {
-    def applyCommand(cmd: Command)(implicit timer: TimerScheduler[Command]): Effect[Event, State]
+    def applyCommand(cmd: Command)(implicit setup: Setup): Effect[Event, State]
     def applyEvent(evt: Event): State
   }
 
@@ -31,12 +31,12 @@ object DeveloperBehavior {
 
     /** Разработчик свободен */
     case object Free extends State {
-      override def applyCommand(cmd: Command)(implicit timer: TimerScheduler[Command]): Effect[Event, State] =
+      override def applyCommand(cmd: Command)(implicit setup: Setup): Effect[Event, State] =
         cmd match {
           case AddTask(task, replyTo) =>
             Effect.persist(Event.TaskAdded(task))
               .thenRun { _: State =>
-                timer.startSingleTimer(FinishTask(task), (task.difficulty * 10).millis) // TODO Factor
+                setup.timer.startSingleTimer(FinishTask(task), (task.difficulty * 10).millis) // TODO Factor
               }
               .thenReply(replyTo)(_ => Replies.TaskStarted)
         }
@@ -48,7 +48,7 @@ object DeveloperBehavior {
 
     /** Разработчик работает над задачей */
     case class Working(task: Task) extends State {
-      override def applyCommand(cmd: Command)(implicit timer: TimerScheduler[Command]): Effect[Event, State] =
+      override def applyCommand(cmd: Command)(implicit setup: Setup): Effect[Event, State] =
         cmd match {
           case FinishTask(task) =>
             Effect.persist(Event.TaskFinished(task))
@@ -69,8 +69,11 @@ object DeveloperBehavior {
     case object TaskStarted extends AddTaskResult
   }
 
+  case class Setup(timeFactor: Int, timer: TimerScheduler[Command])
+
   def apply(persistenceId: PersistenceId): Behavior[Command] =
-    Behaviors.withTimers { implicit timer =>
+    Behaviors.withTimers { timer =>
+      implicit val setup: Setup = Setup(10, timer)
       EventSourcedBehavior[Command, Event, State](
         persistenceId = persistenceId,
         emptyState = State.Free,
