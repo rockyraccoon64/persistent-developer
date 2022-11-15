@@ -14,7 +14,7 @@ object DeveloperBehavior {
   sealed trait Event
 
   case object Event {
-    case object TaskAdded extends Event
+    case class TaskAdded(task: Task) extends Event
   }
 
   sealed trait State {
@@ -29,16 +29,16 @@ object DeveloperBehavior {
       override def applyCommand(cmd: Command): Effect[Event, State] =
         cmd match {
           case AddTask(task, replyTo) =>
-            Effect.persist(Event.TaskAdded).thenReply(replyTo)(_ => Replies.TaskStarted)
+            Effect.persist(Event.TaskAdded(task)).thenReply(replyTo)(_ => Replies.TaskStarted)
         }
       override def applyEvent(evt: Event): State =
         evt match {
-          case Event.TaskAdded => Working
+          case Event.TaskAdded(task) => Working(task)
         }
     }
 
     /** Разработчик работает над задачей */
-    case object Working extends State {
+    case class Working(task: Task) extends State {
       override def applyCommand(cmd: Command): Effect[Event, State] = ???
       override def applyEvent(evt: Event): State = ???
     }
