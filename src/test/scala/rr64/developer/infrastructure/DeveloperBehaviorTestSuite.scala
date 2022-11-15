@@ -46,4 +46,15 @@ class DeveloperBehaviorTestSuite extends ScalaTestWithActorTestKit(EventSourcedB
     result.state shouldEqual State.Working
   }
 
+  /** По окончании выполнения задачи разработчик снова свободен */
+  "The developer" should "stop working when the task is done" in {
+    val difficulty = 30
+    val factor = 10
+    val time = difficulty * factor
+    val task = Task(difficulty)
+    val result = developerTestKit.runCommand(AddTask(task, _))
+    Thread.sleep(time) // TODO
+    developerTestKit.getState() shouldEqual State.Free
+  }
+
 }
