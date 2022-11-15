@@ -8,6 +8,7 @@ import org.scalatest.BeforeAndAfterEach
 import org.scalatest.flatspec.AnyFlatSpecLike
 import org.scalatest.matchers.should.Matchers
 import rr64.developer.domain.Task
+import rr64.developer.infrastructure.DeveloperBehavior.State.Working
 import rr64.developer.infrastructure.DeveloperBehavior._
 
 class DeveloperBehaviorTestSuite extends ScalaTestWithActorTestKit(EventSourcedBehaviorTestKit.config)
@@ -43,7 +44,8 @@ class DeveloperBehaviorTestSuite extends ScalaTestWithActorTestKit(EventSourcedB
     val result = developerTestKit.runCommand(AddTask(task, _))
     result.reply shouldEqual Replies.TaskStarted
     result.event shouldEqual Event.TaskAdded(task)
-    result.state shouldEqual State.Working(task)
+    val state = result.stateOfType[Working]
+    state.task shouldEqual task
   }
 
   /** По окончании выполнения задачи разработчик снова свободен */

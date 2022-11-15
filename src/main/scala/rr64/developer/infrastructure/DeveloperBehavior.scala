@@ -1,6 +1,7 @@
 package rr64.developer.infrastructure
 
-import akka.actor.typed.ActorRef
+import akka.actor.typed.scaladsl.{Behaviors, TimerScheduler}
+import akka.actor.typed.{ActorRef, Behavior}
 import akka.persistence.typed.PersistenceId
 import akka.persistence.typed.scaladsl.{Effect, EventSourcedBehavior}
 import rr64.developer.domain.Task
@@ -18,7 +19,7 @@ object DeveloperBehavior {
   }
 
   sealed trait State {
-    def applyCommand(cmd: Command): Effect[Event, State]
+    def applyCommand(cmd: Command)(implicit timer: TimerScheduler[Command]): Effect[Event, State]
     def applyEvent(evt: Event): State
   }
 
@@ -26,7 +27,7 @@ object DeveloperBehavior {
 
     /** Разработчик свободен */
     case object Free extends State {
-      override def applyCommand(cmd: Command): Effect[Event, State] =
+      override def applyCommand(cmd: Command)(implicit timer: TimerScheduler[Command]): Effect[Event, State] =
         cmd match {
           case AddTask(task, replyTo) =>
             Effect.persist(Event.TaskAdded(task)).thenReply(replyTo)(_ => Replies.TaskStarted)
@@ -39,7 +40,7 @@ object DeveloperBehavior {
 
     /** Разработчик работает над задачей */
     case class Working(task: Task) extends State {
-      override def applyCommand(cmd: Command): Effect[Event, State] = ???
+      override def applyCommand(cmd: Command)(implicit timer: TimerScheduler[Command]): Effect[Event, State] = ???
       override def applyEvent(evt: Event): State = ???
     }
 
@@ -52,12 +53,14 @@ object DeveloperBehavior {
     case object TaskStarted extends AddTaskResult
   }
 
-  def apply(persistenceId: PersistenceId): EventSourcedBehavior[Command, Event, State] =
-    EventSourcedBehavior[Command, Event, State](
-      persistenceId = persistenceId,
-      emptyState = State.Free,
-      commandHandler = (state, cmd) => state.applyCommand(cmd),
-      eventHandler = (state, evt) => state.applyEvent(evt)
-    )
+  def apply(persistenceId: PersistenceId): Behavior[Command] =
+    Behaviors.withTimers { implicit timer =>
+      EventSourcedBehavior[Command, Event, State](
+        persistenceId = persistenceId,
+        emptyState = State.Free,
+        commandHandler = (state, cmd) => state.applyCommand(cmd),
+        eventHandler = (state, evt) => state.applyEvent(evt)
+      )
+    }
 
 }
