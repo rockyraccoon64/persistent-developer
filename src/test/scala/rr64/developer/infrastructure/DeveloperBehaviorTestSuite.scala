@@ -3,6 +3,7 @@ package rr64.developer.infrastructure
 import akka.actor.testkit.typed.scaladsl.ScalaTestWithActorTestKit
 import akka.persistence.testkit.scaladsl.EventSourcedBehaviorTestKit
 import akka.persistence.testkit.scaladsl.EventSourcedBehaviorTestKit.SerializationSettings
+import akka.persistence.typed.PersistenceId
 import org.scalatest.BeforeAndAfterEach
 import org.scalatest.flatspec.AnyFlatSpecLike
 import org.scalatest.matchers.should.Matchers
@@ -21,7 +22,7 @@ class DeveloperBehaviorTestSuite extends ScalaTestWithActorTestKit(EventSourcedB
       DeveloperBehavior.State
     ](
       system = system,
-      behavior = DeveloperBehavior(),
+      behavior = DeveloperBehavior(PersistenceId.ofUniqueId("dev-test")),
       SerializationSettings.disabled
     )
 

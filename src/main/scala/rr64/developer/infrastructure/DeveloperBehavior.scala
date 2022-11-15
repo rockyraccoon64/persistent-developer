@@ -52,9 +52,9 @@ object DeveloperBehavior {
     case object TaskStarted extends AddTaskResult
   }
 
-  def apply(): EventSourcedBehavior[Command, Event, State] =
+  def apply(persistenceId: PersistenceId): EventSourcedBehavior[Command, Event, State] =
     EventSourcedBehavior[Command, Event, State](
-      persistenceId = PersistenceId.ofUniqueId("dev"),
+      persistenceId = persistenceId,
       emptyState = State.Free,
       commandHandler = (state, cmd) => state.applyCommand(cmd),
       eventHandler = (state, evt) => state.applyEvent(evt)
