@@ -24,19 +24,20 @@ object DeveloperBehavior {
 
   object State {
 
+    /** Разработчик свободен */
     case object Free extends State {
       override def applyCommand(cmd: Command): Effect[Event, State] =
         cmd match {
           case AddTask(task, replyTo) =>
             Effect.persist(Event.TaskAdded).thenReply(replyTo)(_ => Replies.TaskAdded)
         }
-
       override def applyEvent(evt: Event): State =
         evt match {
           case Event.TaskAdded => Working
         }
     }
 
+    /** Разработчик работает над задачей */
     case object Working extends State {
       override def applyCommand(cmd: Command): Effect[Event, State] = ???
       override def applyEvent(evt: Event): State = ???
@@ -45,7 +46,9 @@ object DeveloperBehavior {
   }
 
   object Replies {
+    /** Результат добавления задачи */
     sealed trait AddTaskResult
+    /** Задача принята в работу */
     case object TaskAdded extends AddTaskResult
   }
 
