@@ -50,7 +50,7 @@ class DeveloperBehaviorTestSuite extends ScalaTestWithActorTestKit(EventSourcedB
     val task = Task(5)
     val result = developerTestKit.runCommand(AddTask(task, _))
     result.reply shouldEqual Replies.TaskStarted
-    result.event shouldEqual Event.TaskAdded(task)
+    result.event shouldEqual Event.TaskStarted(task)
     val state = result.stateOfType[Working]
     state.task shouldEqual task
   }

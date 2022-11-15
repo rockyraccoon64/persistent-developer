@@ -18,7 +18,7 @@ object DeveloperBehavior {
   sealed trait Event
 
   case object Event {
-    case class TaskAdded(task: Task) extends Event
+    case class TaskStarted(task: Task) extends Event
     case class TaskFinished(task: Task) extends Event
   }
 
@@ -34,7 +34,7 @@ object DeveloperBehavior {
       override def applyCommand(cmd: Command)(implicit setup: Setup): Effect[Event, State] =
         cmd match {
           case AddTask(task, replyTo) =>
-            Effect.persist(Event.TaskAdded(task))
+            Effect.persist(Event.TaskStarted(task))
               .thenRun { _: State =>
                 val timeNeeded = task.difficulty * setup.timeFactor
                 val message = FinishTask(task)
@@ -44,7 +44,7 @@ object DeveloperBehavior {
         }
       override def applyEvent(evt: Event): State =
         evt match {
-          case Event.TaskAdded(task) => Working(task)
+          case Event.TaskStarted(task) => Working(task)
         }
     }
 
