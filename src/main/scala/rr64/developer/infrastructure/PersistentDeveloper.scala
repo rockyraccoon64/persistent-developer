@@ -5,7 +5,7 @@ import rr64.developer.domain.DeveloperState._
 
 class PersistentDeveloper extends Developer {
   override def state: DeveloperState = Free
-  override def addTask(task: Task): DeveloperReply = ???
+  override def addTask(task: Task): DeveloperReply = DeveloperReply.TaskAccepted
 }
 
 object PersistentDeveloper {
