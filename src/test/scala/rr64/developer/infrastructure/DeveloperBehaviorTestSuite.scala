@@ -2,10 +2,11 @@ package rr64.developer.infrastructure
 
 import akka.actor.testkit.typed.scaladsl.ScalaTestWithActorTestKit
 import akka.persistence.testkit.scaladsl.EventSourcedBehaviorTestKit
+import akka.persistence.testkit.scaladsl.EventSourcedBehaviorTestKit.SerializationSettings
 import org.scalatest.BeforeAndAfterEach
 import org.scalatest.flatspec.AnyFlatSpecLike
 import org.scalatest.matchers.should.Matchers
-import rr64.developer.domain.{DeveloperReply, Task}
+import rr64.developer.domain.Task
 import rr64.developer.infrastructure.DeveloperBehavior._
 
 class DeveloperBehaviorTestSuite extends ScalaTestWithActorTestKit(EventSourcedBehaviorTestKit.config)
@@ -20,7 +21,8 @@ class DeveloperBehaviorTestSuite extends ScalaTestWithActorTestKit(EventSourcedB
       DeveloperBehavior.State
     ](
       system = system,
-      behavior = DeveloperBehavior()
+      behavior = DeveloperBehavior(),
+      SerializationSettings.disabled
     )
 
   override protected def beforeEach(): Unit = {
@@ -37,8 +39,8 @@ class DeveloperBehaviorTestSuite extends ScalaTestWithActorTestKit(EventSourcedB
   /** Когда разработчик свободен, он принимает задачу */
   "The developer" should "accept the task he's given when he's free" in {
     val task = Task()
-    val result = eventSourcedTestKit.runCommand(AddTask(task))
-    result.reply shouldEqual DeveloperReply.TaskAccepted
+    val result = eventSourcedTestKit.runCommand(AddTask(task, _))
+    result.reply shouldEqual Replies.TaskAdded
   }
 
 }
