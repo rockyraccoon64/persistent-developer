@@ -29,7 +29,7 @@ object DeveloperBehavior {
       override def applyCommand(cmd: Command): Effect[Event, State] =
         cmd match {
           case AddTask(task, replyTo) =>
-            Effect.persist(Event.TaskAdded).thenReply(replyTo)(_ => Replies.TaskAdded)
+            Effect.persist(Event.TaskAdded).thenReply(replyTo)(_ => Replies.TaskStarted)
         }
       override def applyEvent(evt: Event): State =
         evt match {
@@ -49,7 +49,7 @@ object DeveloperBehavior {
     /** Результат добавления задачи */
     sealed trait AddTaskResult
     /** Задача принята в работу */
-    case object TaskAdded extends AddTaskResult
+    case object TaskStarted extends AddTaskResult
   }
 
   def apply(): EventSourcedBehavior[Command, Event, State] =
