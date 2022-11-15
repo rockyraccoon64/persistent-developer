@@ -43,4 +43,11 @@ class DeveloperBehaviorTestSuite extends ScalaTestWithActorTestKit(EventSourcedB
     result.reply shouldEqual Replies.TaskAdded
   }
 
+  /** Когда разработчик получает задачу, его состояние меняется на "Работает" */
+  "The developer" should "start working when he's given a task" in {
+    val task = Task()
+    val result = eventSourcedTestKit.runCommand(AddTask(task, _))
+    result.state shouldEqual State.Working
+  }
+
 }
