@@ -73,4 +73,20 @@ class DeveloperBehaviorTestSuite extends ScalaTestWithActorTestKit(EventSourcedB
     kit.getState() shouldEqual State.Free
   }
 
+  /** Завершив задачу, разработчик делает перерыв */
+  "The developer" should "rest after completing a task" in {
+    val difficulty = 50
+    val task = Task(difficulty)
+    val workTime = difficulty * timeFactor
+    val restingTime = difficulty * 100 // TODO Тоже в инициализацию Behavior
+
+    developerTestKit.runCommand(AddTask(task, _))
+
+    Thread.sleep(workTime + 100)
+    developerTestKit.getState() shouldEqual State.Resting
+
+    Thread.sleep(restingTime)
+    developerTestKit.getState() shouldEqual State.Free
+  }
+
 }
