@@ -6,6 +6,7 @@ import org.scalatest.BeforeAndAfterEach
 import org.scalatest.flatspec.AnyFlatSpecLike
 import org.scalatest.matchers.should.Matchers
 import rr64.developer.domain.{DeveloperReply, Task}
+import rr64.developer.infrastructure.DeveloperBehavior._
 
 class DeveloperBehaviorTestSuite extends ScalaTestWithActorTestKit(EventSourcedBehaviorTestKit.config)
   with AnyFlatSpecLike

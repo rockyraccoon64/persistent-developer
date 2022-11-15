@@ -2,10 +2,12 @@ package rr64.developer.infrastructure
 
 import akka.persistence.typed.PersistenceId
 import akka.persistence.typed.scaladsl.{Effect, EventSourcedBehavior}
+import rr64.developer.domain.Task
 
 object DeveloperBehavior {
 
   sealed trait Command
+  case class AddTask(task: Task) extends Command
 
   sealed trait Event
 
