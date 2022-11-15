@@ -12,12 +12,14 @@ object DeveloperBehavior {
   case class AddTask(task: Task, replyTo: ActorRef[AddTaskResult]) extends Command
 
   sealed trait Event
+
   case object Event {
     case object TaskAdded extends Event
   }
 
   sealed trait State {
     def applyCommand(cmd: Command): Effect[Event, State]
+    def applyEvent(evt: Event): State
   }
 
   object State {
@@ -28,10 +30,16 @@ object DeveloperBehavior {
           case AddTask(task, replyTo) =>
             Effect.persist(Event.TaskAdded).thenReply(replyTo)(_ => Replies.TaskAdded)
         }
+
+      override def applyEvent(evt: Event): State =
+        evt match {
+          case Event.TaskAdded => Working
+        }
     }
 
     case object Working extends State {
       override def applyCommand(cmd: Command): Effect[Event, State] = ???
+      override def applyEvent(evt: Event): State = ???
     }
 
   }
@@ -46,6 +54,7 @@ object DeveloperBehavior {
       persistenceId = PersistenceId.ofUniqueId("dev"),
       emptyState = State.Free,
       commandHandler = (state, cmd) => state.applyCommand(cmd),
-      eventHandler = (state, evt) => State.Working // TODO В State
+      eventHandler = (state, evt) => state.applyEvent(evt)
     )
+
 }
