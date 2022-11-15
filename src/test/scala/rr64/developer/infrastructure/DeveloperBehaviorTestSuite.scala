@@ -5,7 +5,6 @@ import akka.persistence.testkit.scaladsl.EventSourcedBehaviorTestKit
 import org.scalatest.BeforeAndAfterEach
 import org.scalatest.flatspec.AnyFlatSpecLike
 import org.scalatest.matchers.should.Matchers
-import rr64.developer.domain.DeveloperState
 
 class DeveloperBehaviorTestSuite extends ScalaTestWithActorTestKit(EventSourcedBehaviorTestKit.config)
   with AnyFlatSpecLike
@@ -30,7 +29,7 @@ class DeveloperBehaviorTestSuite extends ScalaTestWithActorTestKit(EventSourcedB
   /** Разработчик начинает в свободном состоянии */
   "The developer" should "start in a free state" in {
     val state = eventSourcedTestKit.getState()
-    state shouldEqual DeveloperState.Free
+    state shouldEqual DeveloperBehavior.Free
   }
 
 }
