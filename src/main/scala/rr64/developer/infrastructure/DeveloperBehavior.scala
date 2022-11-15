@@ -17,7 +17,13 @@ object DeveloperBehavior {
     def applyCommand(cmd: Command): Effect[Event, State]
   }
 
-  case object Free extends State {
+  case object State {
+    case object Working extends State {
+      override def applyCommand(cmd: Command): Effect[Event, State] = ???
+    }
+  }
+
+  case object Free extends State { // TODO Перенести в State
     override def applyCommand(cmd: Command): Effect[Event, State] =
       cmd match {
         case AddTask(task, replyTo) =>
