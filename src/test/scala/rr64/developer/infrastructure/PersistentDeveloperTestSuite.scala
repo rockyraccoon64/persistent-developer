@@ -6,13 +6,6 @@ import rr64.developer.domain._
 
 class PersistentDeveloperTestSuite extends AnyFlatSpec with Matchers {
 
-  /** Разработчик начинает в свободном состоянии */
-  "The developer" should "start in a free state" in {
-    val developer = PersistentDeveloper()
-    val state = developer.state
-    state shouldEqual DeveloperState.Free
-  }
-
   /** Когда разработчик свободен, он принимает задачу */
   "The developer" should "accept the task he's given when he's free" in {
     val developer = PersistentDeveloper()
