@@ -128,7 +128,8 @@ class DeveloperBehaviorTestSuite extends ScalaTestWithActorTestKit(EventSourcedB
     val newTask = Task(10)
     developerTestKit.initialize(Event.TaskStarted(currentTask))
     val result = addTask(developerTestKit, newTask)
-    result.reply shouldEqual TaskQueued(id)
+    val reply = result.replyOfType[Replies.TaskQueued]
+    reply.id should not be null
   }
 
   /** Когда разработчик работает над задачей,

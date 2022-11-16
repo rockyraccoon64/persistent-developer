@@ -96,6 +96,8 @@ object DeveloperBehavior {
     sealed trait AddTaskResult
     /** Задача принята в работу */
     case class TaskStarted(id: UUID) extends AddTaskResult
+    /** Задача поставлена в очередь */
+    case class TaskQueued(id: UUID) extends AddTaskResult
   }
 
   case class Setup(workFactor: Int, restFactor: Int, timer: TimerScheduler[Command])
