@@ -56,6 +56,9 @@ class DeveloperBehaviorTestSuite
   private val restFactor = 5
   private val developerTestKit = createTestKit("dev-test", workFactor, restFactor)
 
+  private def workTimeMs(difficulty: Int): Int = difficulty * workFactor
+  private def restTimeMs(difficulty: Int): Int = difficulty * restFactor
+
   override protected def beforeEach(): Unit = {
     super.beforeEach()
     developerTestKit.clear()
@@ -87,24 +90,21 @@ class DeveloperBehaviorTestSuite
 
   /** До выполнения задачи разработчик работает */
   "The developer" should "work until the task is done" in {
-    val workFactor = 100
-    val restFactor = 5
     val difficulty = 10
     val task = Task(difficulty)
-    val workTime = difficulty * workFactor
-    val kit = createTestKit("timer-test", workFactor, restFactor)
+    val workTime = workTimeMs(difficulty)
 
-    addTask(kit, task)
+    addTask(developerTestKit, task)
 
-    manualTime.timePasses((workTime - 5).millis)
+    manualTime.timePasses((workTime - 1).millis)
 
-    inside(kit.getState()) {
+    inside(developerTestKit.getState()) {
       case working: Working => working.task shouldEqual task
     }
 
-    manualTime.timePasses(10.millis)
+    manualTime.timePasses(1.millis)
 
-    kit.getState() should not be a [State.Working]
+    developerTestKit.getState() should not be a [State.Working]
   }
 
   /** Завершив задачу, разработчик делает перерыв */
