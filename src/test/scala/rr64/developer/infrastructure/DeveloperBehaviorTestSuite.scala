@@ -233,4 +233,6 @@ class DeveloperBehaviorTestSuite extends ScalaTestWithActorTestKit(EventSourcedB
     developerTestKit.getState() shouldBe a [State.Free]
   }
 
+  /** TODO Если разработчик отдыхает, новые задачи ставятся в очередь */
+
 }
