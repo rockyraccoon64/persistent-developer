@@ -13,6 +13,7 @@ libraryDependencies ++= Seq(
   slick,
   slickHikariCp,
   scalactic,
+  postgres,
   logback,
   akkaPersistenceTestkit % Test,
   scalatest % Test
