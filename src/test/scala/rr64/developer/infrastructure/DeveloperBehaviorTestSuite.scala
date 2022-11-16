@@ -218,7 +218,6 @@ class DeveloperBehaviorTestSuite
     val thirdTaskId = thirdTaskResult.replyOfType[TaskQueued].id
     val thirdTaskWithId = TaskWithId(thirdTask, thirdTaskId)
 
-
     val workTime = workTimeMs(firstTask.difficulty)
     val restTime = restTimeMs(firstTask.difficulty)
 
@@ -228,7 +227,7 @@ class DeveloperBehaviorTestSuite
     inside(developerTestKit.getState()) {
       case Working(currentTask, taskQueue) =>
         currentTask shouldEqual secondTaskWithId
-        taskQueue shouldEqual Seq(thirdTaskWithId)
+        taskQueue should contain theSameElementsInOrderAs Seq(thirdTaskWithId)
     }
   }
 
