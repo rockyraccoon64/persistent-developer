@@ -115,10 +115,20 @@ class DeveloperBehaviorTestSuite extends ScalaTestWithActorTestKit(EventSourcedB
     inside(developerTestKit.getState()) {
       case resting: State.Resting => resting.millis shouldEqual restingTime
     }
+  }
 
-    Thread.sleep(restingTime)
+  /** Перерыв длится строго отведённое время */
+  "The developer" should "only rest for a designated time period" in {
+    val difficulty = 50
+    val task = Task(difficulty)
+    val workTime = difficulty * workFactor
+    val restingTime = difficulty * restFactor
 
-    developerTestKit.getState() shouldBe a [State.Free]
+    addTask(developerTestKit, task)
+
+    Thread.sleep(workTime + restingTime + 100)
+
+    developerTestKit.getState() should not be a [State.Resting]
   }
 
   /** Когда разработчик работает над задачей,
