@@ -190,7 +190,8 @@ class DeveloperBehaviorTestSuite
     val thirdTaskId = thirdResult.replyOfType[TaskQueued].id
     val thirdTaskWithId = TaskWithId(thirdTask, thirdTaskId)
 
-    Thread.sleep(firstTask.difficulty * workFactor + 100)
+    manualTime.timePasses((firstTask.difficulty * workFactor).millis)
+
     val state = developerTestKit.getState()
 
     inside(state) {
