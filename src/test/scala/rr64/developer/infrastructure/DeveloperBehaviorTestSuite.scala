@@ -1,6 +1,6 @@
 package rr64.developer.infrastructure
 
-import akka.actor.testkit.typed.scaladsl.ScalaTestWithActorTestKit
+import akka.actor.testkit.typed.scaladsl.{ManualTime, ScalaTestWithActorTestKit}
 import akka.persistence.testkit.scaladsl.EventSourcedBehaviorTestKit
 import akka.persistence.testkit.scaladsl.EventSourcedBehaviorTestKit.SerializationSettings
 import akka.persistence.typed.PersistenceId
@@ -15,7 +15,11 @@ import rr64.developer.infrastructure.DeveloperBehavior._
 
 import java.util.UUID
 
-class DeveloperBehaviorTestSuite extends ScalaTestWithActorTestKit(EventSourcedBehaviorTestKit.config)
+class DeveloperBehaviorTestSuite
+  extends ScalaTestWithActorTestKit(
+    ManualTime.config
+      .withFallback(EventSourcedBehaviorTestKit.config)
+  )
   with AnyFlatSpecLike
   with BeforeAndAfterEach
   with Matchers {
