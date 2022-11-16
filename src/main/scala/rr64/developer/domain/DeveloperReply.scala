@@ -14,5 +14,9 @@ object DeveloperReply {
    * */
   case class TaskStarted(id: UUID) extends DeveloperReply
 
+  /**
+   * Задача поставлена в очередь
+   * @param id Идентификатор задачи
+   * */
   case class TaskQueued(id: UUID) extends DeveloperReply
 }
