@@ -13,7 +13,7 @@ object DeveloperBehavior {
 
   sealed trait Command
   case class AddTask(task: Task, replyTo: ActorRef[AddTaskResult]) extends Command
-  private case class FinishTask(task: Task) extends Command
+  private case object FinishTask extends Command
   private case object StopResting extends Command
 
   sealed trait Event
@@ -39,8 +39,7 @@ object DeveloperBehavior {
             Effect.persist(Event.TaskStarted(task))
               .thenRun { _: State =>
                 val timeNeeded = task.difficulty * setup.timeFactor
-                val message = FinishTask(task)
-                setup.timer.startSingleTimer(message, timeNeeded.millis) // TODO Не будет выполнено, если упадёт во время работы
+                setup.timer.startSingleTimer(FinishTask, timeNeeded.millis) // TODO Не будет выполнено, если упадёт во время работы
               }
               .thenReply(replyTo)(_ => Replies.TaskStarted)
         }
@@ -54,7 +53,7 @@ object DeveloperBehavior {
     case class Working(task: Task)(implicit setup: Setup) extends State {
       override def applyCommand(cmd: Command): Effect[Event, State] =
         cmd match {
-          case FinishTask(task) =>
+          case FinishTask =>
             Effect.persist(Event.TaskFinished)
               .thenRun {
                 case Resting(millis) => setup.timer.startSingleTimer(StopResting, millis.millis)
