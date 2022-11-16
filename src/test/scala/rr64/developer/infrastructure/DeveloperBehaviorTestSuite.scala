@@ -156,4 +156,25 @@ class DeveloperBehaviorTestSuite extends ScalaTestWithActorTestKit(EventSourcedB
     }
   }
 
+  /** После окончания работы над задачей очередь задач сохраняется */
+  "The task queue" should "remain the same when a task is finished" in {
+    val firstTask = Task(100)
+    val secondTask = Task(50)
+    val thirdTask = Task(25)
+
+    val firstResult = addTask(developerTestKit, firstTask)
+    val secondResult = addTask(developerTestKit, secondTask)
+    val thirdResult = addTask(developerTestKit, thirdTask)
+
+    Thread.sleep(firstTask.difficulty * workFactor + 100)
+    val state = developerTestKit.getState()
+
+    inside(state) {
+      case State.Resting(millis, taskQueue) =>
+      taskQueue.map(_.task) should have theSameElementsAs Seq(secondTask, thirdTask)
+    }
+  }
+
+  /** После отдыха берётся первая задача из очереди, если имеется */
+
 }
