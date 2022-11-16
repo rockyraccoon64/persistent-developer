@@ -5,5 +5,5 @@ import java.util.UUID
 sealed trait DeveloperReply
 
 object DeveloperReply {
-  case class TaskAccepted(id: UUID) extends DeveloperReply
+  case class TaskStarted(id: UUID) extends DeveloperReply
 }

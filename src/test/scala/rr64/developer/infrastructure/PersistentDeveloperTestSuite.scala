@@ -3,7 +3,7 @@ package rr64.developer.infrastructure
 import akka.actor.testkit.typed.scaladsl.ScalaTestWithActorTestKit
 import akka.actor.typed.Scheduler
 import akka.actor.typed.scaladsl.Behaviors
-import org.scalatest.flatspec.{AnyFlatSpecLike, AsyncFlatSpecLike}
+import org.scalatest.flatspec.AsyncFlatSpecLike
 import rr64.developer.domain.{DeveloperReply, Task}
 
 import java.util.UUID
@@ -42,7 +42,7 @@ class PersistentDeveloperTestSuite
     val task = Task(15)
     val replyFuture = dev.addTask(task)
 
-    replyFuture.map { _ shouldEqual DeveloperReply.TaskAccepted(id) }
+    replyFuture.map { _ shouldEqual DeveloperReply.TaskStarted(id) }
   }
 
 }

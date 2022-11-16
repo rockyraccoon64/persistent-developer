@@ -15,7 +15,7 @@ class PersistentDeveloper(ref: ActorRef[DeveloperBehavior.Command])
 
   override def addTask(task: Task)(implicit ec: ExecutionContext): Future[DeveloperReply] = {
     ref.ask(DeveloperBehavior.AddTask(task, _)).map {
-      case Replies.TaskStarted(id) => DeveloperReply.TaskAccepted(id)
+      case Replies.TaskStarted(id) => DeveloperReply.TaskStarted(id)
     }
   }
 
