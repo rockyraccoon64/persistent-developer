@@ -132,7 +132,19 @@ class DeveloperBehaviorTestSuite extends ScalaTestWithActorTestKit(EventSourcedB
     reply.id should not be null
   }
 
-  /** Когда разработчик работает над задачей,
-   * новая задача отправляется в очередь */
+  /** Когда разработчик работает над задачей, новые задачи отправляются в очередь */
+  "The developer" should "queue new tasks while working" in {
+    val firstTask = Task(100)
+    val secondTask = Task(50)
+    val thirdTask = Task(25)
+
+    val firstResult = addTask(developerTestKit, firstTask)
+    val secondResult = addTask(developerTestKit, secondTask)
+    val thirdResult = addTask(developerTestKit, thirdTask)
+
+    firstResult.stateOfType[State.Working].taskQueue shouldEqual Nil
+    secondResult.stateOfType[State.Working].taskQueue shouldEqual Seq(secondTask)
+    thirdResult.stateOfType[State.Working].taskQueue shouldEqual Seq(secondTask, thirdTask)
+  }
 
 }
