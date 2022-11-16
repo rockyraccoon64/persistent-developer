@@ -22,6 +22,7 @@ object Dependencies {
   val akkaPersistenceQuery: ModuleID = "com.typesafe.akka" %% "akka-persistence-query" % Versions.Akka
   val akkaPersistenceTestkit: ModuleID = "com.typesafe.akka" %% "akka-persistence-testkit" % Versions.Akka
   val akkaProjectionEventSourced: ModuleID = "com.lightbend.akka" %% "akka-projection-eventsourced" % Versions.AkkaProjection
+  val akkaProjectionTestkit: ModuleID = "com.lightbend.akka" %% "akka-projection-testkit" % Versions.AkkaProjection
 
   val slick: ModuleID = "com.typesafe.slick" %% "slick" % Versions.Slick
   val slickHikariCp: ModuleID = "com.typesafe.slick" %% "slick-hikaricp" % Versions.Slick
