@@ -239,7 +239,8 @@ class DeveloperBehaviorTestSuite
 
     addTask(developerTestKit, task)
 
-    Thread.sleep(workTime + restingTime + 100)
+    manualTime.timePasses(workTime.millis)
+    manualTime.timePasses(restingTime.millis)
 
     developerTestKit.getState() shouldBe a [State.Free]
   }
