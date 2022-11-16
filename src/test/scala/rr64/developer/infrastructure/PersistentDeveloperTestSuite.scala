@@ -30,6 +30,9 @@ class PersistentDeveloperTestSuite
     testKit.spawn(mockBehavior)
   }
 
+  private def mockProvider(stateResult: DeveloperState): DeveloperStateProvider =
+    (_: ExecutionContext) => Future.successful(stateResult)
+
   private def createDeveloper(
     developerRef: ActorRef[DeveloperBehavior.Command] = emptyRef,
     provider: DeveloperStateProvider = emptyProvider
@@ -84,14 +87,8 @@ class PersistentDeveloperTestSuite
     val working = DeveloperState.Working
     val free = DeveloperState.Free
 
-    val provider1 = new DeveloperStateProvider {
-      override def state(implicit ec: ExecutionContext): Future[DeveloperState] =
-        Future.successful(working)
-    }
-    val provider2 = new DeveloperStateProvider {
-      override def state(implicit ec: ExecutionContext): Future[DeveloperState] =
-        Future.successful(free)
-    }
+    val provider1 = mockProvider(working)
+    val provider2 = mockProvider(free)
     val dev1 = createDeveloper(provider = provider1)
     val dev2 = createDeveloper(provider = provider2)
 
