@@ -31,7 +31,7 @@ class DeveloperBehaviorTestSuite
     DeveloperBehavior.State
   ]
 
-  def createTestKit(
+  private def createTestKit(
     persistenceId: String,
     workFactor: Int,
     restFactor: Int
