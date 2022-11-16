@@ -183,9 +183,15 @@ class DeveloperBehaviorTestSuite extends ScalaTestWithActorTestKit(EventSourcedB
     val thirdTask = Task(25)
 
     addTask(developerTestKit, firstTask)
+
     val secondTaskResult = addTask(developerTestKit, secondTask)
     val secondTaskId = secondTaskResult.replyOfType[TaskQueued].id
-    addTask(developerTestKit, thirdTask)
+    val secondTaskWithId = TaskWithId(secondTask, secondTaskId)
+
+    val thirdTaskResult = addTask(developerTestKit, thirdTask)
+    val thirdTaskId = thirdTaskResult.replyOfType[TaskQueued].id
+    val thirdTaskWithId = TaskWithId(thirdTask, thirdTaskId)
+
 
     val workTime = firstTask.difficulty * workFactor
     val restTime = firstTask.difficulty * restFactor
@@ -193,8 +199,8 @@ class DeveloperBehaviorTestSuite extends ScalaTestWithActorTestKit(EventSourcedB
 
     inside(developerTestKit.getState()) {
       case Working(currentTask, taskQueue) =>
-        currentTask shouldEqual TaskWithId(secondTask, secondTaskId)
-        taskQueue.map(_.task) shouldEqual Seq(thirdTask)
+        currentTask shouldEqual secondTaskWithId
+        taskQueue shouldEqual Seq(thirdTaskWithId)
     }
   }
 
