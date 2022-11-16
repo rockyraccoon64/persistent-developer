@@ -35,6 +35,7 @@ object DeveloperBehavior {
 
     /** Разработчик свободен */
     case class Free()(implicit setup: Setup) extends State {
+
       override def applyCommand(cmd: Command): Effect[Event, State] =
         cmd match {
           case AddTask(task, replyTo) =>
@@ -45,16 +46,21 @@ object DeveloperBehavior {
                 setup.timer.startSingleTimer(FinishTask(taskWithId.id), timeNeeded.millis) // TODO Не будет выполнено, если упадёт во время работы
               }
               .thenReply(replyTo)(_ => Replies.TaskStarted(taskWithId.id))
+          case _ =>
+            Effect.unhandled
         }
+
       override def applyEvent(evt: Event): State =
         evt match {
           case Event.TaskStarted(taskWithId) => Working(taskWithId, Nil)
         }
+
     }
 
     /** Разработчик работает над задачей */
     case class Working(currentTask: TaskWithId, taskQueue: Seq[TaskWithId])
       (implicit setup: Setup) extends State {
+
       override def applyCommand(cmd: Command): Effect[Event, State] =
         cmd match {
           case FinishTask(id) if id == currentTask.id =>
@@ -63,30 +69,41 @@ object DeveloperBehavior {
                 case Resting(millis, _) => setup.timer.startSingleTimer(StopResting, millis.millis)
                 case _ =>
               }
+
           case AddTask(task, replyTo) =>
             val taskWithId = createTaskWithId(task)
             Effect.persist(Event.TaskQueued(taskWithId))
               .thenReply(replyTo)(_ => Replies.TaskQueued(taskWithId.id))
-          case _ => Effect.stash
+
+          case _ =>
+            Effect.unhandled
         }
+
       override def applyEvent(evt: Event): State =
         evt match {
           case Event.TaskFinished => Resting(currentTask.task.difficulty * setup.restFactor, taskQueue)
           case Event.TaskQueued(newTask) => Working(currentTask, taskQueue :+ newTask)
         }
+
     }
 
     /** Разработчик отдыхает */
-    case class Resting(millis: Int, taskQueue: Seq[TaskWithId])(implicit setup: Setup) extends State {
+    case class Resting(millis: Int, taskQueue: Seq[TaskWithId])
+        (implicit setup: Setup) extends State {
+
       override def applyCommand(cmd: Command): Effect[Event, State] =
         cmd match {
           case StopResting => Effect.persist(Event.Rested)
+
           case AddTask(task, replyTo) =>
             val taskWithId = createTaskWithId(task)
             Effect.persist(Event.TaskQueued(taskWithId))
               .thenReply(replyTo)(_ => Replies.TaskQueued(taskWithId.id))
-          case _ => Effect.unhandled
+
+          case _ =>
+            Effect.unhandled
         }
+
       override def applyEvent(evt: Event): State =
         evt match {
           case Event.Rested =>
@@ -94,9 +111,11 @@ object DeveloperBehavior {
               case head :: tail => Working(head, tail)
               case Nil => State.Free()
             }
+
           case Event.TaskQueued(newTask) =>
             Resting(millis, taskQueue :+ newTask)
         }
+
     }
 
     implicit class WorkingOps(working: Working) {
