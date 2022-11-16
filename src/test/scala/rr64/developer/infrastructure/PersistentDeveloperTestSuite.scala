@@ -26,7 +26,7 @@ class PersistentDeveloperTestSuite
   private val emptyRef = testKit.spawn(Behaviors.empty[Command])
 
   private def mockDeveloperRef(
-    receive: DeveloperBehavior.Command => Behavior[Command]
+    receive: Command => Behavior[Command]
   ): DeveloperRef = {
     val mockBehavior = Behaviors.receiveMessage(receive)
     testKit.spawn(mockBehavior)
