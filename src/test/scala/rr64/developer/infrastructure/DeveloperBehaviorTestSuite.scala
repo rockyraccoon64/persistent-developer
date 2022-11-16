@@ -258,11 +258,8 @@ class DeveloperBehaviorTestSuite
 
     developerTestKit.getState() shouldBe a [State.Resting]
 
-    val task1 = Task(10)
-    val taskWithId1 = queueTask(task1)
-
-    val task2 = Task(5)
-    val taskWithId2 = queueTask(task2)
+    val taskWithId1 = queueTask(Task(10))
+    val taskWithId2 = queueTask(Task(5))
 
     inside(developerTestKit.getState()) {
       case resting: State.Resting =>
