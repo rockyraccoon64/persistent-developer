@@ -111,8 +111,8 @@ class DeveloperBehaviorTestSuite
   "The developer" should "rest after completing a task" in {
     val difficulty = 50
     val task = Task(difficulty)
-    val workTime = difficulty * workFactor
-    val restingTime = difficulty * restFactor
+    val workTime = workTimeMs(difficulty)
+    val restingTime = restTimeMs(difficulty)
 
     addTask(developerTestKit, task)
 
@@ -128,8 +128,8 @@ class DeveloperBehaviorTestSuite
   "The developer" should "only rest for a designated time period" in {
     val difficulty = 50
     val task = Task(difficulty)
-    val workTime = difficulty * workFactor // TODO Устранить дублирование
-    val restingTime = difficulty * restFactor
+    val workTime = workTimeMs(difficulty)
+    val restingTime = restTimeMs(difficulty)
 
     addTask(developerTestKit, task)
 
@@ -190,7 +190,9 @@ class DeveloperBehaviorTestSuite
     val thirdTaskId = thirdResult.replyOfType[TaskQueued].id
     val thirdTaskWithId = TaskWithId(thirdTask, thirdTaskId)
 
-    manualTime.timePasses((firstTask.difficulty * workFactor).millis)
+    val workTime = workTimeMs(firstTask.difficulty)
+
+    manualTime.timePasses(workTime.millis)
 
     val state = developerTestKit.getState()
 
@@ -217,8 +219,8 @@ class DeveloperBehaviorTestSuite
     val thirdTaskWithId = TaskWithId(thirdTask, thirdTaskId)
 
 
-    val workTime = firstTask.difficulty * workFactor
-    val restTime = firstTask.difficulty * restFactor
+    val workTime = workTimeMs(firstTask.difficulty)
+    val restTime = restTimeMs(firstTask.difficulty)
 
     manualTime.timePasses(workTime.millis)
     manualTime.timePasses(restTime.millis)
@@ -234,8 +236,8 @@ class DeveloperBehaviorTestSuite
   "The developer" should "be free after resting if there are no more tasks in the queue" in {
     val difficulty = 50
     val task = Task(difficulty)
-    val workTime = difficulty * workFactor
-    val restingTime = difficulty * restFactor
+    val workTime = workTimeMs(difficulty)
+    val restingTime = restTimeMs(difficulty)
 
     addTask(developerTestKit, task)
 
