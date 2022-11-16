@@ -14,6 +14,7 @@ import rr64.developer.infrastructure.DeveloperBehavior.State.Working
 import rr64.developer.infrastructure.DeveloperBehavior._
 
 import java.util.UUID
+import scala.concurrent.duration.DurationInt
 
 class DeveloperBehaviorTestSuite
   extends ScalaTestWithActorTestKit(
@@ -48,6 +49,8 @@ class DeveloperBehaviorTestSuite
 
   private def addTask(kit: Kit, task: Task) =
     kit.runCommand(AddTask(task, _))
+
+  private val manualTime = ManualTime()
 
   private val workFactor = 10
   private val restFactor = 5
@@ -88,19 +91,18 @@ class DeveloperBehaviorTestSuite
     val restFactor = 5
     val difficulty = 10
     val task = Task(difficulty)
-    val firstCheckMs = 750
-    val secondCheckMs = 500
+    val workTime = difficulty * workFactor
     val kit = createTestKit("timer-test", workFactor, restFactor)
 
     addTask(kit, task)
 
-    Thread.sleep(firstCheckMs)
+    manualTime.timePasses((workTime - 5).millis)
 
     inside(kit.getState()) {
       case working: Working => working.task shouldEqual task
     }
 
-    Thread.sleep(secondCheckMs)
+    manualTime.timePasses(10.millis)
 
     kit.getState() should not be a [State.Working]
   }
