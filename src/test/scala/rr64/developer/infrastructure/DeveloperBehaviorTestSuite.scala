@@ -85,7 +85,7 @@ class DeveloperBehaviorTestSuite
     result.stateOfType[Working].taskId shouldEqual reply.id
   }
 
-  /** До выполнения задачи разработчик работает, по окончании снова свободен */
+  /** До выполнения задачи разработчик работает */
   "The developer" should "work until the task is done" in {
     val workFactor = 100
     val restFactor = 5
@@ -116,10 +116,11 @@ class DeveloperBehaviorTestSuite
 
     addTask(developerTestKit, task)
 
-    Thread.sleep(workTime + 100)
+    manualTime.timePasses(workTime.millis)
 
     inside(developerTestKit.getState()) {
-      case resting: State.Resting => resting.millis shouldEqual restingTime
+      case resting: State.Resting =>
+        resting.millis shouldEqual restingTime
     }
   }
 
