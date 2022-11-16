@@ -210,5 +210,17 @@ class DeveloperBehaviorTestSuite extends ScalaTestWithActorTestKit(EventSourcedB
   }
 
   /** Если задач в очереди нет, после отдыха разработчик возвращается в свободное состояние */
+  "The developer" should "be free after resting if there are no more tasks in the queue" in {
+    val difficulty = 50
+    val task = Task(difficulty)
+    val workTime = difficulty * workFactor
+    val restingTime = difficulty * restFactor
+
+    addTask(developerTestKit, task)
+
+    Thread.sleep(workTime + restingTime + 100)
+
+    developerTestKit.getState() shouldBe a [State.Free]
+  }
 
 }
