@@ -70,7 +70,7 @@ class DeveloperBehaviorTestSuite extends ScalaTestWithActorTestKit(EventSourcedB
     kit.getState() shouldEqual State.Working(task)
 
     Thread.sleep(secondCheckMs)
-    kit.getState() shouldEqual State.Free
+    kit.getState() should not equal State.Working(task)
   }
 
   /** Завершив задачу, разработчик делает перерыв */
@@ -83,7 +83,7 @@ class DeveloperBehaviorTestSuite extends ScalaTestWithActorTestKit(EventSourcedB
     developerTestKit.runCommand(AddTask(task, _))
 
     Thread.sleep(workTime + 100)
-    developerTestKit.getState() shouldEqual State.Resting
+    developerTestKit.getState() shouldEqual State.Resting(restingTime)
 
     Thread.sleep(restingTime)
     developerTestKit.getState() shouldEqual State.Free

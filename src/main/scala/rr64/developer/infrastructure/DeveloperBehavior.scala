@@ -20,7 +20,7 @@ object DeveloperBehavior {
 
   case object Event {
     case class TaskStarted(task: Task) extends Event
-    case class TaskFinished(task: Task) extends Event
+    case class TaskFinished(task: Task) extends Event // TODO Удалить task
     case object Rested extends Event
   }
 
@@ -40,7 +40,7 @@ object DeveloperBehavior {
               .thenRun { _: State =>
                 val timeNeeded = task.difficulty * setup.timeFactor
                 val message = FinishTask(task)
-                setup.timer.startSingleTimer(message, timeNeeded.millis)
+                setup.timer.startSingleTimer(message, timeNeeded.millis) // TODO Не будет выполнено, если упадёт во время работы
               }
               .thenReply(replyTo)(_ => Replies.TaskStarted)
         }
@@ -56,15 +56,19 @@ object DeveloperBehavior {
         cmd match {
           case FinishTask(task) =>
             Effect.persist(Event.TaskFinished(task))
+              .thenRun {
+                case Resting(millis) => setup.timer.startSingleTimer(StopResting, millis.millis)
+                case _ =>
+              }
           case _ => Effect.stash
         }
       override def applyEvent(evt: Event): State =
         evt match {
-          case Event.TaskFinished(_) => Free
+          case Event.TaskFinished(task) => Resting(task.difficulty * 100)
         }
     }
 
-    case object Resting extends State {
+    case class Resting(millis: Int) extends State {
       override def applyCommand(cmd: Command)(implicit setup: Setup): Effect[Event, State] =
         cmd match {
           case StopResting => Effect.persist(Event.Rested)
