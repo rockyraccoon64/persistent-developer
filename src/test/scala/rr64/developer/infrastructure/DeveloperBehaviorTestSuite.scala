@@ -47,14 +47,20 @@ class DeveloperBehaviorTestSuite
     )
   }
 
-  private def addTask(kit: Kit, task: Task) = // TODO Значение по умолчанию
-    kit.runCommand(AddTask(task, _))
-
   private val manualTime = ManualTime()
 
   private val workFactor = 10
   private val restFactor = 5
   private val developerTestKit = createTestKit("dev-test", workFactor, restFactor)
+
+  private def addTask(kit: Kit, task: Task) = // TODO Значение по умолчанию
+    kit.runCommand(AddTask(task, _))
+
+  private def queueTask(task: Task, kit: Kit = developerTestKit): TaskWithId = {
+    val result = addTask(kit, task)
+    val id = result.replyOfType[TaskQueued].id
+    TaskWithId(task, id)
+  }
 
   private def workTimeMs(difficulty: Int): Int = difficulty * workFactor
   private def restTimeMs(difficulty: Int): Int = difficulty * restFactor
@@ -253,12 +259,6 @@ class DeveloperBehaviorTestSuite
       case resting: State.Resting =>
         resting.taskQueue should contain theSameElementsInOrderAs Seq(taskWithId1, taskWithId2)
     }
-  }
-
-  private def queueTask(task: Task, kit: Kit = developerTestKit): TaskWithId = {
-    val result = addTask(kit, task)
-    val id = result.replyOfType[TaskQueued].id
-    TaskWithId(task, id)
   }
 
 }
