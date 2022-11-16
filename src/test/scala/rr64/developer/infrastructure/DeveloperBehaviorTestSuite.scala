@@ -182,23 +182,17 @@ class DeveloperBehaviorTestSuite
     val thirdTask = Task(25)
 
     addTask(developerTestKit, firstTask)
-    val secondResult = addTask(developerTestKit, secondTask)
-    val secondTaskId = secondResult.replyOfType[TaskQueued].id
-    val secondTaskWithId = TaskWithId(secondTask, secondTaskId)
 
-    val thirdResult = addTask(developerTestKit, thirdTask)
-    val thirdTaskId = thirdResult.replyOfType[TaskQueued].id
-    val thirdTaskWithId = TaskWithId(thirdTask, thirdTaskId)
+    val secondTaskWithId = queueTask(secondTask)
+    val thirdTaskWithId = queueTask(thirdTask)
 
     val workTime = workTimeMs(firstTask.difficulty)
 
     manualTime.timePasses(workTime.millis)
 
-    val state = developerTestKit.getState()
-
-    inside(state) {
+    inside(developerTestKit.getState()) {
       case State.Resting(_, taskQueue) =>
-        taskQueue shouldEqual Seq(secondTaskWithId, thirdTaskWithId)
+        taskQueue should contain theSameElementsInOrderAs Seq(secondTaskWithId, thirdTaskWithId)
     }
   }
 
