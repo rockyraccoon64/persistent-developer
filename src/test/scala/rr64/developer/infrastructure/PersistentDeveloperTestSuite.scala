@@ -1,12 +1,15 @@
 package rr64.developer.infrastructure
 
 import akka.actor.testkit.typed.scaladsl.ScalaTestWithActorTestKit
+import akka.actor.typed.Scheduler
 import org.scalatest.flatspec.AnyFlatSpecLike
 import rr64.developer.domain.Task
 
 class PersistentDeveloperTestSuite
   extends ScalaTestWithActorTestKit
     with AnyFlatSpecLike {
+
+  private implicit val scheduler: Scheduler = testKit.system.scheduler
 
   /** Команды должны перенаправляться персистентному актору */
   "Commands" should "be redirected to the persistent actor" in {
