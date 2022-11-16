@@ -9,6 +9,7 @@ import org.scalatest.Inside.inside
 import org.scalatest.flatspec.AnyFlatSpecLike
 import org.scalatest.matchers.should.Matchers
 import rr64.developer.domain.Task
+import rr64.developer.infrastructure.DeveloperBehavior.Replies.TaskQueued
 import rr64.developer.infrastructure.DeveloperBehavior.State.Working
 import rr64.developer.infrastructure.DeveloperBehavior._
 
@@ -176,5 +177,27 @@ class DeveloperBehaviorTestSuite extends ScalaTestWithActorTestKit(EventSourcedB
   }
 
   /** После отдыха берётся первая задача из очереди, если имеется */
+  "The developer" should "take the first task from the queue when he's finished resting" in {
+    val firstTask = Task(100)
+    val secondTask = Task(90)
+    val thirdTask = Task(25)
+
+    addTask(developerTestKit, firstTask)
+    val secondTaskResult = addTask(developerTestKit, secondTask)
+    val secondTaskId = secondTaskResult.replyOfType[TaskQueued].id
+    addTask(developerTestKit, thirdTask)
+
+    val workTime = firstTask.difficulty * workFactor
+    val restTime = firstTask.difficulty * restFactor
+    Thread.sleep(workTime + restTime + 100)
+
+    inside(developerTestKit.getState()) {
+      case Working(currentTask, taskQueue) =>
+        currentTask shouldEqual TaskWithId(secondTask, secondTaskId)
+        taskQueue shouldEqual Seq(thirdTask)
+    }
+  }
+
+  /** Если задач в очереди нет, после отдыха разработчик возвращается в свободное состояние */
 
 }
