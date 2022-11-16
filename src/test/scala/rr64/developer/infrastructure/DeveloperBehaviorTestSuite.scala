@@ -26,7 +26,7 @@ class DeveloperBehaviorTestSuite extends ScalaTestWithActorTestKit(EventSourcedB
     DeveloperBehavior.State
   ]
 
-  def testKit(
+  def createTestKit(
     persistenceId: String,
     workFactor: Int,
     restFactor: Int
@@ -47,7 +47,7 @@ class DeveloperBehaviorTestSuite extends ScalaTestWithActorTestKit(EventSourcedB
 
   private val workFactor = 10
   private val restFactor = 5
-  private val developerTestKit = testKit("dev-test", workFactor, restFactor)
+  private val developerTestKit = createTestKit("dev-test", workFactor, restFactor)
 
   override protected def beforeEach(): Unit = {
     super.beforeEach()
@@ -86,7 +86,7 @@ class DeveloperBehaviorTestSuite extends ScalaTestWithActorTestKit(EventSourcedB
     val task = Task(difficulty)
     val firstCheckMs = 750
     val secondCheckMs = 500
-    val kit = testKit("timer-test", workFactor, restFactor)
+    val kit = createTestKit("timer-test", workFactor, restFactor)
 
     addTask(kit, task)
 
