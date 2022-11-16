@@ -2,9 +2,11 @@ package rr64.developer.infrastructure
 
 import akka.actor.testkit.typed.scaladsl.ScalaTestWithActorTestKit
 import akka.actor.typed.scaladsl.Behaviors
-import akka.actor.typed.{ActorRef, Behavior, Scheduler}
+import akka.actor.typed.{Behavior, Scheduler}
 import org.scalatest.flatspec.AsyncFlatSpecLike
 import rr64.developer.domain.{DeveloperReply, DeveloperState, Task}
+import rr64.developer.infrastructure.DeveloperBehavior.Command
+import rr64.developer.infrastructure.PersistentDeveloper.DeveloperRef
 
 import java.util.UUID
 import scala.concurrent.{ExecutionContext, Future}
@@ -12,9 +14,6 @@ import scala.concurrent.{ExecutionContext, Future}
 class PersistentDeveloperTestSuite
   extends ScalaTestWithActorTestKit
     with AsyncFlatSpecLike {
-  
-  private type Command = DeveloperBehavior.Command
-  private type DeveloperRef = ActorRef[Command]
 
   private implicit val ec: ExecutionContext = testKit.system.executionContext
   private implicit val scheduler: Scheduler = testKit.system.scheduler
