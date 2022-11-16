@@ -12,7 +12,7 @@ import scala.concurrent.{ExecutionContext, Future}
  * Реализация поведения разработчика на основе Akka Persistence
  */
 class PersistentDeveloper(
-  ref: ActorRef[DeveloperBehavior.Command],
+  developerRef: ActorRef[DeveloperBehavior.Command],
   stateProvider: DeveloperStateProvider
 )(implicit timeout: Timeout, scheduler: Scheduler) extends Developer {
 
@@ -23,7 +23,7 @@ class PersistentDeveloper(
   /** Поручить разработчику задачу */
   override def addTask(task: Task)
       (implicit ec: ExecutionContext): Future[DeveloperReply] = {
-    ref.ask(DeveloperBehavior.AddTask(task, _)).map {
+    developerRef.ask(DeveloperBehavior.AddTask(task, _)).map {
       case Replies.TaskStarted(id) => DeveloperReply.TaskStarted(id)
       case Replies.TaskQueued(id) => DeveloperReply.TaskQueued(id)
     }
@@ -32,7 +32,7 @@ class PersistentDeveloper(
 }
 
 object PersistentDeveloper {
-  def apply(ref: ActorRef[DeveloperBehavior.Command], stateProvider: DeveloperStateProvider)
+  def apply(developerRef: ActorRef[DeveloperBehavior.Command], stateProvider: DeveloperStateProvider)
     (implicit timeout: Timeout, scheduler: Scheduler): PersistentDeveloper =
-  new PersistentDeveloper(ref, stateProvider)
+  new PersistentDeveloper(developerRef, stateProvider)
 }
