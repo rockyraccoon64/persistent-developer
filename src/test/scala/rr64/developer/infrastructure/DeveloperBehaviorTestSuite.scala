@@ -128,12 +128,13 @@ class DeveloperBehaviorTestSuite
   "The developer" should "only rest for a designated time period" in {
     val difficulty = 50
     val task = Task(difficulty)
-    val workTime = difficulty * workFactor
+    val workTime = difficulty * workFactor // TODO Устранить дублирование
     val restingTime = difficulty * restFactor
 
     addTask(developerTestKit, task)
 
-    Thread.sleep(workTime + restingTime + 100)
+    manualTime.timePasses(workTime.millis)
+    manualTime.timePasses(restingTime.millis)
 
     developerTestKit.getState() should not be a [State.Resting]
   }
