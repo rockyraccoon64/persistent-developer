@@ -48,12 +48,13 @@ object DeveloperBehavior {
         }
       override def applyEvent(evt: Event): State =
         evt match {
-          case Event.TaskStarted(taskWithId) => Working(taskWithId)
+          case Event.TaskStarted(taskWithId) => Working(taskWithId, Nil)
         }
     }
 
     /** Разработчик работает над задачей */
-    case class Working(taskWithId: TaskWithId)(implicit setup: Setup) extends State {
+    case class Working(taskWithId: TaskWithId, taskQueue: Seq[TaskWithId])
+      (implicit setup: Setup) extends State {
       override def applyCommand(cmd: Command): Effect[Event, State] =
         cmd match {
           case FinishTask => // TODO ID в FinishTask
