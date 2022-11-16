@@ -21,6 +21,7 @@ object DeveloperBehavior {
   case object Event {
     case class TaskStarted(task: Task) extends Event
     case class TaskFinished(task: Task) extends Event
+    case object Rested extends Event
   }
 
   sealed trait State {
@@ -66,11 +67,14 @@ object DeveloperBehavior {
     case object Resting extends State {
       override def applyCommand(cmd: Command)(implicit setup: Setup): Effect[Event, State] =
         cmd match {
-          case AddTask(task, replyTo) => Effect.stash()// TODO reply
-          case StopResting => Effect.none // TODO Free
+          case StopResting => Effect.persist(Event.Rested)
+          case AddTask(task, replyTo) => Effect.stash() // TODO reply
           case _ => Effect.unhandled
         }
-      override def applyEvent(evt: Event): State = ???
+      override def applyEvent(evt: Event): State =
+        evt match {
+          case Event.Rested => State.Free
+        }
     }
 
   }
