@@ -16,7 +16,11 @@ class DeveloperBehaviorTestSuite extends ScalaTestWithActorTestKit(EventSourcedB
   with BeforeAndAfterEach
   with Matchers {
 
-  def testKit(persistenceId: String, timeFactor: Int): EventSourcedBehaviorTestKit[
+  def testKit(
+    persistenceId: String,
+    timeFactor: Int,
+    restFactor: Int
+  ): EventSourcedBehaviorTestKit[
     DeveloperBehavior.Command,
     DeveloperBehavior.Event,
     DeveloperBehavior.State
@@ -25,14 +29,16 @@ class DeveloperBehaviorTestSuite extends ScalaTestWithActorTestKit(EventSourcedB
       system = system,
       behavior = DeveloperBehavior(
         persistenceId = PersistenceId.ofUniqueId(persistenceId),
-        timeFactor = timeFactor
+        timeFactor = timeFactor,
+        restFactor = restFactor
       ),
       SerializationSettings.disabled
     )
   }
 
   private val timeFactor = 10
-  private val developerTestKit = testKit("dev-test", timeFactor)
+  private val restFactor = 5
+  private val developerTestKit = testKit("dev-test", timeFactor, restFactor)
 
   override protected def beforeEach(): Unit = {
     super.beforeEach()
@@ -57,12 +63,13 @@ class DeveloperBehaviorTestSuite extends ScalaTestWithActorTestKit(EventSourcedB
 
   /** До выполнения задачи разработчик работает, по окончании снова свободен */
   "The developer" should "work until the task is done" in {
-    val factor = 100
+    val workFactor = 100
+    val restFactor = 5
     val difficulty = 10
     val task = Task(difficulty)
     val firstCheckMs = 750
     val secondCheckMs = 500
-    val kit = testKit("timer-test", factor)
+    val kit = testKit("timer-test", workFactor, restFactor)
 
     kit.runCommand(AddTask(task, _))
 

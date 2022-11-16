@@ -91,11 +91,11 @@ object DeveloperBehavior {
     case object TaskStarted extends AddTaskResult
   }
 
-  case class Setup(timeFactor: Int, timer: TimerScheduler[Command])
+  case class Setup(timeFactor: Int, restFactor: Int, timer: TimerScheduler[Command])
 
-  def apply(persistenceId: PersistenceId, timeFactor: Int): Behavior[Command] =
+  def apply(persistenceId: PersistenceId, timeFactor: Int, restFactor: Int): Behavior[Command] =
     Behaviors.withTimers { timer =>
-      implicit val setup: Setup = Setup(timeFactor, timer)
+      implicit val setup: Setup = Setup(timeFactor, restFactor, timer)
       EventSourcedBehavior[Command, Event, State](
         persistenceId = persistenceId,
         emptyState = State.Free,
