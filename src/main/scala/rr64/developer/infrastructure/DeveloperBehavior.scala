@@ -20,7 +20,7 @@ object DeveloperBehavior {
   sealed trait Event
 
   case object Event {
-    case class TaskStarted(task: Task) extends Event
+    case class TaskStarted(taskWithId: TaskWithId) extends Event
     case object TaskFinished extends Event
     case object Rested extends Event
   }
@@ -39,7 +39,7 @@ object DeveloperBehavior {
           case AddTask(task, replyTo) =>
             val id = UUID.randomUUID()
             val taskWithId = TaskWithId(task, id)
-            Effect.persist(Event.TaskStarted(task))
+            Effect.persist(Event.TaskStarted(taskWithId))
               .thenRun { _: State =>
                 val timeNeeded = task.difficulty * setup.timeFactor
                 setup.timer.startSingleTimer(FinishTask, timeNeeded.millis) // TODO Не будет выполнено, если упадёт во время работы
@@ -48,12 +48,12 @@ object DeveloperBehavior {
         }
       override def applyEvent(evt: Event): State =
         evt match {
-          case Event.TaskStarted(task) => Working(task)
+          case Event.TaskStarted(taskWithId) => Working(taskWithId)
         }
     }
 
     /** Разработчик работает над задачей */
-    case class Working(task: Task)(implicit setup: Setup) extends State {
+    case class Working(taskWithId: TaskWithId)(implicit setup: Setup) extends State {
       override def applyCommand(cmd: Command): Effect[Event, State] =
         cmd match {
           case FinishTask =>
@@ -66,7 +66,7 @@ object DeveloperBehavior {
         }
       override def applyEvent(evt: Event): State =
         evt match {
-          case Event.TaskFinished => Resting(task.difficulty * setup.restFactor)
+          case Event.TaskFinished => Resting(taskWithId.task.difficulty * setup.restFactor)
         }
     }
 
@@ -82,6 +82,10 @@ object DeveloperBehavior {
         evt match {
           case Event.Rested => State.Free()
         }
+    }
+
+    implicit class WorkingOps(working: Working) {
+      def task: Task = working.taskWithId.task
     }
 
   }

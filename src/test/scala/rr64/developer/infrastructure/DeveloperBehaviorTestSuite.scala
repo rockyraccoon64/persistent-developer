@@ -84,7 +84,7 @@ class DeveloperBehaviorTestSuite extends ScalaTestWithActorTestKit(EventSourcedB
     Thread.sleep(firstCheckMs)
 
     inside(kit.getState()) {
-      case Working(t) => t shouldEqual task
+      case working: Working => working.task shouldEqual task
     }
 
     Thread.sleep(secondCheckMs)
