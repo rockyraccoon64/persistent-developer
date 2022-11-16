@@ -12,6 +12,8 @@ import rr64.developer.domain.Task
 import rr64.developer.infrastructure.DeveloperBehavior.State.Working
 import rr64.developer.infrastructure.DeveloperBehavior._
 
+import java.util.UUID
+
 class DeveloperBehaviorTestSuite extends ScalaTestWithActorTestKit(EventSourcedBehaviorTestKit.config)
   with AnyFlatSpecLike
   with BeforeAndAfterEach
@@ -117,5 +119,19 @@ class DeveloperBehaviorTestSuite extends ScalaTestWithActorTestKit(EventSourcedB
 
     developerTestKit.getState() shouldBe a [State.Free]
   }
+
+  /** Когда разработчик работает над задачей,
+   * то при получении новой задачи он присваивает ей идентификатор
+   * и отправляет его в ответе */
+  "The developer" should "reply with an identifier after receiving a new task while working" in {
+    val currentTask = TaskWithId(Task(100), UUID.randomUUID())
+    val newTask = Task(10)
+    developerTestKit.initialize(Event.TaskStarted(currentTask))
+    val result = addTask(developerTestKit, newTask)
+    result.reply shouldEqual TaskQueued(id)
+  }
+
+  /** Когда разработчик работает над задачей,
+   * новая задача отправляется в очередь */
 
 }
