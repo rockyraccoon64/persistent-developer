@@ -53,11 +53,11 @@ class DeveloperBehaviorTestSuite
   private val restFactor = 5
   private val developerTestKit = createTestKit("dev-test", workFactor, restFactor)
 
-  private def addTask(kit: Kit, task: Task) = // TODO Значение по умолчанию
+  private def addTask(task: Task, kit: Kit) = // TODO Значение по умолчанию
     kit.runCommand(AddTask(task, _))
 
   private def queueTask(task: Task, kit: Kit = developerTestKit): TaskWithId = {
-    val result = addTask(kit, task)
+    val result = addTask(task, kit)
     val id = result.replyOfType[TaskQueued].id
     TaskWithId(task, id)
   }
@@ -79,7 +79,7 @@ class DeveloperBehaviorTestSuite
   /** Когда разработчик свободен, он принимает задачу в работу */
   "The developer" should "accept the task he's given when he's free" in {
     val task = Task(5)
-    val result = addTask(developerTestKit, task)
+    val result = addTask(task, developerTestKit)
     val state = result.stateOfType[Working]
     state.task shouldEqual task
   }
@@ -88,7 +88,7 @@ class DeveloperBehaviorTestSuite
    * он присваивает ей идентификатор и отправляет его в ответе */
   "The developer" should "reply with a Task Started message when he's free" in {
     val task = Task(5)
-    val result = addTask(developerTestKit, task)
+    val result = addTask(task, developerTestKit)
     val reply = result.replyOfType[Replies.TaskStarted]
     reply.id should not be null
     result.stateOfType[Working].taskId shouldEqual reply.id
@@ -100,7 +100,7 @@ class DeveloperBehaviorTestSuite
     val task = Task(difficulty)
     val workTime = workTimeMs(difficulty)
 
-    addTask(developerTestKit, task)
+    addTask(task, developerTestKit)
 
     manualTime.timePasses((workTime - 1).millis)
 
@@ -120,7 +120,7 @@ class DeveloperBehaviorTestSuite
     val workTime = workTimeMs(difficulty)
     val restingTime = restTimeMs(difficulty)
 
-    addTask(developerTestKit, task)
+    addTask(task, developerTestKit)
 
     manualTime.timePasses(workTime.millis)
 
@@ -137,7 +137,7 @@ class DeveloperBehaviorTestSuite
     val workTime = workTimeMs(difficulty)
     val restingTime = restTimeMs(difficulty)
 
-    addTask(developerTestKit, task)
+    addTask(task, developerTestKit)
 
     manualTime.timePasses(workTime.millis)
     manualTime.timePasses(restingTime.millis)
@@ -152,7 +152,7 @@ class DeveloperBehaviorTestSuite
     val currentTask = TaskWithId(Task(100), UUID.randomUUID())
     val newTask = Task(10)
     developerTestKit.initialize(Event.TaskStarted(currentTask))
-    val result = addTask(developerTestKit, newTask)
+    val result = addTask(newTask, developerTestKit)
     val reply = result.replyOfType[Replies.TaskQueued]
     reply.id should not be null
   }
@@ -163,9 +163,9 @@ class DeveloperBehaviorTestSuite
     val secondTask = Task(50)
     val thirdTask = Task(25)
 
-    val firstResult = addTask(developerTestKit, firstTask)
-    val secondResult = addTask(developerTestKit, secondTask)
-    val thirdResult = addTask(developerTestKit, thirdTask)
+    val firstResult = addTask(firstTask, developerTestKit)
+    val secondResult = addTask(secondTask, developerTestKit)
+    val thirdResult = addTask(thirdTask, developerTestKit)
 
     firstResult.stateOfType[State.Working].taskQueue shouldEqual Nil
 
@@ -187,7 +187,7 @@ class DeveloperBehaviorTestSuite
     val secondTask = Task(50)
     val thirdTask = Task(25)
 
-    addTask(developerTestKit, firstTask)
+    addTask(firstTask, developerTestKit)
 
     val secondTaskWithId = queueTask(secondTask)
     val thirdTaskWithId = queueTask(thirdTask)
@@ -208,7 +208,7 @@ class DeveloperBehaviorTestSuite
     val secondTask = Task(90)
     val thirdTask = Task(25)
 
-    addTask(developerTestKit, firstTask)
+    addTask(firstTask, developerTestKit)
 
     val secondTaskWithId = queueTask(secondTask)
     val thirdTaskWithId = queueTask(thirdTask)
@@ -233,7 +233,7 @@ class DeveloperBehaviorTestSuite
     val workTime = workTimeMs(difficulty)
     val restingTime = restTimeMs(difficulty)
 
-    addTask(developerTestKit, task)
+    addTask(task, developerTestKit)
 
     manualTime.timePasses(workTime.millis)
     manualTime.timePasses(restingTime.millis)
@@ -246,7 +246,7 @@ class DeveloperBehaviorTestSuite
     val initialTask = Task(1)
     val workTime = workTimeMs(initialTask.difficulty)
 
-    addTask(developerTestKit, initialTask)
+    addTask(initialTask, developerTestKit)
 
     manualTime.timePasses(workTime.millis)
 
