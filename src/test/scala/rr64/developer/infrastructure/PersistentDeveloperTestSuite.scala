@@ -4,10 +4,10 @@ import akka.actor.testkit.typed.scaladsl.ScalaTestWithActorTestKit
 import akka.actor.typed.scaladsl.Behaviors
 import akka.actor.typed.{ActorRef, Behavior, Scheduler}
 import org.scalatest.flatspec.AsyncFlatSpecLike
-import rr64.developer.domain.{DeveloperReply, Task}
+import rr64.developer.domain.{DeveloperReply, DeveloperState, Task}
 
 import java.util.UUID
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 
 class PersistentDeveloperTestSuite
   extends ScalaTestWithActorTestKit
@@ -65,6 +65,27 @@ class PersistentDeveloperTestSuite
     val replyFuture = dev.addTask(task)
 
     replyFuture.map { _ shouldEqual DeveloperReply.TaskQueued(id) }
+  }
+
+  /** Запрос на получение состояния разработчика перенаправляется провайдеру */
+  "The State query" should "be redirected to the developer state provider" in {
+    val working = DeveloperState.Working
+    val free = DeveloperState.Free
+
+    val ref = testKit.spawn(Behaviors.empty[DeveloperBehavior.Command])
+    val provider1 = new DeveloperStateProvider {
+      override def state(implicit ec: ExecutionContext): Future[DeveloperState] =
+        Future.successful(working)
+    }
+    val provider2 = new DeveloperStateProvider {
+      override def state(implicit ec: ExecutionContext): Future[DeveloperState] =
+        Future.successful(free)
+    }
+    val dev1 = PersistentDeveloper(ref, provider1)
+    val dev2 = PersistentDeveloper(ref, provider2)
+
+    dev1.state.map(_ shouldEqual working)
+    dev2.state.map(_ shouldEqual free)
   }
 
 }
