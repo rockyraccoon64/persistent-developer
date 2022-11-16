@@ -112,7 +112,7 @@ class DeveloperBehaviorTestSuite extends ScalaTestWithActorTestKit(EventSourcedB
     Thread.sleep(workTime + 100)
 
     inside(developerTestKit.getState()) {
-      case State.Resting(millis) => millis shouldEqual restingTime
+      case resting: State.Resting => resting.millis shouldEqual restingTime
     }
 
     Thread.sleep(restingTime)
@@ -170,8 +170,8 @@ class DeveloperBehaviorTestSuite extends ScalaTestWithActorTestKit(EventSourcedB
     val state = developerTestKit.getState()
 
     inside(state) {
-      case State.Resting(millis, taskQueue) =>
-      taskQueue.map(_.task) should have theSameElementsAs Seq(secondTask, thirdTask)
+      case State.Resting(_, taskQueue) =>
+        taskQueue.map(_.task) shouldEqual Seq(secondTask, thirdTask)
     }
   }
 

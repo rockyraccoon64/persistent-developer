@@ -61,7 +61,7 @@ object DeveloperBehavior {
           case FinishTask => // TODO ID в FinishTask
             Effect.persist(Event.TaskFinished)
               .thenRun {
-                case Resting(millis) => setup.timer.startSingleTimer(StopResting, millis.millis)
+                case Resting(millis, _) => setup.timer.startSingleTimer(StopResting, millis.millis)
                 case _ =>
               }
           case AddTask(task, replyTo) =>
@@ -73,13 +73,13 @@ object DeveloperBehavior {
         }
       override def applyEvent(evt: Event): State =
         evt match {
-          case Event.TaskFinished => Resting(currentTask.task.difficulty * setup.restFactor)
+          case Event.TaskFinished => Resting(currentTask.task.difficulty * setup.restFactor, taskQueue)
           case Event.TaskQueued(newTask) => Working(currentTask, taskQueue :+ newTask)
         }
     }
 
     /** Разработчик отдыхает */
-    case class Resting(millis: Int)(implicit setup: Setup) extends State {
+    case class Resting(millis: Int, taskQueue: Seq[TaskWithId])(implicit setup: Setup) extends State {
       override def applyCommand(cmd: Command): Effect[Event, State] =
         cmd match {
           case StopResting => Effect.persist(Event.Rested)
