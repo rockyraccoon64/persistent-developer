@@ -16,19 +16,19 @@ class PersistentDeveloperTestSuite
   private implicit val ec: ExecutionContext = testKit.system.executionContext
   private implicit val scheduler: Scheduler = testKit.system.scheduler
 
-  private def mockActorRef(
-    receive: DeveloperBehavior.Command => Behavior[DeveloperBehavior.Command]
-  ): ActorRef[DeveloperBehavior.Command] = {
-    val mockBehavior = Behaviors.receiveMessage(receive)
-    testKit.spawn(mockBehavior)
-  }
-
   private val emptyProvider = new DeveloperStateProvider {
     override def state(implicit ec: ExecutionContext): Future[DeveloperState] =
       Future.failed(new NotImplementedError)
   }
 
   private val emptyRef = testKit.spawn(Behaviors.empty[DeveloperBehavior.Command])
+
+  private def mockActorRef(
+    receive: DeveloperBehavior.Command => Behavior[DeveloperBehavior.Command]
+  ): ActorRef[DeveloperBehavior.Command] = {
+    val mockBehavior = Behaviors.receiveMessage(receive)
+    testKit.spawn(mockBehavior)
+  }
 
   private def createDeveloper(
     ref: ActorRef[DeveloperBehavior.Command] = emptyRef,
