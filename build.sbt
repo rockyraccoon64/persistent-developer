@@ -8,6 +8,10 @@ scalaVersion := "2.13.10"
 libraryDependencies ++= Seq(
   akkaActor,
   akkaPersistence,
+  akkaPersistenceJdbc,
+  akkaPersistenceQuery,
+  slick,
+  slickHikariCp,
   scalactic,
   logback,
   akkaPersistenceTestkit % Test,
