@@ -17,15 +17,17 @@ class DeveloperBehaviorTestSuite extends ScalaTestWithActorTestKit(EventSourcedB
   with BeforeAndAfterEach
   with Matchers {
 
+  private type Kit = EventSourcedBehaviorTestKit[
+    DeveloperBehavior.Command,
+    DeveloperBehavior.Event,
+    DeveloperBehavior.State
+  ]
+
   def testKit(
     persistenceId: String,
     timeFactor: Int,
     restFactor: Int
-  ): EventSourcedBehaviorTestKit[
-    DeveloperBehavior.Command,
-    DeveloperBehavior.Event,
-    DeveloperBehavior.State
-  ] = {
+  ): Kit = {
     EventSourcedBehaviorTestKit(
       system = system,
       behavior = DeveloperBehavior(
@@ -36,6 +38,9 @@ class DeveloperBehaviorTestSuite extends ScalaTestWithActorTestKit(EventSourcedB
       SerializationSettings.disabled
     )
   }
+
+  private def addTask(kit: Kit, task: Task) =
+    kit.runCommand(AddTask(task, _))
 
   private val timeFactor = 10
   private val restFactor = 5
@@ -55,7 +60,7 @@ class DeveloperBehaviorTestSuite extends ScalaTestWithActorTestKit(EventSourcedB
   /** Когда разработчик свободен, он принимает задачу в работу */
   "The developer" should "accept the task he's given when he's free" in {
     val task = Task(5)
-    val result = developerTestKit.runCommand(AddTask(task, _))
+    val result = addTask(developerTestKit, task)
     val state = result.stateOfType[Working]
     state.task shouldEqual task
   }
@@ -64,7 +69,7 @@ class DeveloperBehaviorTestSuite extends ScalaTestWithActorTestKit(EventSourcedB
    * он присваивает ей идентификатор и отправляет его в ответе */
   "The developer" should "reply with a Task Started message when he's free" in {
     val task = Task(5)
-    val result = developerTestKit.runCommand(AddTask(task, _))
+    val result = addTask(developerTestKit, task)
     val reply = result.replyOfType[Replies.TaskStarted]
     reply.id should not be null
     result.stateOfType[Working].taskId shouldEqual reply.id
@@ -80,7 +85,7 @@ class DeveloperBehaviorTestSuite extends ScalaTestWithActorTestKit(EventSourcedB
     val secondCheckMs = 500
     val kit = testKit("timer-test", workFactor, restFactor)
 
-    kit.runCommand(AddTask(task, _))
+    addTask(kit, task)
 
     Thread.sleep(firstCheckMs)
 
@@ -100,7 +105,7 @@ class DeveloperBehaviorTestSuite extends ScalaTestWithActorTestKit(EventSourcedB
     val workTime = difficulty * timeFactor
     val restingTime = difficulty * restFactor
 
-    developerTestKit.runCommand(AddTask(task, _))
+    addTask(developerTestKit, task)
 
     Thread.sleep(workTime + 100)
 
