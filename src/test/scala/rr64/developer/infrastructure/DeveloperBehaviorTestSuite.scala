@@ -22,8 +22,7 @@ class DeveloperBehaviorTestSuite
       .withFallback(EventSourcedBehaviorTestKit.config)
   )
   with AnyFlatSpecLike
-  with BeforeAndAfterEach
-  with Matchers {
+  with BeforeAndAfterEach {
 
   private type Kit = EventSourcedBehaviorTestKit[
     DeveloperBehavior.Command,
