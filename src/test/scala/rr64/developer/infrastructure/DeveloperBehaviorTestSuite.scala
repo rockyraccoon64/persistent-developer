@@ -210,13 +210,8 @@ class DeveloperBehaviorTestSuite
 
     addTask(developerTestKit, firstTask)
 
-    val secondTaskResult = addTask(developerTestKit, secondTask)
-    val secondTaskId = secondTaskResult.replyOfType[TaskQueued].id
-    val secondTaskWithId = TaskWithId(secondTask, secondTaskId)
-
-    val thirdTaskResult = addTask(developerTestKit, thirdTask)
-    val thirdTaskId = thirdTaskResult.replyOfType[TaskQueued].id
-    val thirdTaskWithId = TaskWithId(thirdTask, thirdTaskId)
+    val secondTaskWithId = queueTask(secondTask)
+    val thirdTaskWithId = queueTask(thirdTask)
 
     val workTime = workTimeMs(firstTask.difficulty)
     val restTime = restTimeMs(firstTask.difficulty)
