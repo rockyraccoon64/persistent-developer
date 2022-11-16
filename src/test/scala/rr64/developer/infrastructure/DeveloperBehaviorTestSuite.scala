@@ -219,7 +219,9 @@ class DeveloperBehaviorTestSuite
 
     val workTime = firstTask.difficulty * workFactor
     val restTime = firstTask.difficulty * restFactor
-    Thread.sleep(workTime + restTime + 100)
+
+    manualTime.timePasses(workTime.millis)
+    manualTime.timePasses(restTime.millis)
 
     inside(developerTestKit.getState()) {
       case Working(currentTask, taskQueue) =>
