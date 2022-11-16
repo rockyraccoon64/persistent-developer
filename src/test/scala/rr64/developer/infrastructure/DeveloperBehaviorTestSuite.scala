@@ -194,7 +194,7 @@ class DeveloperBehaviorTestSuite extends ScalaTestWithActorTestKit(EventSourcedB
     inside(developerTestKit.getState()) {
       case Working(currentTask, taskQueue) =>
         currentTask shouldEqual TaskWithId(secondTask, secondTaskId)
-        taskQueue shouldEqual Seq(thirdTask)
+        taskQueue.map(_.task) shouldEqual Seq(thirdTask)
     }
   }
 

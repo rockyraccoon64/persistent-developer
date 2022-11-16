@@ -88,7 +88,11 @@ object DeveloperBehavior {
         }
       override def applyEvent(evt: Event): State =
         evt match {
-          case Event.Rested => State.Free()
+          case Event.Rested =>
+            taskQueue match {
+              case head :: tail => Working(head, tail)
+              case Nil => State.Free()
+            }
         }
     }
 
