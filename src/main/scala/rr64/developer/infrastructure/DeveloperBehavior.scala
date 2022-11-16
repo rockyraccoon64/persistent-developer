@@ -83,7 +83,11 @@ object DeveloperBehavior {
       override def applyCommand(cmd: Command): Effect[Event, State] =
         cmd match {
           case StopResting => Effect.persist(Event.Rested)
-          case AddTask(task, replyTo) => Effect.stash() // TODO reply
+          case AddTask(task, replyTo) =>
+            val id = generateTaskId()
+            val taskWithId = TaskWithId(task, id) // TODO Дублирование
+            Effect.persist(Event.TaskQueued(taskWithId))
+              .thenReply(replyTo)(_ => Replies.TaskQueued(id))
           case _ => Effect.unhandled
         }
       override def applyEvent(evt: Event): State =
@@ -93,6 +97,8 @@ object DeveloperBehavior {
               case head :: tail => Working(head, tail)
               case Nil => State.Free()
             }
+          case Event.TaskQueued(newTask) =>
+            Resting(millis, taskQueue :+ newTask)
         }
     }
 
