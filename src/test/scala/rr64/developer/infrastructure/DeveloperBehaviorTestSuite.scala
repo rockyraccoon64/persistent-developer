@@ -85,7 +85,7 @@ class DeveloperBehaviorTestSuite extends ScalaTestWithActorTestKit(EventSourcedB
     val difficulty = 50
     val task = Task(difficulty)
     val workTime = difficulty * timeFactor
-    val restingTime = difficulty * 100 // TODO Тоже в инициализацию Behavior
+    val restingTime = difficulty * restFactor
 
     developerTestKit.runCommand(AddTask(task, _))
 

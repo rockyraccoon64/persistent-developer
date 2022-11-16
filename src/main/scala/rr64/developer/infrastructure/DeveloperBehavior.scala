@@ -26,7 +26,7 @@ object DeveloperBehavior {
 
   sealed trait State {
     def applyCommand(cmd: Command)(implicit setup: Setup): Effect[Event, State]
-    def applyEvent(evt: Event): State
+    def applyEvent(evt: Event)(implicit setup: Setup): State
   }
 
   object State {
@@ -44,7 +44,7 @@ object DeveloperBehavior {
               }
               .thenReply(replyTo)(_ => Replies.TaskStarted)
         }
-      override def applyEvent(evt: Event): State =
+      override def applyEvent(evt: Event)(implicit setup: Setup): State =
         evt match {
           case Event.TaskStarted(task) => Working(task)
         }
@@ -62,9 +62,9 @@ object DeveloperBehavior {
               }
           case _ => Effect.stash
         }
-      override def applyEvent(evt: Event): State =
+      override def applyEvent(evt: Event)(implicit setup: Setup): State =
         evt match {
-          case Event.TaskFinished => Resting(task.difficulty * 100)
+          case Event.TaskFinished => Resting(task.difficulty * setup.restFactor)
         }
     }
 
@@ -76,7 +76,7 @@ object DeveloperBehavior {
           case AddTask(task, replyTo) => Effect.stash() // TODO reply
           case _ => Effect.unhandled
         }
-      override def applyEvent(evt: Event): State =
+      override def applyEvent(evt: Event)(implicit setup: Setup): State =
         evt match {
           case Event.Rested => State.Free
         }
