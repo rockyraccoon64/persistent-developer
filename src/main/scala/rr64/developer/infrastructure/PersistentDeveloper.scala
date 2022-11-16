@@ -11,8 +11,10 @@ import scala.concurrent.{ExecutionContext, Future}
 /**
  * Реализация поведения разработчика на основе Akka Persistence
  */
-class PersistentDeveloper(ref: ActorRef[DeveloperBehavior.Command])
-    (implicit timeout: Timeout, scheduler: Scheduler) extends Developer {
+class PersistentDeveloper(
+  ref: ActorRef[DeveloperBehavior.Command],
+  stateProvider: DeveloperStateProvider
+)(implicit timeout: Timeout, scheduler: Scheduler) extends Developer {
 
   /** Состояние разработчика */
   override def state(implicit ec: ExecutionContext): Future[DeveloperState] =
@@ -30,7 +32,7 @@ class PersistentDeveloper(ref: ActorRef[DeveloperBehavior.Command])
 }
 
 object PersistentDeveloper {
-  def apply(ref: ActorRef[DeveloperBehavior.Command])
+  def apply(ref: ActorRef[DeveloperBehavior.Command], stateProvider: DeveloperStateProvider)
     (implicit timeout: Timeout, scheduler: Scheduler): PersistentDeveloper =
-  new PersistentDeveloper(ref)
+  new PersistentDeveloper(ref, stateProvider)
 }

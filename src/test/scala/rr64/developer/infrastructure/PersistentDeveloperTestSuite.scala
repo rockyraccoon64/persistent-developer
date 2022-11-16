@@ -23,10 +23,15 @@ class PersistentDeveloperTestSuite
     testKit.spawn(mockBehavior)
   }
 
+  private val emptyProvider = new DeveloperStateProvider {
+    override def state(implicit ec: ExecutionContext): Future[DeveloperState] =
+      Future.failed(new NotImplementedError)
+  }
+
   /** Команда добавления задачи должна перенаправляться персистентному актору */
   "The Add Task command" should "be redirected to the persistent actor" in {
     val probe = testKit.createTestProbe[DeveloperBehavior.Command]()
-    val dev = PersistentDeveloper(probe.ref)
+    val dev = PersistentDeveloper(probe.ref, emptyProvider)
 
     val task = Task(10)
     dev.addTask(task)
@@ -43,7 +48,7 @@ class PersistentDeveloperTestSuite
         replyTo ! DeveloperBehavior.Replies.TaskStarted(id)
         Behaviors.same
     }
-    val dev = PersistentDeveloper(mockActor)
+    val dev = PersistentDeveloper(mockActor, emptyProvider)
 
     val task = Task(15)
     val replyFuture = dev.addTask(task)
@@ -59,7 +64,7 @@ class PersistentDeveloperTestSuite
         replyTo ! DeveloperBehavior.Replies.TaskQueued(id)
         Behaviors.same
     }
-    val dev = PersistentDeveloper(mockActor)
+    val dev = PersistentDeveloper(mockActor, emptyProvider)
 
     val task = Task(45)
     val replyFuture = dev.addTask(task)
@@ -84,8 +89,13 @@ class PersistentDeveloperTestSuite
     val dev1 = PersistentDeveloper(ref, provider1)
     val dev2 = PersistentDeveloper(ref, provider2)
 
-    dev1.state.map(_ shouldEqual working)
-    dev2.state.map(_ shouldEqual free)
+    for {
+      state1 <- dev1.state
+      state2 <- dev2.state
+    } yield {
+      state1 shouldEqual working
+      state2 shouldEqual free
+    }
   }
 
 }
