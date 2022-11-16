@@ -5,6 +5,7 @@ import akka.persistence.testkit.scaladsl.EventSourcedBehaviorTestKit
 import akka.persistence.testkit.scaladsl.EventSourcedBehaviorTestKit.SerializationSettings
 import akka.persistence.typed.PersistenceId
 import org.scalatest.BeforeAndAfterEach
+import org.scalatest.Inside.inside
 import org.scalatest.flatspec.AnyFlatSpecLike
 import org.scalatest.matchers.should.Matchers
 import rr64.developer.domain.Task
@@ -48,7 +49,7 @@ class DeveloperBehaviorTestSuite extends ScalaTestWithActorTestKit(EventSourcedB
   /** Разработчик начинает в свободном состоянии */
   "The developer" should "start in a free state" in {
     val state = developerTestKit.getState()
-    state shouldEqual DeveloperBehavior.State.Free
+    state shouldBe a [State.Free]
   }
 
   /** Когда разработчик свободен, он принимает задачу в работу */
@@ -74,10 +75,14 @@ class DeveloperBehaviorTestSuite extends ScalaTestWithActorTestKit(EventSourcedB
     kit.runCommand(AddTask(task, _))
 
     Thread.sleep(firstCheckMs)
-    kit.getState() shouldEqual State.Working(task)
+
+    inside(kit.getState()) {
+      case Working(t) => t shouldEqual task
+    }
 
     Thread.sleep(secondCheckMs)
-    kit.getState() should not equal State.Working(task)
+
+    kit.getState() should not be a [State.Working]
   }
 
   /** Завершив задачу, разработчик делает перерыв */
@@ -90,10 +95,14 @@ class DeveloperBehaviorTestSuite extends ScalaTestWithActorTestKit(EventSourcedB
     developerTestKit.runCommand(AddTask(task, _))
 
     Thread.sleep(workTime + 100)
-    developerTestKit.getState() shouldEqual State.Resting(restingTime)
+
+    inside(developerTestKit.getState()) {
+      case State.Resting(millis) => millis shouldEqual restingTime
+    }
 
     Thread.sleep(restingTime)
-    developerTestKit.getState() shouldEqual State.Free
+
+    developerTestKit.getState() shouldBe a [State.Free]
   }
 
 }
