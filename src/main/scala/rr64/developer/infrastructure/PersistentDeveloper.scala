@@ -23,6 +23,7 @@ class PersistentDeveloper(ref: ActorRef[DeveloperBehavior.Command])
       (implicit ec: ExecutionContext): Future[DeveloperReply] = {
     ref.ask(DeveloperBehavior.AddTask(task, _)).map {
       case Replies.TaskStarted(id) => DeveloperReply.TaskStarted(id)
+      case Replies.TaskQueued(id) => DeveloperReply.TaskQueued(id)
     }
   }
 
