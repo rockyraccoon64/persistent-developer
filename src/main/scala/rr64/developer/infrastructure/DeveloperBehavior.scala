@@ -62,6 +62,11 @@ object DeveloperBehavior {
         }
     }
 
+    case object Resting extends State {
+      override def applyCommand(cmd: Command)(implicit setup: Setup): Effect[Event, State] = ???
+      override def applyEvent(evt: Event): State = ???
+    }
+
   }
 
   object Replies {
