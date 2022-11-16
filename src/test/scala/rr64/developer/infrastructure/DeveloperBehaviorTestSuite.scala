@@ -162,9 +162,9 @@ class DeveloperBehaviorTestSuite extends ScalaTestWithActorTestKit(EventSourcedB
     val secondTask = Task(50)
     val thirdTask = Task(25)
 
-    val firstResult = addTask(developerTestKit, firstTask)
-    val secondResult = addTask(developerTestKit, secondTask)
-    val thirdResult = addTask(developerTestKit, thirdTask)
+    addTask(developerTestKit, firstTask)
+    addTask(developerTestKit, secondTask)
+    addTask(developerTestKit, thirdTask)
 
     Thread.sleep(firstTask.difficulty * workFactor + 100)
     val state = developerTestKit.getState()
