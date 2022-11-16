@@ -21,6 +21,7 @@ object DeveloperBehavior {
 
   case object Event {
     case class TaskStarted(taskWithId: TaskWithId) extends Event
+    case class TaskQueued(taskWithId: TaskWithId) extends Event
     case object TaskFinished extends Event
     case object Rested extends Event
   }
@@ -65,12 +66,15 @@ object DeveloperBehavior {
               }
           case AddTask(task, replyTo) =>
             val id = generateTaskId()
-            Effect.reply(replyTo)(Replies.TaskQueued(id))
+            val taskWithId = TaskWithId(task, id)
+            Effect.persist(Event.TaskQueued(taskWithId))
+              .thenReply(replyTo)(_ => Replies.TaskQueued(id))
           case _ => Effect.stash
         }
       override def applyEvent(evt: Event): State =
         evt match {
           case Event.TaskFinished => Resting(taskWithId.task.difficulty * setup.restFactor)
+          case Event.TaskQueued(newTask) => Working(taskWithId, taskQueue :+ newTask)
         }
     }
 
