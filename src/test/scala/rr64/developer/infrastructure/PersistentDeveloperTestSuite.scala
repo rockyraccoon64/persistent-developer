@@ -23,7 +23,7 @@ class PersistentDeveloperTestSuite
 
   private val emptyRef = testKit.spawn(Behaviors.empty[DeveloperBehavior.Command])
 
-  private def mockActorRef(
+  private def mockDeveloperRef(
     receive: DeveloperBehavior.Command => Behavior[DeveloperBehavior.Command]
   ): ActorRef[DeveloperBehavior.Command] = {
     val mockBehavior = Behaviors.receiveMessage(receive)
@@ -31,9 +31,9 @@ class PersistentDeveloperTestSuite
   }
 
   private def createDeveloper(
-    ref: ActorRef[DeveloperBehavior.Command] = emptyRef,
+    developerRef: ActorRef[DeveloperBehavior.Command] = emptyRef,
     provider: DeveloperStateProvider = emptyProvider
-  ) = PersistentDeveloper(ref, provider)
+  ) = PersistentDeveloper(developerRef, provider)
 
   /** Команда добавления задачи должна перенаправляться персистентному актору */
   "The Add Task command" should "be redirected to the persistent actor" in {
@@ -50,7 +50,7 @@ class PersistentDeveloperTestSuite
   /** Когда разработчик отвечает "Задача начата", должно приходить соответствующее доменное сообщение */
   "When a task is started, there" should "be a corresponding domain message" in {
     val id = UUID.randomUUID()
-    val mockActor = mockActorRef {
+    val mockActor = mockDeveloperRef {
       case DeveloperBehavior.AddTask(_, replyTo) =>
         replyTo ! DeveloperBehavior.Replies.TaskStarted(id)
         Behaviors.same
@@ -66,7 +66,7 @@ class PersistentDeveloperTestSuite
   /** Когда разработчик отвечает "Задача поставлена в очередь", приходит соответствующее доменное сообщение */
   "When a task is queued, there" should "be a corresponding domain message" in {
     val id = UUID.randomUUID()
-    val mockActor = mockActorRef {
+    val mockActor = mockDeveloperRef {
       case DeveloperBehavior.AddTask(_, replyTo) =>
         replyTo ! DeveloperBehavior.Replies.TaskQueued(id)
         Behaviors.same
