@@ -12,6 +12,9 @@ import scala.concurrent.{ExecutionContext, Future}
 class PersistentDeveloperTestSuite
   extends ScalaTestWithActorTestKit
     with AsyncFlatSpecLike {
+  
+  private type Command = DeveloperBehavior.Command
+  private type DeveloperRef = ActorRef[Command]
 
   private implicit val ec: ExecutionContext = testKit.system.executionContext
   private implicit val scheduler: Scheduler = testKit.system.scheduler
@@ -21,11 +24,11 @@ class PersistentDeveloperTestSuite
       Future.failed(new NotImplementedError)
   }
 
-  private val emptyRef = testKit.spawn(Behaviors.empty[DeveloperBehavior.Command])
+  private val emptyRef = testKit.spawn(Behaviors.empty[Command])
 
   private def mockDeveloperRef(
-    receive: DeveloperBehavior.Command => Behavior[DeveloperBehavior.Command]
-  ): ActorRef[DeveloperBehavior.Command] = {
+    receive: DeveloperBehavior.Command => Behavior[Command]
+  ): DeveloperRef = {
     val mockBehavior = Behaviors.receiveMessage(receive)
     testKit.spawn(mockBehavior)
   }
@@ -34,13 +37,13 @@ class PersistentDeveloperTestSuite
     (_: ExecutionContext) => Future.successful(stateResult)
 
   private def createDeveloper(
-    developerRef: ActorRef[DeveloperBehavior.Command] = emptyRef,
+    developerRef: DeveloperRef = emptyRef,
     provider: DeveloperStateProvider = emptyProvider
   ) = PersistentDeveloper(developerRef, provider)
 
   /** Команда добавления задачи должна перенаправляться персистентному актору */
   "The Add Task command" should "be redirected to the persistent actor" in {
-    val probe = testKit.createTestProbe[DeveloperBehavior.Command]()
+    val probe = testKit.createTestProbe[Command]()
     val dev = createDeveloper(probe.ref)
 
     val task = Task(10)
