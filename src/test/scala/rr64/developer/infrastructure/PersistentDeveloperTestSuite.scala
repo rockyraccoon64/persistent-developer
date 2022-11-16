@@ -45,4 +45,21 @@ class PersistentDeveloperTestSuite
     replyFuture.map { _ shouldEqual DeveloperReply.TaskStarted(id) }
   }
 
+  /** Когда разработчик отвечает "Задача поставлена в очередь", приходит соответствующее доменное сообщение */
+  "When a task is queued, there" should "be a corresponding domain message" in {
+    val id = UUID.randomUUID()
+    val mockBehavior = Behaviors.receiveMessage[DeveloperBehavior.Command] {
+      case DeveloperBehavior.AddTask(_, replyTo) =>
+        replyTo ! DeveloperBehavior.Replies.TaskQueued(id)
+        Behaviors.same
+    }
+    val mockActor = testKit.spawn(mockBehavior)
+    val dev = PersistentDeveloper(mockActor)
+
+    val task = Task(45)
+    val replyFuture = dev.addTask(task)
+
+    replyFuture.map { _ shouldEqual DeveloperReply.TaskQueued(id) }
+  }
+
 }
