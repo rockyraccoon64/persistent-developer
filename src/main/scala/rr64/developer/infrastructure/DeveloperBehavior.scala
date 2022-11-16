@@ -37,12 +37,14 @@ object DeveloperBehavior {
       override def applyCommand(cmd: Command): Effect[Event, State] =
         cmd match {
           case AddTask(task, replyTo) =>
+            val id = UUID.randomUUID()
+            val taskWithId = TaskWithId(task, id)
             Effect.persist(Event.TaskStarted(task))
               .thenRun { _: State =>
                 val timeNeeded = task.difficulty * setup.timeFactor
                 setup.timer.startSingleTimer(FinishTask, timeNeeded.millis) // TODO Не будет выполнено, если упадёт во время работы
               }
-              .thenReply(replyTo)(_ => Replies.TaskStarted(null))
+              .thenReply(replyTo)(_ => Replies.TaskStarted(id))
         }
       override def applyEvent(evt: Event): State =
         evt match {
@@ -92,6 +94,8 @@ object DeveloperBehavior {
   }
 
   case class Setup(timeFactor: Int, restFactor: Int, timer: TimerScheduler[Command])
+
+  case class TaskWithId(task: Task, id: UUID)
 
   def apply(persistenceId: PersistenceId, timeFactor: Int, restFactor: Int): Behavior[Command] =
     Behaviors.withTimers { timer =>
