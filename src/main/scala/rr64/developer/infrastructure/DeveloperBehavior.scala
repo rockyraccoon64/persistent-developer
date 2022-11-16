@@ -20,7 +20,7 @@ object DeveloperBehavior {
 
   case object Event {
     case class TaskStarted(task: Task) extends Event
-    case class TaskFinished(task: Task) extends Event // TODO Удалить task
+    case object TaskFinished extends Event
     case object Rested extends Event
   }
 
@@ -55,7 +55,7 @@ object DeveloperBehavior {
       override def applyCommand(cmd: Command)(implicit setup: Setup): Effect[Event, State] =
         cmd match {
           case FinishTask(task) =>
-            Effect.persist(Event.TaskFinished(task))
+            Effect.persist(Event.TaskFinished)
               .thenRun {
                 case Resting(millis) => setup.timer.startSingleTimer(StopResting, millis.millis)
                 case _ =>
@@ -64,10 +64,11 @@ object DeveloperBehavior {
         }
       override def applyEvent(evt: Event): State =
         evt match {
-          case Event.TaskFinished(task) => Resting(task.difficulty * 100)
+          case Event.TaskFinished => Resting(task.difficulty * 100)
         }
     }
 
+    /** Разработчик отдыхает */
     case class Resting(millis: Int) extends State {
       override def applyCommand(cmd: Command)(implicit setup: Setup): Effect[Event, State] =
         cmd match {
