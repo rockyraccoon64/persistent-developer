@@ -38,14 +38,13 @@ object DeveloperBehavior {
       override def applyCommand(cmd: Command): Effect[Event, State] =
         cmd match {
           case AddTask(task, replyTo) =>
-            val id = generateTaskId()
-            val taskWithId = TaskWithId(task, id)
+            val taskWithId = createTaskWithId(task)
             Effect.persist(Event.TaskStarted(taskWithId))
               .thenRun { _: State =>
                 val timeNeeded = task.difficulty * setup.workFactor
-                setup.timer.startSingleTimer(FinishTask(id), timeNeeded.millis) // TODO Не будет выполнено, если упадёт во время работы
+                setup.timer.startSingleTimer(FinishTask(taskWithId.id), timeNeeded.millis) // TODO Не будет выполнено, если упадёт во время работы
               }
-              .thenReply(replyTo)(_ => Replies.TaskStarted(id))
+              .thenReply(replyTo)(_ => Replies.TaskStarted(taskWithId.id))
         }
       override def applyEvent(evt: Event): State =
         evt match {
@@ -65,10 +64,9 @@ object DeveloperBehavior {
                 case _ =>
               }
           case AddTask(task, replyTo) =>
-            val id = generateTaskId()
-            val taskWithId = TaskWithId(task, id)
+            val taskWithId = createTaskWithId(task)
             Effect.persist(Event.TaskQueued(taskWithId))
-              .thenReply(replyTo)(_ => Replies.TaskQueued(id))
+              .thenReply(replyTo)(_ => Replies.TaskQueued(taskWithId.id))
           case _ => Effect.stash
         }
       override def applyEvent(evt: Event): State =
@@ -84,10 +82,9 @@ object DeveloperBehavior {
         cmd match {
           case StopResting => Effect.persist(Event.Rested)
           case AddTask(task, replyTo) =>
-            val id = generateTaskId()
-            val taskWithId = TaskWithId(task, id) // TODO Дублирование
+            val taskWithId = createTaskWithId(task)
             Effect.persist(Event.TaskQueued(taskWithId))
-              .thenReply(replyTo)(_ => Replies.TaskQueued(id))
+              .thenReply(replyTo)(_ => Replies.TaskQueued(taskWithId.id))
           case _ => Effect.unhandled
         }
       override def applyEvent(evt: Event): State =
@@ -123,6 +120,8 @@ object DeveloperBehavior {
   case class TaskWithId(task: Task, id: UUID)
 
   private def generateTaskId(): UUID = UUID.randomUUID()
+  private def createTaskWithId(task: Task): TaskWithId =
+    TaskWithId(task, generateTaskId())
 
   def apply(persistenceId: PersistenceId, workFactor: Int, restFactor: Int): Behavior[Command] =
     Behaviors.withTimers { timer =>
