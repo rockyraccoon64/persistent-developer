@@ -18,7 +18,7 @@ class PersistentDeveloper(
 
   /** Состояние разработчика */
   override def state(implicit ec: ExecutionContext): Future[DeveloperState] =
-    Future.successful(DeveloperState.Free)
+    stateProvider.state
 
   /** Поручить разработчику задачу */
   override def addTask(task: Task)
