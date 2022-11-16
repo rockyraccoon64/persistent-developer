@@ -14,6 +14,7 @@ object DeveloperBehavior {
   sealed trait Command
   case class AddTask(task: Task, replyTo: ActorRef[AddTaskResult]) extends Command
   private case class FinishTask(task: Task) extends Command
+  private case object StopResting extends Command
 
   sealed trait Event
 
@@ -63,7 +64,12 @@ object DeveloperBehavior {
     }
 
     case object Resting extends State {
-      override def applyCommand(cmd: Command)(implicit setup: Setup): Effect[Event, State] = ???
+      override def applyCommand(cmd: Command)(implicit setup: Setup): Effect[Event, State] =
+        cmd match {
+          case AddTask(task, replyTo) => Effect.stash()// TODO reply
+          case StopResting => Effect.none // TODO Free
+          case _ => Effect.unhandled
+        }
       override def applyEvent(evt: Event): State = ???
     }
 
