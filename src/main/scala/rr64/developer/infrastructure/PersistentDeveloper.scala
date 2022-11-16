@@ -8,12 +8,19 @@ import rr64.developer.infrastructure.DeveloperBehavior.Replies
 
 import scala.concurrent.{ExecutionContext, Future}
 
+/**
+ * Реализация поведения разработчика на основе Akka Persistence
+ */
 class PersistentDeveloper(ref: ActorRef[DeveloperBehavior.Command])
     (implicit timeout: Timeout, scheduler: Scheduler) extends Developer {
 
-  override def state(implicit ec: ExecutionContext): Future[DeveloperState] = Future.successful(DeveloperState.Free)
+  /** Состояние разработчика */
+  override def state(implicit ec: ExecutionContext): Future[DeveloperState] =
+    Future.successful(DeveloperState.Free)
 
-  override def addTask(task: Task)(implicit ec: ExecutionContext): Future[DeveloperReply] = {
+  /** Поручить разработчику задачу */
+  override def addTask(task: Task)
+      (implicit ec: ExecutionContext): Future[DeveloperReply] = {
     ref.ask(DeveloperBehavior.AddTask(task, _)).map {
       case Replies.TaskStarted(id) => DeveloperReply.TaskStarted(id)
     }
