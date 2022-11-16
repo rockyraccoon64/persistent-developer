@@ -2,8 +2,11 @@ package rr64.developer.infrastructure
 
 import akka.actor.testkit.typed.scaladsl.ScalaTestWithActorTestKit
 import akka.actor.typed.Scheduler
+import akka.actor.typed.scaladsl.Behaviors
 import org.scalatest.flatspec.AnyFlatSpecLike
-import rr64.developer.domain.Task
+import rr64.developer.domain.{DeveloperReply, Task}
+
+import java.util.UUID
 
 class PersistentDeveloperTestSuite
   extends ScalaTestWithActorTestKit
@@ -21,6 +24,23 @@ class PersistentDeveloperTestSuite
 
     val command = probe.expectMessageType[DeveloperBehavior.AddTask]
     command.task shouldEqual task
+  }
+
+  /** Когда разработчик отвечает "Задача начата", должно приходить соответствующее доменное сообщение */
+  "When a task is started, there" should "be a corresponding domain message" in {
+    val id = UUID.randomUUID()
+    val mockBehavior = Behaviors.receiveMessage[DeveloperBehavior.Command] {
+      case DeveloperBehavior.AddTask(_, replyTo) =>
+        replyTo ! DeveloperBehavior.Replies.TaskStarted(id)
+        Behaviors.same
+    }
+    val mockActor = testKit.spawn(mockBehavior)
+    val dev = PersistentDeveloper(mockActor)
+
+    val task = Task(15)
+    val reply = dev.addTask(task)
+
+    reply shouldEqual DeveloperReply.TaskAccepted(id)
   }
 
 }
