@@ -7,11 +7,13 @@ import org.scalatest.flatspec.AnyFlatSpecLike
 import rr64.developer.domain.{DeveloperReply, Task}
 
 import java.util.UUID
+import scala.concurrent.ExecutionContext
 
 class PersistentDeveloperTestSuite
   extends ScalaTestWithActorTestKit
     with AnyFlatSpecLike {
 
+  private implicit val ec: ExecutionContext = testKit.system.executionContext
   private implicit val scheduler: Scheduler = testKit.system.scheduler
 
   /** Команда добавления задачи должна перенаправляться персистентному актору */
