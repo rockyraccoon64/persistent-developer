@@ -11,8 +11,8 @@ class PersistentDeveloperTestSuite
 
   private implicit val scheduler: Scheduler = testKit.system.scheduler
 
-  /** Команды должны перенаправляться персистентному актору */
-  "Commands" should "be redirected to the persistent actor" in {
+  /** Команда добавления задачи должна перенаправляться персистентному актору */
+  "The Add Task command" should "be redirected to the persistent actor" in {
     val probe = testKit.createTestProbe[DeveloperBehavior.Command]()
     val dev = PersistentDeveloper(probe.ref)
 
