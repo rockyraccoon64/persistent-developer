@@ -3,7 +3,7 @@ package rr64.developer.infrastructure
 import akka.actor.testkit.typed.scaladsl.ScalaTestWithActorTestKit
 import akka.actor.typed.Scheduler
 import akka.actor.typed.scaladsl.Behaviors
-import org.scalatest.flatspec.AnyFlatSpecLike
+import org.scalatest.flatspec.{AnyFlatSpecLike, AsyncFlatSpecLike}
 import rr64.developer.domain.{DeveloperReply, Task}
 
 import java.util.UUID
@@ -11,7 +11,7 @@ import scala.concurrent.ExecutionContext
 
 class PersistentDeveloperTestSuite
   extends ScalaTestWithActorTestKit
-    with AnyFlatSpecLike {
+    with AsyncFlatSpecLike {
 
   private implicit val ec: ExecutionContext = testKit.system.executionContext
   private implicit val scheduler: Scheduler = testKit.system.scheduler
@@ -40,9 +40,9 @@ class PersistentDeveloperTestSuite
     val dev = PersistentDeveloper(mockActor)
 
     val task = Task(15)
-    val reply = dev.addTask(task)
+    val replyFuture = dev.addTask(task)
 
-    reply shouldEqual DeveloperReply.TaskAccepted(id)
+    replyFuture.map { _ shouldEqual DeveloperReply.TaskAccepted(id) }
   }
 
 }
