@@ -28,10 +28,17 @@ class PersistentDeveloperTestSuite
       Future.failed(new NotImplementedError)
   }
 
+  private val emptyRef = testKit.spawn(Behaviors.empty[DeveloperBehavior.Command])
+
+  private def createDeveloper(
+    ref: ActorRef[DeveloperBehavior.Command] = emptyRef,
+    provider: DeveloperStateProvider = emptyProvider
+  ) = PersistentDeveloper(ref, provider)
+
   /** Команда добавления задачи должна перенаправляться персистентному актору */
   "The Add Task command" should "be redirected to the persistent actor" in {
     val probe = testKit.createTestProbe[DeveloperBehavior.Command]()
-    val dev = PersistentDeveloper(probe.ref, emptyProvider)
+    val dev = createDeveloper(probe.ref)
 
     val task = Task(10)
     dev.addTask(task)
@@ -48,7 +55,7 @@ class PersistentDeveloperTestSuite
         replyTo ! DeveloperBehavior.Replies.TaskStarted(id)
         Behaviors.same
     }
-    val dev = PersistentDeveloper(mockActor, emptyProvider)
+    val dev = createDeveloper(mockActor)
 
     val task = Task(15)
     val replyFuture = dev.addTask(task)
@@ -64,7 +71,7 @@ class PersistentDeveloperTestSuite
         replyTo ! DeveloperBehavior.Replies.TaskQueued(id)
         Behaviors.same
     }
-    val dev = PersistentDeveloper(mockActor, emptyProvider)
+    val dev = createDeveloper(mockActor)
 
     val task = Task(45)
     val replyFuture = dev.addTask(task)
@@ -77,7 +84,6 @@ class PersistentDeveloperTestSuite
     val working = DeveloperState.Working
     val free = DeveloperState.Free
 
-    val ref = testKit.spawn(Behaviors.empty[DeveloperBehavior.Command])
     val provider1 = new DeveloperStateProvider {
       override def state(implicit ec: ExecutionContext): Future[DeveloperState] =
         Future.successful(working)
@@ -86,8 +92,8 @@ class PersistentDeveloperTestSuite
       override def state(implicit ec: ExecutionContext): Future[DeveloperState] =
         Future.successful(free)
     }
-    val dev1 = PersistentDeveloper(ref, provider1)
-    val dev2 = PersistentDeveloper(ref, provider2)
+    val dev1 = createDeveloper(provider = provider1)
+    val dev2 = createDeveloper(provider = provider2)
 
     for {
       state1 <- dev1.state
