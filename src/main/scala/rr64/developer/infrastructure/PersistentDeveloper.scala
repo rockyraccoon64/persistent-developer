@@ -6,12 +6,14 @@ import akka.util.Timeout
 import rr64.developer.domain.DeveloperState._
 import rr64.developer.domain._
 
+import java.util.UUID
+
 class PersistentDeveloper(ref: ActorRef[DeveloperBehavior.Command])
     (implicit timeout: Timeout, scheduler: Scheduler) extends Developer {
   override def state: DeveloperState = Free
   override def addTask(task: Task): DeveloperReply = {
     ref.ask(DeveloperBehavior.AddTask(task, _))
-    DeveloperReply.TaskAccepted
+    DeveloperReply.TaskAccepted(UUID.randomUUID())
   }
 }
 
