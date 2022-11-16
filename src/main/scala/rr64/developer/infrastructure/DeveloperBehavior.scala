@@ -54,7 +54,7 @@ object DeveloperBehavior {
     }
 
     /** Разработчик работает над задачей */
-    case class Working(taskWithId: TaskWithId, taskQueue: Seq[TaskWithId])
+    case class Working(currentTask: TaskWithId, taskQueue: Seq[TaskWithId])
       (implicit setup: Setup) extends State {
       override def applyCommand(cmd: Command): Effect[Event, State] =
         cmd match {
@@ -73,8 +73,8 @@ object DeveloperBehavior {
         }
       override def applyEvent(evt: Event): State =
         evt match {
-          case Event.TaskFinished => Resting(taskWithId.task.difficulty * setup.restFactor)
-          case Event.TaskQueued(newTask) => Working(taskWithId, taskQueue :+ newTask)
+          case Event.TaskFinished => Resting(currentTask.task.difficulty * setup.restFactor)
+          case Event.TaskQueued(newTask) => Working(currentTask, taskQueue :+ newTask)
         }
     }
 
@@ -93,8 +93,8 @@ object DeveloperBehavior {
     }
 
     implicit class WorkingOps(working: Working) {
-      def task: Task = working.taskWithId.task
-      def taskId: UUID = working.taskWithId.id
+      def task: Task = working.currentTask.task
+      def taskId: UUID = working.currentTask.id
     }
 
   }
