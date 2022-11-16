@@ -66,7 +66,7 @@ class DeveloperBehaviorTestSuite extends ScalaTestWithActorTestKit(EventSourcedB
     val task = Task(5)
     val result = developerTestKit.runCommand(AddTask(task, _))
     val reply = result.replyOfType[Replies.TaskStarted]
-    reply.identifier should not be null
+    reply.id should not be null
   }
 
   /** До выполнения задачи разработчик работает, по окончании снова свободен */

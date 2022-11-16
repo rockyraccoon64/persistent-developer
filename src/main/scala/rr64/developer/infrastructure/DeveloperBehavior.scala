@@ -7,6 +7,7 @@ import akka.persistence.typed.scaladsl.{Effect, EventSourcedBehavior}
 import rr64.developer.domain.Task
 import rr64.developer.infrastructure.DeveloperBehavior.Replies.AddTaskResult
 
+import java.util.UUID
 import scala.concurrent.duration.DurationInt
 
 object DeveloperBehavior {
@@ -41,7 +42,7 @@ object DeveloperBehavior {
                 val timeNeeded = task.difficulty * setup.timeFactor
                 setup.timer.startSingleTimer(FinishTask, timeNeeded.millis) // TODO Не будет выполнено, если упадёт во время работы
               }
-              .thenReply(replyTo)(_ => Replies.TaskStarted)
+              .thenReply(replyTo)(_ => Replies.TaskStarted(null))
         }
       override def applyEvent(evt: Event): State =
         evt match {
@@ -87,7 +88,7 @@ object DeveloperBehavior {
     /** Результат добавления задачи */
     sealed trait AddTaskResult
     /** Задача принята в работу */
-    case object TaskStarted extends AddTaskResult
+    case class TaskStarted(id: UUID) extends AddTaskResult
   }
 
   case class Setup(timeFactor: Int, restFactor: Int, timer: TimerScheduler[Command])
