@@ -86,6 +86,7 @@ object DeveloperBehavior {
 
     implicit class WorkingOps(working: Working) {
       def task: Task = working.taskWithId.task
+      def taskId: UUID = working.taskWithId.id
     }
 
   }
