@@ -47,7 +47,7 @@ class DeveloperBehaviorTestSuite
     )
   }
 
-  private def addTask(kit: Kit, task: Task) =
+  private def addTask(kit: Kit, task: Task) = // TODO Значение по умолчанию
     kit.runCommand(AddTask(task, _))
 
   private val manualTime = ManualTime()
@@ -247,6 +247,33 @@ class DeveloperBehaviorTestSuite
     developerTestKit.getState() shouldBe a [State.Free]
   }
 
-  /** TODO Если разработчик отдыхает, новые задачи ставятся в очередь */
+  /** Если разработчик отдыхает, новые задачи ставятся в очередь */
+  "The developer" should "queue tasks while resting" in {
+    val initialTask = Task(1)
+    val workTime = workTimeMs(initialTask.difficulty)
+
+    addTask(developerTestKit, initialTask)
+
+    manualTime.timePasses(workTime.millis)
+
+    developerTestKit.getState() shouldBe a [State.Resting]
+
+    val task1 = Task(10)
+    val taskWithId1 = queueTask(task1)
+
+    val task2 = Task(5)
+    val taskWithId2 = queueTask(task2)
+
+    inside(developerTestKit.getState()) {
+      case resting: State.Resting =>
+        resting.taskQueue should contain theSameElementsInOrderAs Seq(taskWithId1, taskWithId2)
+    }
+  }
+
+  private def queueTask(task: Task, kit: Kit = developerTestKit): TaskWithId = {
+    val result = addTask(kit, task)
+    val id = result.replyOfType[TaskQueued].id
+    TaskWithId(task, id)
+  }
 
 }
