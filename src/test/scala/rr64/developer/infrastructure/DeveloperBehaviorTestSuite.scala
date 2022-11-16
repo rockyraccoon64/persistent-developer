@@ -25,14 +25,14 @@ class DeveloperBehaviorTestSuite extends ScalaTestWithActorTestKit(EventSourcedB
 
   def testKit(
     persistenceId: String,
-    timeFactor: Int,
+    workFactor: Int,
     restFactor: Int
   ): Kit = {
     EventSourcedBehaviorTestKit(
       system = system,
       behavior = DeveloperBehavior(
         persistenceId = PersistenceId.ofUniqueId(persistenceId),
-        timeFactor = timeFactor,
+        workFactor = workFactor,
         restFactor = restFactor
       ),
       SerializationSettings.disabled
@@ -42,9 +42,9 @@ class DeveloperBehaviorTestSuite extends ScalaTestWithActorTestKit(EventSourcedB
   private def addTask(kit: Kit, task: Task) =
     kit.runCommand(AddTask(task, _))
 
-  private val timeFactor = 10
+  private val workFactor = 10
   private val restFactor = 5
-  private val developerTestKit = testKit("dev-test", timeFactor, restFactor)
+  private val developerTestKit = testKit("dev-test", workFactor, restFactor)
 
   override protected def beforeEach(): Unit = {
     super.beforeEach()
@@ -102,7 +102,7 @@ class DeveloperBehaviorTestSuite extends ScalaTestWithActorTestKit(EventSourcedB
   "The developer" should "rest after completing a task" in {
     val difficulty = 50
     val task = Task(difficulty)
-    val workTime = difficulty * timeFactor
+    val workTime = difficulty * workFactor
     val restingTime = difficulty * restFactor
 
     addTask(developerTestKit, task)

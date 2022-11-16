@@ -41,7 +41,7 @@ object DeveloperBehavior {
             val taskWithId = TaskWithId(task, id)
             Effect.persist(Event.TaskStarted(taskWithId))
               .thenRun { _: State =>
-                val timeNeeded = task.difficulty * setup.timeFactor
+                val timeNeeded = task.difficulty * setup.workFactor
                 setup.timer.startSingleTimer(FinishTask, timeNeeded.millis) // TODO Не будет выполнено, если упадёт во время работы
               }
               .thenReply(replyTo)(_ => Replies.TaskStarted(id))
@@ -98,13 +98,13 @@ object DeveloperBehavior {
     case class TaskStarted(id: UUID) extends AddTaskResult
   }
 
-  case class Setup(timeFactor: Int, restFactor: Int, timer: TimerScheduler[Command])
+  case class Setup(workFactor: Int, restFactor: Int, timer: TimerScheduler[Command])
 
   case class TaskWithId(task: Task, id: UUID)
 
-  def apply(persistenceId: PersistenceId, timeFactor: Int, restFactor: Int): Behavior[Command] =
+  def apply(persistenceId: PersistenceId, workFactor: Int, restFactor: Int): Behavior[Command] =
     Behaviors.withTimers { timer =>
-      implicit val setup: Setup = Setup(timeFactor, restFactor, timer)
+      implicit val setup: Setup = Setup(workFactor, restFactor, timer)
       EventSourcedBehavior[Command, Event, State](
         persistenceId = persistenceId,
         emptyState = State.Free(),
