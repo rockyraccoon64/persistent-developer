@@ -59,9 +59,7 @@ class DeveloperStateProjectionTestSuite
 
   /** Обработчик проекции должен обновлять состояние разработчика на "Работает", когда он начинает задачу */
   "The handler" should "update the developer state in the repository when a task is started" in {
-    val events = Seq(
-      Event.TaskStarted(TaskWithId(Task(1), UUID.randomUUID()))
-    )
+    val events = Event.TaskStarted(TaskWithId(Task(1), UUID.randomUUID())) :: Nil
     val sourceProvider = provider(events)
     val projection = TestProjection(ProjectionId("dev-state-test", "0"), sourceProvider, () => handler)
 
@@ -72,10 +70,8 @@ class DeveloperStateProjectionTestSuite
 
   /** Обработчик проекции должен обновлять состояние разработчика на "Отдых", когда он заканчивает задачу */
   "The handler" should "update the developer state in the repository when a task is finished" in {
-    val events = Seq(
-      Event.TaskStarted(TaskWithId(Task(1), UUID.randomUUID())),
-      Event.TaskFinished
-    )
+    val events = Event.TaskStarted(TaskWithId(Task(1), UUID.randomUUID())) ::
+      Event.TaskFinished :: Nil
     val sourceProvider = provider(events)
 
     val projection = TestProjection(ProjectionId("dev-state-test", "0"), sourceProvider, () => handler)
