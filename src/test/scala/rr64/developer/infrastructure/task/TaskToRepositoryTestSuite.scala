@@ -72,4 +72,15 @@ class TaskToRepositoryTestSuite
     }
   }
 
+  /** Когда задача ставится в очередь, её текущее состояние должно сохраняться в репозиторий */
+  "The current task state" should "be saved to the repository when the task is queued" in new Fixture {
+    val taskWithId = TaskWithId(Task(100), UUID.randomUUID())
+    val taskInfo = TaskInfo(taskWithId.id, taskWithId.task.difficulty, TaskStatus.Queued)
+    val events = Event.TaskQueued(taskWithId) :: Nil
+    val projection: TestProjection[Offset, EventEnvelope[Event]] = projectionFromEvents(events, "proj")
+    projectionTestKit.run(projection) {
+      mockRepository.findById(taskInfo.id).futureValue shouldEqual Some(taskInfo)
+    }
+  }
+
 }
