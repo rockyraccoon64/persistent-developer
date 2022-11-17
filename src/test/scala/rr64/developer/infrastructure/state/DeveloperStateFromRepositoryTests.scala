@@ -35,7 +35,8 @@ class DeveloperStateFromRepositoryTests extends AsyncFlatSpec with Matchers {
   /** Если состояние разработчика не сохранено в репозитории,
    * он ещё не получил задачу и находится в начальном состоянии */
   "The provider" should "return the initial state if the developer's state is not saved in the repository" in {
-    val provider = new DeveloperStateFromRepository("dev-id4", mockRepository)
+    val nonexistentDevId = "dave"
+    val provider = new DeveloperStateFromRepository(nonexistentDevId, mockRepository)
     provider.state.map(_ shouldEqual DeveloperState.Free)
   }
 
