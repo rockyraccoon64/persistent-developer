@@ -21,6 +21,12 @@ class TaskSlickRepositoryTestSuite
     status = TaskStatus.Queued
   )
 
+  private val taskInProgress = TaskInfo(
+    id = UUID.fromString("959c3bee-9f0b-472e-b45b-1285aa78f215"),
+    difficulty = 38,
+    status = TaskStatus.InProgress
+  )
+
   override protected def beforeAll(): Unit = {
     super.beforeAll()
     Await.result(
@@ -46,6 +52,15 @@ class TaskSlickRepositoryTestSuite
   }
 
   /** Репозиторий должен сохранять задачи со статусом "В разработке" */
+  "The repository" should "save tasks in progress" in {
+    val repository = new TaskSlickRepository(database)
+    for {
+      _ <- repository.save(taskInProgress)
+      result <- repository.findById(taskInProgress.id)
+    } yield {
+      result shouldEqual Some(taskInProgress)
+    }
+  }
 
   /** Репозиторий должен сохранять задачи со статусом "Завершено" */
 
