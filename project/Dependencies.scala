@@ -5,6 +5,7 @@ object Dependencies {
   object Versions {
     val Scalactic = "3.2.14"
     val Scalatest = "3.2.14"
+    val Scalamock = "5.1.0"
     val Akka = "2.7.0"
     val Logback = "1.2.11"
     val AkkaPersistenceJdbc = "5.2.0"
@@ -15,6 +16,7 @@ object Dependencies {
 
   val scalactic: ModuleID = "org.scalactic" %% "scalactic" % Versions.Scalactic
   val scalatest: ModuleID = "org.scalatest" %% "scalatest" % Versions.Scalatest
+  val scalamock: ModuleID = "org.scalamock" %% "scalamock" % Versions.Scalamock
 
   val akkaActor: ModuleID = "com.typesafe.akka" %% "akka-actor-typed" % Versions.Akka
   val akkaPersistence: ModuleID = "com.typesafe.akka" %% "akka-persistence-typed" % Versions.Akka

@@ -18,5 +18,6 @@ libraryDependencies ++= Seq(
   logback,
   akkaPersistenceTestkit % Test,
   akkaProjectionTestkit % Test,
-  scalatest % Test
+  scalatest % Test,
+  scalamock % Test
 )
