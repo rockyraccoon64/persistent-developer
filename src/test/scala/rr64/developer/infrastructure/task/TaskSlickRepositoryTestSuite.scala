@@ -1,8 +1,8 @@
 package rr64.developer.infrastructure.task
 
-import org.scalatest.Assertion
 import org.scalatest.flatspec.AsyncFlatSpecLike
 import org.scalatest.matchers.should.Matchers
+import org.scalatest.{Assertion, BeforeAndAfterEach}
 import rr64.developer.domain.{TaskInfo, TaskStatus}
 import rr64.developer.infrastructure.PostgresSpec
 import slick.jdbc.PostgresProfile.api._
@@ -14,6 +14,7 @@ import scala.concurrent.{Await, Future}
 class TaskSlickRepositoryTestSuite
   extends PostgresSpec
     with AsyncFlatSpecLike
+    with BeforeAndAfterEach
     with Matchers {
 
   private val repository = new TaskSlickRepository(database)
@@ -36,8 +37,8 @@ class TaskSlickRepositoryTestSuite
     status = TaskStatus.InProgress
   )
 
-  override protected def beforeAll(): Unit = {
-    super.beforeAll()
+  override protected def beforeEach(): Unit = {
+    super.beforeEach()
     Await.result(
       database.run {
         sqlu"""CREATE TABLE task(
@@ -47,6 +48,15 @@ class TaskSlickRepositoryTestSuite
            )"""
       }, 10.seconds
     )
+  }
+
+  override protected def afterEach(): Unit = {
+    Await.result(
+      database.run {
+        sqlu"""DROP TABLE task"""
+      }, 10.seconds
+    )
+    super.afterEach()
   }
 
   private def saveAndAssert(task: TaskInfo): Future[Assertion] =
