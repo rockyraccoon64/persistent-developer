@@ -6,7 +6,7 @@ import akka.util.Timeout
 import rr64.developer.domain._
 import rr64.developer.infrastructure.DeveloperBehavior.Replies
 import rr64.developer.infrastructure.PersistentDeveloper.DeveloperRef
-import rr64.developer.infrastructure.state.DeveloperStateProvider
+import rr64.developer.infrastructure.dev.DeveloperStateProvider
 
 import scala.concurrent.{ExecutionContext, Future}
 

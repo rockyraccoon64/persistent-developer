@@ -1,4 +1,4 @@
-package rr64.developer.infrastructure.state
+package rr64.developer.infrastructure.dev
 
 import akka.NotUsed
 import akka.actor.testkit.typed.scaladsl.ScalaTestWithActorTestKit
