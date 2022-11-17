@@ -1,5 +1,6 @@
 package rr64.developer.infrastructure.task
 
+import org.scalatest.Assertion
 import org.scalatest.flatspec.AsyncFlatSpecLike
 import org.scalatest.matchers.should.Matchers
 import rr64.developer.domain.{TaskInfo, TaskStatus}
@@ -7,7 +8,7 @@ import rr64.developer.infrastructure.PostgresSpec
 import slick.jdbc.PostgresProfile.api._
 
 import java.util.UUID
-import scala.concurrent.Await
+import scala.concurrent.{Await, Future}
 import scala.concurrent.duration.DurationInt
 
 class TaskSlickRepositoryTestSuite
@@ -42,24 +43,22 @@ class TaskSlickRepositoryTestSuite
     )
   }
 
+  private def assertTask(task: TaskInfo): Future[Assertion] =
+    for {
+      _ <- repository.save(task)
+      result <- repository.findById(task.id)
+    } yield {
+      result shouldEqual Some(task)
+    }
+
   /** Репозиторий должен сохранять задачи со статусом "В очереди" */
   "The repository" should "save queued tasks" in {
-    for {
-      _ <- repository.save(queuedTask)
-      result <- repository.findById(queuedTask.id)
-    } yield {
-      result shouldEqual Some(queuedTask)
-    }
+    assertTask(queuedTask)
   }
 
   /** Репозиторий должен сохранять задачи со статусом "В разработке" */
   "The repository" should "save tasks in progress" in {
-    for {
-      _ <- repository.save(taskInProgress)
-      result <- repository.findById(taskInProgress.id)
-    } yield {
-      result shouldEqual Some(taskInProgress)
-    }
+    assertTask(taskInProgress)
   }
 
   /** Репозиторий должен сохранять задачи со статусом "Завершено" */
