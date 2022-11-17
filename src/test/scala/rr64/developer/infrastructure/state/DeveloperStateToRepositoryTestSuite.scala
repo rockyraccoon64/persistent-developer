@@ -19,7 +19,7 @@ import scala.concurrent.{ExecutionContext, Future}
 /**
  * Тесты обработчика проекции состояния разработчика
  * */
-class DeveloperStateProjectionHandlerTestSuite
+class DeveloperStateToRepositoryTestSuite
   extends ScalaTestWithActorTestKit
   with AnyFlatSpecLike {
 
