@@ -11,6 +11,7 @@ import akka.stream.scaladsl.Source
 import org.scalatest.flatspec.AnyFlatSpecLike
 import rr64.developer.domain.{Task, TaskInfo, TaskStatus}
 import rr64.developer.infrastructure.DeveloperBehavior.{Event, TaskWithId}
+import rr64.developer.infrastructure.ProjectionTestUtils
 
 import java.util.UUID
 import scala.concurrent.{ExecutionContext, Future}
@@ -46,16 +47,7 @@ class TaskToRepositoryTestSuite
       persistenceId: String,
       startOffset: Long = 0
     ): Source[EventEnvelope[Event], NotUsed] =
-      Source(events).zipWithIndex.map { case (event, idx) =>
-        val offset = startOffset + idx
-        EventEnvelope(
-          offset = Offset.sequence(offset),
-          persistenceId = persistenceId,
-          sequenceNr = offset,
-          event = event,
-          timestamp = offset
-        )
-      }
+      ProjectionTestUtils.envelopeSource(events, persistenceId, startOffset)
 
     protected def providerFromSource(
       source: Source[EventEnvelope[Event], NotUsed]
