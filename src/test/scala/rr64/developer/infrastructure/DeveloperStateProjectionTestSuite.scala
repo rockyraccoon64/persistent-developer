@@ -67,7 +67,7 @@ class DeveloperStateProjectionTestSuite
       handler = () => handler
     )
 
-  private def createProjection(
+  private def projectionFromEvents(
     events: Seq[Event],
     persistenceId: String = defaultPersistenceId
   ): TestProjection[Offset, EventEnvelope[Event]] = {
@@ -92,7 +92,7 @@ class DeveloperStateProjectionTestSuite
   /** Обработчик проекции должен обновлять состояние разработчика на "Работает", когда он начинает задачу */
   "The handler" should "update the developer state in the repository when a task is started" in {
     val events = Event.TaskStarted(defaultTask1) :: Nil
-    val projection = createProjection(events)
+    val projection = projectionFromEvents(events)
 
     projectionTestKit.run(projection) {
       assertState(DeveloperState.Working)
@@ -103,7 +103,7 @@ class DeveloperStateProjectionTestSuite
   "The handler" should "update the developer state in the repository when a task is finished" in {
     val events = Event.TaskStarted(defaultTask1) ::
       Event.TaskFinished :: Nil
-    val projection = createProjection(events)
+    val projection = projectionFromEvents(events)
 
     projectionTestKit.run(projection) {
       assertState(DeveloperState.Resting)
@@ -117,7 +117,7 @@ class DeveloperStateProjectionTestSuite
       Event.TaskFinished ::
       Event.Rested ::
       Nil
-    val projection = createProjection(events)
+    val projection = projectionFromEvents(events)
 
     projectionTestKit.run(projection) {
       assertState(DeveloperState.Free)
@@ -129,7 +129,7 @@ class DeveloperStateProjectionTestSuite
     val events = Event.TaskStarted(defaultTask1) ::
       Event.TaskQueued(defaultTask2) ::
       Nil
-    val projection = createProjection(events)
+    val projection = projectionFromEvents(events)
 
     projectionTestKit.run(projection) {
       assertState(DeveloperState.Working)
@@ -142,7 +142,7 @@ class DeveloperStateProjectionTestSuite
       Event.TaskFinished ::
       Event.TaskQueued(defaultTask2) ::
       Nil
-    val projection = createProjection(events)
+    val projection = projectionFromEvents(events)
 
     projectionTestKit.run(projection) {
       assertState(DeveloperState.Resting)
