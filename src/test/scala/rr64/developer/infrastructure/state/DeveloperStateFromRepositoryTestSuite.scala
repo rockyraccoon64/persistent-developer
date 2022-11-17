@@ -7,13 +7,16 @@ import rr64.developer.domain.DeveloperState
 
 import scala.concurrent.{ExecutionContext, Future}
 
+/**
+ * Тесты источника состояний разработчиков на основе репозитория
+ */
 class DeveloperStateFromRepositoryTestSuite extends AsyncFlatSpec with Matchers {
 
   private val dev1 = "walter"
   private val dev2 = "mark"
   private val dev3 = "gruff97"
 
-  private def mockRepository = new DeveloperStateRepository {
+  private def mockRepository: DeveloperStateRepository = new DeveloperStateRepository {
     private var states: Map[String, DeveloperState] = Map(
       dev1 -> DeveloperState.Working,
       dev2 -> DeveloperState.Resting,
