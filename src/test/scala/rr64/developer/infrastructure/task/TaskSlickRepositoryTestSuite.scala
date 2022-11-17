@@ -4,8 +4,11 @@ import org.scalatest.flatspec.AsyncFlatSpecLike
 import org.scalatest.matchers.should.Matchers
 import rr64.developer.domain.{TaskInfo, TaskStatus}
 import rr64.developer.infrastructure.PostgresSpec
+import slick.jdbc.PostgresProfile.api._
 
 import java.util.UUID
+import scala.concurrent.Await
+import scala.concurrent.duration.DurationInt
 
 class TaskSlickRepositoryTestSuite
   extends PostgresSpec
@@ -18,14 +21,26 @@ class TaskSlickRepositoryTestSuite
     status = TaskStatus.Queued
   )
 
+  override protected def beforeAll(): Unit = {
+    super.beforeAll()
+    Await.result(
+      database.run {
+        sqlu"""CREATE TABLE task(
+             id UUID PRIMARY KEY,
+             difficulty INT NOT NULL,
+             status VARCHAR(10) NOT NULL
+           )"""
+      }, 10.seconds
+    )
+  }
+
   /** Репозиторий должен сохранять задачи со статусом "В очереди" */
   "The repository" should "save queued tasks" in {
-    val repository = new TaskSlickRepository
+    val repository = new TaskSlickRepository(database)
     for {
-      count <- repository.save(queuedTask)
+      _ <- repository.save(queuedTask)
       result <- repository.findById(queuedTask.id)
     } yield {
-      count shouldEqual 1
       result shouldEqual Some(queuedTask)
     }
   }
