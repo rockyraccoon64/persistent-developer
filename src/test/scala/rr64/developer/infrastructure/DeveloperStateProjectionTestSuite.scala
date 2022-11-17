@@ -38,7 +38,7 @@ class DeveloperStateProjectionTestSuite
 
   private val defaultPersistenceId = "test-id"
 
-  private val defaultTask = TaskWithId(Task(1), UUID.randomUUID())
+  private val defaultTask1 = TaskWithId(Task(1), UUID.randomUUID())
 
   private def provider(
     events: Seq[Event],
@@ -86,7 +86,7 @@ class DeveloperStateProjectionTestSuite
 
   /** Обработчик проекции должен обновлять состояние разработчика на "Работает", когда он начинает задачу */
   "The handler" should "update the developer state in the repository when a task is started" in {
-    val events = Event.TaskStarted(defaultTask) :: Nil
+    val events = Event.TaskStarted(defaultTask1) :: Nil
     val projection = createProjection(events)
 
     projectionTestKit.run(projection) {
@@ -96,7 +96,7 @@ class DeveloperStateProjectionTestSuite
 
   /** Обработчик проекции должен обновлять состояние разработчика на "Отдых", когда он заканчивает задачу */
   "The handler" should "update the developer state in the repository when a task is finished" in {
-    val events = Event.TaskStarted(defaultTask) ::
+    val events = Event.TaskStarted(defaultTask1) ::
       Event.TaskFinished :: Nil
     val projection = createProjection(events)
 
@@ -108,7 +108,7 @@ class DeveloperStateProjectionTestSuite
   /** Обработчик проекции должен обновлять состояние разработчика на "Свободен",
    * когда он отдохнул и у него нет задач */
   "The handler" should "update the state to Free after the developer rests if he has no more tasks" in {
-    val events = Event.TaskStarted(defaultTask) :: // TODO Общий Task
+    val events = Event.TaskStarted(defaultTask1) :: // TODO Общий Task
       Event.TaskFinished ::
       Event.Rested ::
       Nil
@@ -121,7 +121,7 @@ class DeveloperStateProjectionTestSuite
 
   /** Обработчик проекции не должен обновлять состояние разработчика при получении задачи, когда он работает */
   "The handler" should "not update the state after receiving a new task while working" in {
-    val events = Event.TaskStarted(defaultTask) ::
+    val events = Event.TaskStarted(defaultTask1) ::
       Event.TaskQueued(TaskWithId(Task(5), UUID.randomUUID())) ::
       Nil
     val projection = createProjection(events)
