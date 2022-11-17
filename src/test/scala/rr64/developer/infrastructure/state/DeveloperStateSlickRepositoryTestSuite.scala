@@ -1,10 +1,13 @@
 package rr64.developer.infrastructure.state
 
+import org.scalatest.Assertion
 import org.scalatest.flatspec.AsyncFlatSpecLike
 import org.scalatest.matchers.should.Matchers
 import rr64.developer.domain.DeveloperState
 import rr64.developer.infrastructure.PostgresSpec
 import slick.jdbc.PostgresProfile.api._
+
+import scala.concurrent.Future
 
 class DeveloperStateSlickRepositoryTestSuite extends PostgresSpec with AsyncFlatSpecLike with Matchers {
 
@@ -20,24 +23,22 @@ class DeveloperStateSlickRepositoryTestSuite extends PostgresSpec with AsyncFlat
     }
   }
 
+  private def checkInsert(id: String, state: DeveloperState): Future[Assertion] =
+    for {
+      _ <- repository.save(id, state)
+      stateResult <- repository.findById(id)
+    } yield {
+      stateResult shouldEqual Some(state)
+    }
+
   /** Состояние "Свободен" должно добавляться и извлекаться из репозитория */
   "The free developer state" should "be inserted" in {
-    for {
-      _ <- repository.save("dev-1", DeveloperState.Free)
-      state <- repository.findById("dev-1")
-    } yield {
-      state shouldEqual Some(DeveloperState.Free)
-    }
+    checkInsert("dev-1", DeveloperState.Free)
   }
 
   /** Состояние "Работает" должно добавляться и извлекаться из репозитория */
   "The Working developer state" should "be inserted" in {
-    for {
-      _ <- repository.save("dev-2", DeveloperState.Working)
-      state <- repository.findById("dev-2")
-    } yield {
-      state shouldEqual Some(DeveloperState.Working)
-    }
+    checkInsert("dev-2", DeveloperState.Working)
   }
 
 
