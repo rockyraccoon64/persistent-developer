@@ -25,7 +25,7 @@ class DeveloperStateTableTestSuite
   }
 
   /** Состояние "Свободен" должно добавляться в БД */
-  "The free developer state" should "be saved to the database" in {
+  "The free developer state" should "be saved to the database" in { // TODO
     val id = "dev-1"
     val state = (id, DeveloperState.Free)
     for {
@@ -40,4 +40,22 @@ class DeveloperStateTableTestSuite
       result shouldEqual Seq(state)
     }
   }
+
+  /** Состояние "Работает" должно добавляться и извлекаться из БД */
+  "The Working developer state" should "be inserted and retrieved from the database" in {
+    val id = "dev-2"
+    val state = (id, DeveloperState.Working)
+    for {
+      count <- database.run {
+        table += state
+      }
+      result <- database.run {
+        table.filter(_.id === id).result
+      }
+    } yield {
+      count shouldEqual 1
+      result shouldEqual Seq(state)
+    }
+  }
+
 }
