@@ -50,7 +50,7 @@ class DeveloperStateProjectionTestSuite
       event.toEnvelope(persistenceId, startOffset + idx)
     }
 
-  private def providerFromEnvelopeSource(
+  private def providerFromSource(
     source: Source[EventEnvelope[Event], NotUsed]
   ): TestSourceProvider[Offset, EventEnvelope[Event]] =
     TestSourceProvider(
@@ -78,7 +78,7 @@ class DeveloperStateProjectionTestSuite
   private def projectionFromSource(
     source: Source[EventEnvelope[Event], NotUsed]
   ): TestProjection[Offset, EventEnvelope[Event]] = {
-    val sourceProvider = providerFromEnvelopeSource(source)
+    val sourceProvider = providerFromSource(source)
     projectionFromSourceProvider(sourceProvider)
   }
 
