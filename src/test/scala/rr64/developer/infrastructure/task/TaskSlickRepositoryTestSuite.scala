@@ -102,9 +102,13 @@ class TaskSlickRepositoryTestSuite
     } yield succeeded
   }
 
-  /** Репозиторий должен находить существующие задачи */
-
-  /** Репозиторий должен не должен находить несуществующие задачи */
+  /** Репозиторий не должен находить несуществующие задачи */
+  "The repository" should "not find nonexistent tasks" in {
+    val nonexistentId = UUID.fromString("6b8a92d0-f331-410e-bd28-8c23f00ef285")
+    for {
+      taskOpt <- repository.findById(nonexistentId)
+    } yield taskOpt shouldEqual None
+  }
 
   /** Репозиторий должен возвращать список всех задач */
 
