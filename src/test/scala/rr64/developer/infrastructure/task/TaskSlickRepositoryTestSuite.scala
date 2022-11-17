@@ -30,6 +30,12 @@ class TaskSlickRepositoryTestSuite
     status = TaskStatus.InProgress
   )
 
+  private val finishedTask = TaskInfo(
+    id = UUID.fromString("cc972e84-c43a-49dc-8ab2-3a2a36676ac8"),
+    difficulty = 100,
+    status = TaskStatus.InProgress
+  )
+
   override protected def beforeAll(): Unit = {
     super.beforeAll()
     Await.result(
@@ -62,6 +68,9 @@ class TaskSlickRepositoryTestSuite
   }
 
   /** Репозиторий должен сохранять задачи со статусом "Завершено" */
+  "The repository" should "save finished tasks" in {
+    assertTask(finishedTask)
+  }
 
   /** Репозиторий должен обновлять статус у существующих задач */
 
