@@ -5,7 +5,7 @@ import akka.actor.testkit.typed.scaladsl.ScalaTestWithActorTestKit
 import akka.persistence.query.Offset
 import akka.projection.ProjectionId
 import akka.projection.eventsourced.EventEnvelope
-import akka.projection.scaladsl.{Handler, SourceProvider}
+import akka.projection.scaladsl.Handler
 import akka.projection.testkit.scaladsl.{ProjectionTestKit, TestProjection}
 import akka.stream.scaladsl.Source
 import org.scalatest.Assertion
@@ -44,15 +44,6 @@ class DeveloperStateToRepositoryTestSuite
   private val defaultTask1 = TaskWithId(Task(1), UUID.randomUUID())
   private val defaultTask2 = TaskWithId(Task(5), UUID.randomUUID())
 
-  private def projectionFromSourceProvider(
-    sourceProvider: SourceProvider[Offset, EventEnvelope[Event]]
-  ): TestProjection[Offset, EventEnvelope[Event]] =
-    TestProjection(
-      projectionId = ProjectionId("dev-state-test", "0"),
-      sourceProvider = sourceProvider,
-      handler = () => handler
-    )
-
   private def projectionFromEvents(
     events: Seq[Event],
     persistenceId: String = defaultPersistenceId
@@ -63,10 +54,12 @@ class DeveloperStateToRepositoryTestSuite
 
   private def projectionFromSource(
     source: Source[EventEnvelope[Event], NotUsed]
-  ): TestProjection[Offset, EventEnvelope[Event]] = {
-    val sourceProvider = ProjectionTestUtils.providerFromSource(source)
-    projectionFromSourceProvider(sourceProvider)
-  }
+  ): TestProjection[Offset, EventEnvelope[Event]] =
+    TestProjection(
+      projectionId = ProjectionId("dev-proj-test", "0"),
+      sourceProvider = ProjectionTestUtils.providerFromSource(source),
+      handler = () => handler
+    )
 
   def assertState(
     state: DeveloperState,

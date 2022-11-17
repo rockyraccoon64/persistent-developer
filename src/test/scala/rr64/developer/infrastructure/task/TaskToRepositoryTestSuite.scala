@@ -5,7 +5,7 @@ import akka.actor.testkit.typed.scaladsl.ScalaTestWithActorTestKit
 import akka.persistence.query.Offset
 import akka.projection.ProjectionId
 import akka.projection.eventsourced.EventEnvelope
-import akka.projection.scaladsl.{Handler, SourceProvider}
+import akka.projection.scaladsl.Handler
 import akka.projection.testkit.scaladsl.{ProjectionTestKit, TestProjection}
 import akka.stream.scaladsl.Source
 import org.scalatest.flatspec.AnyFlatSpecLike
@@ -42,15 +42,6 @@ class TaskToRepositoryTestSuite
 
     protected val handler: Handler[EventEnvelope[Event]] = new TaskToRepository(mockRepository)
 
-    protected def projectionFromSourceProvider(
-      sourceProvider: SourceProvider[Offset, EventEnvelope[Event]]
-    ): TestProjection[Offset, EventEnvelope[Event]] =
-      TestProjection(
-        projectionId = ProjectionId("dev-state-test", "0"),
-        sourceProvider = sourceProvider,
-        handler = () => handler
-      )
-
     protected def projectionFromEvents(
       events: Seq[Event],
       persistenceId: String
@@ -61,10 +52,12 @@ class TaskToRepositoryTestSuite
 
     protected def projectionFromSource(
       source: Source[EventEnvelope[Event], NotUsed]
-    ): TestProjection[Offset, EventEnvelope[Event]] = {
-      val sourceProvider = ProjectionTestUtils.providerFromSource(source)
-      projectionFromSourceProvider(sourceProvider)
-    }
+    ): TestProjection[Offset, EventEnvelope[Event]] =
+      TestProjection(
+        projectionId = ProjectionId("task-proj-test", "0"),
+        sourceProvider = ProjectionTestUtils.providerFromSource(source),
+        handler = () => handler
+      )
 
   }
 
