@@ -74,9 +74,14 @@ class TaskSlickRepositoryTestSuite
 
   /** Репозиторий должен обновлять статус у существующих задач */
   "The repository" should "update existing tasks' status" in {
-    val updatedTask = taskInProgress.copy(status = TaskStatus.Finished)
+    val initialTask = TaskInfo(
+      id = UUID.fromString("a67fb9da-9c25-4bce-ac57-abe4de23f208"),
+      difficulty = 50,
+      status = TaskStatus.InProgress
+    )
+    val updatedTask = initialTask.copy(status = TaskStatus.Finished)
     for {
-      _ <- repository.save(taskInProgress)
+      _ <- repository.save(initialTask)
       _ <- assertTask(updatedTask)
     } yield succeed
   }
