@@ -11,17 +11,24 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class TaskToRepository(repository: TaskRepository)
     (implicit ec: ExecutionContext) extends Handler[EventEnvelope[Event]] {
+
   override def process(envelope: EventEnvelope[Event]): Future[Done] =
     envelope.event match {
       case Event.TaskStarted(taskWithId) =>
         val taskInfo = taskWithId.withStatus(TaskStatus.InProgress)
-        repository.save(taskInfo).map(_ => Done)
+        save(taskInfo)
+
       case Event.TaskQueued(taskWithId) =>
         val taskInfo = taskWithId.withStatus(TaskStatus.Queued)
-        repository.save(taskInfo).map(_ => Done)
+        save(taskInfo)
+
       case Event.TaskFinished => ???
       case Event.Rested => ???
     }
+
+  private def save(taskInfo: TaskInfo): Future[Done] =
+    repository.save(taskInfo).map(_ => Done)
+
 }
 
 object TaskToRepository {
