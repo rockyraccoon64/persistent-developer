@@ -55,4 +55,9 @@ class DeveloperStateSlickRepositoryTestSuite extends PostgresSpec with AsyncFlat
     } yield succeeded
   }
 
+  /** Если для разработчика в репозитории нет состояния, ничего не возвращается */
+  "The repository" should "not return a state for a given developer if there is none" in {
+    repository.findById("nonexistent").map(_ shouldEqual None)
+  }
+
 }
