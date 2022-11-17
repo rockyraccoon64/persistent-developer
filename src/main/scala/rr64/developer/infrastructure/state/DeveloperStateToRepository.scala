@@ -10,10 +10,16 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class DeveloperStateToRepository(repository: DeveloperStateRepository)
     (implicit ec: ExecutionContext) extends Handler[EventEnvelope[Event]] {
+
   override def process(envelope: EventEnvelope[Event]): Future[Done] = envelope.event match {
     case Event.TaskStarted(_) =>
-      repository.save(envelope.persistenceId, DeveloperState.Working).map(_ => Done)
+      save(envelope.persistenceId, DeveloperState.Working)
     case Event.TaskFinished =>
-      repository.save(envelope.persistenceId, DeveloperState.Resting).map(_ => Done)
+      save(envelope.persistenceId, DeveloperState.Resting)
   }
+
+  private def save(id: String, state: DeveloperState): Future[Done] = {
+    repository.save(id, state).map(_ => Done)
+  }
+
 }
