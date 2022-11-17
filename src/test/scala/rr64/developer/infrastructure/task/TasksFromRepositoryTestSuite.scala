@@ -3,9 +3,10 @@ package rr64.developer.infrastructure.task
 import org.scalamock.scalatest.AsyncMockFactory
 import org.scalatest.flatspec.AsyncFlatSpecLike
 import org.scalatest.matchers.should.Matchers
-import rr64.developer.domain.{TaskInfo, TaskStatus}
+import rr64.developer.domain.{Task, TaskStatus}
+import rr64.developer.infrastructure.TaskTestUtils.TaskWithIdFactory
+import rr64.developer.infrastructure.task.TaskToRepository.TaskOps
 
-import java.util.UUID
 import scala.concurrent.Future
 
 /**
@@ -16,8 +17,8 @@ class TasksFromRepositoryTestSuite
     with AsyncFlatSpecLike
     with Matchers {
 
-  private val task1 = TaskInfo(UUID.randomUUID(), 33, TaskStatus.Queued)
-  private val task2 = TaskInfo(UUID.randomUUID(), 85, TaskStatus.InProgress)
+  private val task1 = Task(33).withRandomId.withStatus(TaskStatus.Queued)
+  private val task2 = Task(85).withRandomId.withStatus(TaskStatus.InProgress)
 
   /** Запрос информации о задаче должен делегироваться репозиторию */
   "Single task queries" should "be redirected to the repository" in {
