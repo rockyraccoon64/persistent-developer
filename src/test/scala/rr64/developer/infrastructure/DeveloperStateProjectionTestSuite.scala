@@ -45,15 +45,20 @@ class DeveloperStateProjectionTestSuite
     )
 
     val mockRepo = new DeveloperStateRepository {
-      override def save(id: String, state: DeveloperState)(implicit ec: ExecutionContext): Future[Unit] = ???
-      override def findById(id: String)(implicit ec: ExecutionContext): Future[Option[DeveloperState]] = ???
+      private var states: Map[String, DeveloperState] = Map.empty
+      override def save(id: String, state: DeveloperState)(implicit ec: ExecutionContext): Future[Unit] = {
+        states = states.updated(id, state)
+        Future.unit
+      }
+      override def findById(id: String)(implicit ec: ExecutionContext): Future[Option[DeveloperState]] =
+        Future.successful(states.get(id))
     }
     val handler: Handler[EventEnvelope[Event]] = new DeveloperStateToRepository(mockRepo)
 
     val projection = TestProjection(ProjectionId("dev-state-test", "0"), sourceProvider, () => handler)
 
     projectionTestKit.run(projection) {
-      mockRepo.findById(persistenceId).futureValue
+      mockRepo.findById(persistenceId).futureValue shouldEqual Some(DeveloperState.Working)
     }
   }
 
