@@ -1,9 +1,8 @@
-package rr64.developer.infrastructure
+package rr64.developer.infrastructure.state
 
 import org.scalatest.flatspec.AsyncFlatSpec
 import org.scalatest.matchers.should.Matchers
 import rr64.developer.domain.DeveloperState
-import rr64.developer.infrastructure.state.{DeveloperStateFromRepository, DeveloperStateRepository}
 
 import scala.concurrent.{ExecutionContext, Future}
 
