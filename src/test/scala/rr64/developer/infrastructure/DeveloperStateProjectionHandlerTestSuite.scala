@@ -17,7 +17,7 @@ import rr64.developer.infrastructure.state.{DeveloperStateRepository, DeveloperS
 import java.util.UUID
 import scala.concurrent.{ExecutionContext, Future}
 
-class DeveloperStateProjectionTestSuite
+class DeveloperStateProjectionHandlerTestSuite
   extends ScalaTestWithActorTestKit
   with AnyFlatSpecLike {
 
