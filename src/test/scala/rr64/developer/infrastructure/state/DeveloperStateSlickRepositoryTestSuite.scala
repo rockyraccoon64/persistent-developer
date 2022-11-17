@@ -9,6 +9,9 @@ import slick.jdbc.PostgresProfile.api._
 
 import scala.concurrent.Future
 
+/**
+ * Тесты репозитория состояний разработчиков на основе PostgreSQL + Slick
+ * */
 class DeveloperStateSlickRepositoryTestSuite extends PostgresSpec with AsyncFlatSpecLike with Matchers {
 
   private val repository = new DeveloperStateSlickRepository(database)
