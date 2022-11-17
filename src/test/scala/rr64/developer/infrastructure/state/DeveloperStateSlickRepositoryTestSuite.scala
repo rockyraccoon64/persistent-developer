@@ -4,10 +4,16 @@ import org.scalatest.flatspec.AsyncFlatSpecLike
 import org.scalatest.matchers.should.Matchers
 import rr64.developer.domain.DeveloperState
 import rr64.developer.infrastructure.PostgresSpec
+import slick.jdbc.PostgresProfile.api._
 
 class DeveloperStateSlickRepositoryTestSuite extends PostgresSpec with AsyncFlatSpecLike with Matchers {
 
   private val repository = new DeveloperStateSlickRepository(database)
+
+  override protected def beforeAll(): Unit = {
+    super.beforeAll()
+    database.run(DeveloperStateSlickRepository.states.schema.createIfNotExists)
+  }
 
   /** Состояние "Свободен" должно добавляться и извлекаться из репозитория */
   "The free developer state" should "be inserted" in {
@@ -18,5 +24,4 @@ class DeveloperStateSlickRepositoryTestSuite extends PostgresSpec with AsyncFlat
       state shouldEqual Some(DeveloperState.Free)
     }
   }
-
 }
