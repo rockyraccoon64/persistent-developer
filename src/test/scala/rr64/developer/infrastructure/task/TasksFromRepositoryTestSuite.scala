@@ -1,5 +1,6 @@
 package rr64.developer.infrastructure.task
 
+import org.scalamock.scalatest.AsyncMockFactory
 import org.scalatest.flatspec.AsyncFlatSpecLike
 import org.scalatest.matchers.should.Matchers
 import rr64.developer.domain.{TaskInfo, TaskStatus}
@@ -10,18 +11,21 @@ import scala.concurrent.Future
 /**
  * Тесты источника задач на основе репозитория
  * */
-class TasksFromRepositoryTestSuite extends AsyncFlatSpecLike with Matchers {
+class TasksFromRepositoryTestSuite
+  extends AsyncMockFactory
+    with AsyncFlatSpecLike
+    with Matchers {
 
   /** Запрос информации о задаче должен делегироваться репозиторию */
   "Single task queries" should "be redirected to the repository" in {
     val task = TaskInfo(UUID.randomUUID(), 33, TaskStatus.Queued)
-    val repository = new TaskRepository { // TODO scalamock
-      override def save(taskInfo: TaskInfo): Future[_] = ???
-      override def findById(id: UUID): Future[Option[TaskInfo]] =
+    val mockRepo = mock[TaskRepository]
+    (mockRepo.findById _)
+      .expects(task.id)
+      .returning {
         Future.successful(Some(task))
-      override def list: Future[Seq[TaskInfo]] = ???
-    }
-    val tasks = new TasksFromRepository(repository)
+      }
+    val tasks = new TasksFromRepository(mockRepo)
     tasks.findById(task.id).map(_ shouldEqual Some(task))
   }
 
