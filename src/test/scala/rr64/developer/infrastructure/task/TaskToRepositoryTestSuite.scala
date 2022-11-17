@@ -44,7 +44,7 @@ class TaskToRepositoryTestSuite
 
     protected def projectionFromEvents(
       events: Seq[Event],
-      persistenceId: String
+      persistenceId: String = "proj"
     ): TestProjection[Offset, EventEnvelope[Event]] = {
       val source = ProjectionTestUtils.envelopeSource(events, persistenceId)
       projectionFromSource(source)
@@ -66,7 +66,7 @@ class TaskToRepositoryTestSuite
     val taskWithId = TaskWithId(Task(90), UUID.randomUUID())
     val taskInfo = TaskInfo(taskWithId.id, taskWithId.task.difficulty, TaskStatus.InProgress)
     val events = Event.TaskStarted(taskWithId) :: Nil
-    val projection = projectionFromEvents(events, "proj")
+    val projection = projectionFromEvents(events)
     projectionTestKit.run(projection) {
       mockRepository.findById(taskInfo.id).futureValue shouldEqual Some(taskInfo)
     }
@@ -77,7 +77,7 @@ class TaskToRepositoryTestSuite
     val taskWithId = TaskWithId(Task(100), UUID.randomUUID())
     val taskInfo = TaskInfo(taskWithId.id, taskWithId.task.difficulty, TaskStatus.Queued)
     val events = Event.TaskQueued(taskWithId) :: Nil
-    val projection = projectionFromEvents(events, "proj")
+    val projection = projectionFromEvents(events)
     projectionTestKit.run(projection) {
       mockRepository.findById(taskInfo.id).futureValue shouldEqual Some(taskInfo)
     }
