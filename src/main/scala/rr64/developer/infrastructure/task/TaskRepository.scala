@@ -8,5 +8,5 @@ import scala.concurrent.{ExecutionContext, Future}
 trait TaskRepository {
   def save(taskInfo: TaskInfo): Future[_]
   def findById(id: UUID)(implicit ec: ExecutionContext): Future[Option[TaskInfo]]
-  def list: Future[Seq[TaskInfo]]
+  def list(implicit ec: ExecutionContext): Future[Seq[TaskInfo]]
 }

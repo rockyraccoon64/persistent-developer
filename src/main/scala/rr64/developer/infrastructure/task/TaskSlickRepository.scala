@@ -4,7 +4,6 @@ import rr64.developer.infrastructure.task.TaskSlickRepository.TaskStatusAdapter
 import slick.jdbc.PostgresProfile.api._
 
 import java.util.UUID
-import scala.concurrent.ExecutionContext.global
 import scala.concurrent.{ExecutionContext, Future}
 
 class TaskSlickRepository(db: Database) extends TaskRepository {
@@ -31,8 +30,7 @@ class TaskSlickRepository(db: Database) extends TaskRepository {
     }
   }
 
-  override def list: Future[Seq[TaskInfo]] = {
-    implicit val ec: ExecutionContext = global // TODO param
+  override def list(implicit ec: ExecutionContext): Future[Seq[TaskInfo]] = {
     db.run {
       sql"""SELECT id, difficulty, status FROM task"""
         .as[(String, Int, String)]

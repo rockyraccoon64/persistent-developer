@@ -8,5 +8,5 @@ import scala.concurrent.{ExecutionContext, Future}
 class TasksFromRepository(repository: TaskRepository) extends Tasks {
   override def findById(id: UUID)(implicit ec: ExecutionContext): Future[Option[TaskInfo]] =
     repository.findById(id)
-  override def list: Future[Seq[TaskInfo]] = repository.list
+  override def list(implicit ec: ExecutionContext): Future[Seq[TaskInfo]] = repository.list
 }

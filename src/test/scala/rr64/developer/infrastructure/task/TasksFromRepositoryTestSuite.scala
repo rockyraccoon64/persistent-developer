@@ -39,8 +39,8 @@ class TasksFromRepositoryTestSuite
   "Task list queries" should "be delegated to the repository" in {
     val taskSeq = Seq(task1, task2)
     val mockRepository = mock[TaskRepository]
-    (mockRepository.list _)
-      .expects()
+    (mockRepository.list(_: ExecutionContext))
+      .expects(*)
       .once()
       .returning {
         Future.successful(taskSeq)
