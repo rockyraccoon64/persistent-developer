@@ -23,13 +23,14 @@ class DeveloperStateTableTestSuite
 
   /** Состояние разработчика должно добавляться в БД */
   "The free developer state" should "be saved to the database" in {
-    val state = ("dev-1", DeveloperState.Free)
+    val id = "dev-1"
+    val state = (id, DeveloperState.Free)
     for {
       count <- database.run {
         table += state
       }
       result <- database.run {
-        table.filter(_.id === "dev-1").result
+        table.filter(_.id === id).result
       }
     } yield {
       count shouldEqual 1
