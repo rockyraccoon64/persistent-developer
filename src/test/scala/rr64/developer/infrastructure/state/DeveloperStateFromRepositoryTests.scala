@@ -8,13 +8,13 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class DeveloperStateFromRepositoryTests extends AsyncFlatSpec with Matchers {
 
-  private val developerId = "walter"
+  private val dev1 = "walter"
   private val dev2 = "mark"
   private val dev3 = "gruff97"
 
   private def mockRepository = new DeveloperStateRepository {
     private var states: Map[String, DeveloperState] = Map(
-      developerId -> DeveloperState.Working,
+      dev1 -> DeveloperState.Working,
       dev2 -> DeveloperState.Resting,
       dev3 -> DeveloperState.Free
     )
@@ -28,7 +28,7 @@ class DeveloperStateFromRepositoryTests extends AsyncFlatSpec with Matchers {
 
   /** Источник должен извлекать известное состояние разработчика из репозитория */
   "The provider" should "extract an existing state for the given developer id from the repository" in {
-    val provider = new DeveloperStateFromRepository(developerId, mockRepository)
+    val provider = new DeveloperStateFromRepository(dev1, mockRepository)
     provider.state.map(_ shouldEqual DeveloperState.Working)
   }
 
