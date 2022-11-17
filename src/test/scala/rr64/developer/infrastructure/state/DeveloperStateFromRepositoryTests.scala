@@ -1,5 +1,6 @@
 package rr64.developer.infrastructure.state
 
+import org.scalatest.Assertion
 import org.scalatest.flatspec.AsyncFlatSpec
 import org.scalatest.matchers.should.Matchers
 import rr64.developer.domain.DeveloperState
@@ -26,10 +27,20 @@ class DeveloperStateFromRepositoryTests extends AsyncFlatSpec with Matchers {
       Future.successful(states.get(id))
   }
 
+  private def createProvider(developerId: String) = new DeveloperStateFromRepository(developerId, mockRepository)
+
+  def checkState(developerId: String, state: DeveloperState): Future[Assertion] = {
+    val provider = createProvider(developerId)
+    provider.state.map(_ shouldEqual state)
+  }
+
   /** Источник должен извлекать известное состояние разработчика из репозитория */
   "The provider" should "extract an existing state for the given developer id from the repository" in {
-    val provider = new DeveloperStateFromRepository(dev1, mockRepository)
-    provider.state.map(_ shouldEqual DeveloperState.Working)
+    for {
+      _ <- checkState(dev1, DeveloperState.Working)
+      _ <- checkState(dev2, DeveloperState.Resting)
+      _ <- checkState(dev3, DeveloperState.Free)
+    } yield succeed
   }
 
   /** Если состояние разработчика не сохранено в репозитории,
