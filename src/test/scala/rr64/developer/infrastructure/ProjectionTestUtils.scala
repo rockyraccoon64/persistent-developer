@@ -3,6 +3,7 @@ package rr64.developer.infrastructure
 import akka.NotUsed
 import akka.persistence.query.Offset
 import akka.projection.eventsourced.EventEnvelope
+import akka.projection.testkit.scaladsl.TestSourceProvider
 import akka.stream.scaladsl.Source
 
 object ProjectionTestUtils {
@@ -22,4 +23,13 @@ object ProjectionTestUtils {
         timestamp = offset
       )
     }
+
+  def providerFromSource[T](
+    source: Source[EventEnvelope[T], NotUsed]
+  ): TestSourceProvider[Offset, EventEnvelope[T]] =
+    TestSourceProvider(
+      source,
+      (envelope: EventEnvelope[T]) => envelope.offset
+    )
+
 }
