@@ -41,20 +41,19 @@ class DeveloperStateProjectionTestSuite
   private val defaultTask1 = TaskWithId(Task(1), UUID.randomUUID())
   private val defaultTask2 = TaskWithId(Task(5), UUID.randomUUID())
 
+  private def envelopeSource(
+    events: Seq[Event],
+    persistenceId: String = defaultPersistenceId
+  ): Source[EventEnvelope[Event], NotUsed] =
+    Source(events).zipWithIndex.map { case (event, idx) =>
+      event.toEnvelope(persistenceId, idx)
+    }
+
   private def provider(
     events: Seq[Event],
     persistenceId: String = defaultPersistenceId
   ): SourceProvider[Offset, EventEnvelope[Event]] = {
-    val source: Source[EventEnvelope[Event], NotUsed] =
-      Source(events).zipWithIndex.map { case (event, idx) =>
-        EventEnvelope[Event](
-          offset = Offset.sequence(idx),
-          persistenceId = persistenceId,
-          sequenceNr = idx,
-          event = event,
-          timestamp = idx
-        )
-      }
+    val source = envelopeSource(events, persistenceId)
     TestSourceProvider(
       source,
       (envelope: EventEnvelope[Event]) => envelope.offset
@@ -145,8 +144,34 @@ class DeveloperStateProjectionTestSuite
     }
   }
 
-  /** Обработчик проекции не должен обновлять состояние разработчика, когда оно не изменяется */
+  /** Для каждого разработчика состояние обновляется отдельно */
+  "The handler" should "update states for different developers separately" in {
+    val differentPersistenceId = "test-id2"
+    val events1 = (Event.TaskStarted(defaultTask2) :: Event.TaskFinished :: Nil)
+      .zipWithIndex
+      .map { case (evt, idx) =>
+        evt.toEnvelope(defaultPersistenceId, idx)
+      }
+    val events2 = Event.TaskStarted(defaultTask1).toEnvelope(differentPersistenceId, events1.size) :: Nil
 
-  /** Для каждого разработчика хранится своё состояние */
+    val source = Source(events1 ::: events2)
+    val sourceProvider = TestSourceProvider(source, (envelope: EventEnvelope[Event]) => envelope.offset)
+    val projection = createProjection(sourceProvider)
+
+    projectionTestKit.run(projection) {
+      assertState(DeveloperState.Resting, defaultPersistenceId)
+      assertState(DeveloperState.Working, differentPersistenceId)
+    }
+  }
+
+  implicit class EventOps(evt: Event) {
+    def toEnvelope(persistenceId: String, offset: Long): EventEnvelope[Event] = EventEnvelope(
+      offset = Offset.sequence(offset),
+      persistenceId = persistenceId,
+      sequenceNr = offset,
+      event = evt,
+      timestamp = offset
+    )
+  }
 
 }
