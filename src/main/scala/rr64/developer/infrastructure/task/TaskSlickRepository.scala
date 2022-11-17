@@ -3,7 +3,8 @@ import rr64.developer.domain.{TaskInfo, TaskStatus}
 import slick.jdbc.PostgresProfile.api._
 
 import java.util.UUID
-import scala.concurrent.Future
+import scala.concurrent.ExecutionContext.global
+import scala.concurrent.{ExecutionContext, Future}
 
 class TaskSlickRepository(db: Database) extends TaskRepository {
 
@@ -20,16 +21,23 @@ class TaskSlickRepository(db: Database) extends TaskRepository {
         """
   }
 
-  override def findById(id: UUID): Future[Option[TaskInfo]] =
-    Future.successful(
-      Some(
-        TaskInfo(
-          id = UUID.fromString("30dbff1f-88dc-4972-aa70-a057bf5f1c88"),
-          difficulty = 5,
-          status = TaskStatus.Queued
-        )
-      )
-    )
+  override def findById(id: UUID): Future[Option[TaskInfo]] = {
+    implicit val ec: ExecutionContext = global // TODO
+    db.run {
+      sql"""SELECT difficulty, status FROM task
+          WHERE id = ${id.toString}::uuid
+        """.as[(Int, String)]
+        .headOption
+        .map(_.map { case (difficulty, statusString) =>
+          val status = statusString match {
+            case "InProgress" => TaskStatus.InProgress
+            case "Queued" => TaskStatus.Queued
+            case "Finished" => TaskStatus.Finished
+          }
+          TaskInfo(id, difficulty, status)
+        })
+    }
+  }
 
   override def list: Future[Seq[TaskInfo]] = ???
 
