@@ -8,6 +8,7 @@ import akka.projection.eventsourced.EventEnvelope
 import akka.projection.scaladsl.{Handler, SourceProvider}
 import akka.projection.testkit.scaladsl.{ProjectionTestKit, TestProjection, TestSourceProvider}
 import akka.stream.scaladsl.Source
+import org.scalatest.Assertion
 import org.scalatest.flatspec.AnyFlatSpecLike
 import rr64.developer.domain.{DeveloperState, Task}
 import rr64.developer.infrastructure.DeveloperBehavior.{Event, TaskWithId}
@@ -74,13 +75,20 @@ class DeveloperStateProjectionTestSuite
     createProjection(sourceProvider)
   }
 
+  def assertState(
+    state: DeveloperState,
+    persistenceId: String = defaultPersistenceId,
+    repository: DeveloperStateRepository = mockRepository
+  ): Assertion =
+    repository.findById(persistenceId).futureValue shouldEqual Some(state)
+
   /** Обработчик проекции должен обновлять состояние разработчика на "Работает", когда он начинает задачу */
   "The handler" should "update the developer state in the repository when a task is started" in {
     val events = Event.TaskStarted(TaskWithId(Task(1), UUID.randomUUID())) :: Nil
     val projection = createProjection(events)
 
     projectionTestKit.run(projection) {
-      mockRepository.findById(defaultPersistenceId).futureValue shouldEqual Some(DeveloperState.Working)
+      assertState(DeveloperState.Working)
     }
   }
 
@@ -91,7 +99,7 @@ class DeveloperStateProjectionTestSuite
     val projection = createProjection(events)
 
     projectionTestKit.run(projection) {
-      mockRepository.findById(defaultPersistenceId).futureValue shouldEqual Some(DeveloperState.Resting)
+      assertState(DeveloperState.Resting)
     }
   }
 
@@ -105,7 +113,7 @@ class DeveloperStateProjectionTestSuite
     val projection = createProjection(events)
 
     projectionTestKit.run(projection) {
-      mockRepository.findById(defaultPersistenceId).futureValue shouldEqual Some(DeveloperState.Free)
+      assertState(DeveloperState.Free)
     }
   }
 
