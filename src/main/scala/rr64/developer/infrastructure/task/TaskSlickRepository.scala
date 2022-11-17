@@ -1,5 +1,6 @@
 package rr64.developer.infrastructure.task
 import rr64.developer.domain.{TaskInfo, TaskStatus}
+import rr64.developer.infrastructure.task.TaskSlickRepository.TaskStatusAdapter
 import slick.jdbc.PostgresProfile.api._
 
 import java.util.UUID
@@ -27,12 +28,8 @@ class TaskSlickRepository(db: Database) extends TaskRepository {
           WHERE id = ${id.toString}::uuid
         """.as[(Int, String)]
         .headOption
-        .map(_.map { case (difficulty, statusString) =>
-          val status = statusString match {
-            case "InProgress" => TaskStatus.InProgress
-            case "Queued" => TaskStatus.Queued
-            case "Finished" => TaskStatus.Finished
-          }
+        .map(_.map { case (difficulty, statusStr) =>
+          val status = TaskStatusAdapter.fromString(statusStr)
           TaskInfo(id, difficulty, status)
         })
     }
@@ -45,13 +42,21 @@ class TaskSlickRepository(db: Database) extends TaskRepository {
         .as[(String, Int, String)]
         .map(_.map { case (idStr, difficulty, statusStr) =>
           val id = UUID.fromString(idStr)
-          val status = statusStr match {
-            case "InProgress" => TaskStatus.InProgress
-            case "Queued" => TaskStatus.Queued
-            case "Finished" => TaskStatus.Finished
-          }
+          val status = TaskStatusAdapter.fromString(statusStr)
           TaskInfo(id, difficulty, status)
         })
+    }
+  }
+
+}
+
+object TaskSlickRepository {
+
+  object TaskStatusAdapter {
+    def fromString(value: String): TaskStatus = value match {
+      case "InProgress" => TaskStatus.InProgress
+      case "Queued" => TaskStatus.Queued
+      case "Finished" => TaskStatus.Finished
     }
   }
 
