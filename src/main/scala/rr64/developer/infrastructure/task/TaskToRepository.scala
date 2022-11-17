@@ -19,7 +19,13 @@ class TaskToRepository(repository: TaskRepository)
           status = TaskStatus.InProgress
         )
         repository.save(taskInfo).map(_ => Done)
-      case Event.TaskQueued(taskWithId) => ???
+      case Event.TaskQueued(taskWithId) =>
+        val taskInfo = TaskInfo(
+          id = taskWithId.id,
+          difficulty = taskWithId.task.difficulty,
+          status = TaskStatus.Queued
+        )
+        repository.save(taskInfo).map(_ => Done)
       case Event.TaskFinished => ???
       case Event.Rested => ???
     }
