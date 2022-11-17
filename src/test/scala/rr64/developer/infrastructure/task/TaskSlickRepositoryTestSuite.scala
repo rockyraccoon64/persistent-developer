@@ -49,7 +49,7 @@ class TaskSlickRepositoryTestSuite
     )
   }
 
-  private def assertTask(task: TaskInfo): Future[Assertion] =
+  private def saveAndAssert(task: TaskInfo): Future[Assertion] =
     for {
       _ <- repository.save(task)
       result <- repository.findById(task.id)
@@ -62,17 +62,17 @@ class TaskSlickRepositoryTestSuite
 
   /** Репозиторий должен сохранять задачи со статусом "В очереди" */
   "The repository" should "save queued tasks" in {
-    assertTask(queuedTask)
+    saveAndAssert(queuedTask)
   }
 
   /** Репозиторий должен сохранять задачи со статусом "В разработке" */
   "The repository" should "save tasks in progress" in {
-    assertTask(taskInProgress)
+    saveAndAssert(taskInProgress)
   }
 
   /** Репозиторий должен сохранять задачи со статусом "Завершено" */
   "The repository" should "save finished tasks" in {
-    assertTask(finishedTask)
+    saveAndAssert(finishedTask)
   }
 
   /** Репозиторий должен обновлять статус у существующих задач */
@@ -85,7 +85,7 @@ class TaskSlickRepositoryTestSuite
     val updatedTask = initialTask.copy(status = TaskStatus.Finished)
     for {
       _ <- repository.save(initialTask)
-      _ <- assertTask(updatedTask)
+      _ <- saveAndAssert(updatedTask)
     } yield succeed
   }
 
