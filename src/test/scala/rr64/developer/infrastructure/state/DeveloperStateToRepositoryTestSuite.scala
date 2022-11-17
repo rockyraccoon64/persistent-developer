@@ -44,13 +44,6 @@ class DeveloperStateToRepositoryTestSuite
   private val defaultTask1 = TaskWithId(Task(1), UUID.randomUUID())
   private val defaultTask2 = TaskWithId(Task(5), UUID.randomUUID())
 
-  private def envelopeSource(
-    events: Seq[Event],
-    persistenceId: String = defaultPersistenceId,
-    startOffset: Long = 0
-  ): Source[EventEnvelope[Event], NotUsed] =
-    ProjectionTestUtils.envelopeSource(events, persistenceId, startOffset)
-
   private def projectionFromSourceProvider(
     sourceProvider: SourceProvider[Offset, EventEnvelope[Event]]
   ): TestProjection[Offset, EventEnvelope[Event]] =
@@ -64,7 +57,7 @@ class DeveloperStateToRepositoryTestSuite
     events: Seq[Event],
     persistenceId: String = defaultPersistenceId
   ): TestProjection[Offset, EventEnvelope[Event]] = {
-    val source = envelopeSource(events, persistenceId)
+    val source = ProjectionTestUtils.envelopeSource(events, persistenceId)
     projectionFromSource(source)
   }
 
@@ -145,8 +138,8 @@ class DeveloperStateToRepositoryTestSuite
   /** Для каждого разработчика состояние обновляется отдельно */
   "The handler" should "update states for different developers separately" in {
     val differentPersistenceId = "test-id2"
-    val events1 = envelopeSource(Event.TaskStarted(defaultTask2) :: Event.TaskFinished :: Nil)
-    val events2 = envelopeSource(Event.TaskStarted(defaultTask1) :: Nil, differentPersistenceId, startOffset = 2)
+    val events1 = ProjectionTestUtils.envelopeSource[Event](Event.TaskStarted(defaultTask2) :: Event.TaskFinished :: Nil, defaultPersistenceId)
+    val events2 = ProjectionTestUtils.envelopeSource[Event](Event.TaskStarted(defaultTask1) :: Nil, differentPersistenceId, startOffset = 2)
 
     val projection = projectionFromSource(events1 concat events2)
 
