@@ -8,13 +8,15 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class DeveloperStateFromRepositoryTests extends AsyncFlatSpec with Matchers {
 
-  private val developerId = "dev-id1"
+  private val developerId = "walter"
+  private val dev2 = "mark"
+  private val dev3 = "gruff97"
 
   private def mockRepository = new DeveloperStateRepository {
     private var states: Map[String, DeveloperState] = Map(
       developerId -> DeveloperState.Working,
-      "dev-id2" -> DeveloperState.Resting,
-      "dev-id3" -> DeveloperState.Free
+      dev2 -> DeveloperState.Resting,
+      dev3 -> DeveloperState.Free
     )
     override def save(id: String, state: DeveloperState)(implicit ec: ExecutionContext): Future[Unit] = {
       states = states.updated(id, state)
