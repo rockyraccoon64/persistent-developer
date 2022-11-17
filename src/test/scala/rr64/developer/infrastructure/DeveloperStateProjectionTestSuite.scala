@@ -35,7 +35,12 @@ class DeveloperStateProjectionTestSuite
 
   private val handler: Handler[EventEnvelope[Event]] = new DeveloperStateToRepository(mockRepository)
 
-  private def provider(events: Seq[Event], persistenceId: String): SourceProvider[Offset, EventEnvelope[Event]] = {
+  private val defaultPersistenceId = "test-id"
+
+  private def provider(
+    events: Seq[Event],
+    persistenceId: String = defaultPersistenceId
+  ): SourceProvider[Offset, EventEnvelope[Event]] = {
     val source: Source[EventEnvelope[Event], NotUsed] =
       Source(events).zipWithIndex.map { case (event, idx) =>
         EventEnvelope[Event](
@@ -54,31 +59,29 @@ class DeveloperStateProjectionTestSuite
 
   /** Обработчик проекции должен обновлять состояние разработчика на "Работает", когда он начинает задачу */
   "The handler" should "update the developer state in the repository when a task is started" in {
-    val persistenceId = "test-id"
     val events = Seq(
       Event.TaskStarted(TaskWithId(Task(1), UUID.randomUUID()))
     )
-    val sourceProvider = provider(events, persistenceId)
+    val sourceProvider = provider(events)
     val projection = TestProjection(ProjectionId("dev-state-test", "0"), sourceProvider, () => handler)
 
     projectionTestKit.run(projection) {
-      mockRepository.findById(persistenceId).futureValue shouldEqual Some(DeveloperState.Working)
+      mockRepository.findById(defaultPersistenceId).futureValue shouldEqual Some(DeveloperState.Working)
     }
   }
 
   /** Обработчик проекции должен обновлять состояние разработчика на "Отдых", когда он заканчивает задачу */
   "The handler" should "update the developer state in the repository when a task is finished" in {
-    val persistenceId = "test-id"
     val events = Seq(
       Event.TaskStarted(TaskWithId(Task(1), UUID.randomUUID())),
       Event.TaskFinished
     )
-    val sourceProvider = provider(events, persistenceId)
+    val sourceProvider = provider(events)
 
     val projection = TestProjection(ProjectionId("dev-state-test", "0"), sourceProvider, () => handler)
 
     projectionTestKit.run(projection) {
-      mockRepository.findById(persistenceId).futureValue shouldEqual Some(DeveloperState.Resting)
+      mockRepository.findById(defaultPersistenceId).futureValue shouldEqual Some(DeveloperState.Resting)
     }
   }
 
