@@ -136,7 +136,7 @@ object DeveloperBehavior {
 
   case class Setup(workFactor: Int, restFactor: Int, timer: TimerScheduler[Command])
 
-  case class TaskWithId(task: Task, id: UUID)
+  case class TaskWithId(task: Task, id: UUID) // TODO move
 
   private def generateTaskId(): UUID = UUID.randomUUID()
   private def createTaskWithId(task: Task): TaskWithId =

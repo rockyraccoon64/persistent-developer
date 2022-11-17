@@ -5,7 +5,7 @@ import org.scalatest.flatspec.AsyncFlatSpecLike
 import org.scalatest.matchers.should.Matchers
 import rr64.developer.domain.{Task, TaskStatus}
 import rr64.developer.infrastructure.TaskTestUtils.TaskWithIdFactory
-import rr64.developer.infrastructure.task.TaskToRepository.TaskOps
+import rr64.developer.infrastructure.task.TaskToRepository.TaskInfoFactory
 
 import scala.concurrent.Future
 

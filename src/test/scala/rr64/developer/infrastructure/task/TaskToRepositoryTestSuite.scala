@@ -14,7 +14,7 @@ import rr64.developer.domain.{Task, TaskInfo, TaskStatus}
 import rr64.developer.infrastructure.DeveloperBehavior.Event
 import rr64.developer.infrastructure.ProjectionTestUtils
 import rr64.developer.infrastructure.TaskTestUtils.TaskWithIdFactory
-import rr64.developer.infrastructure.task.TaskToRepository.TaskOps
+import rr64.developer.infrastructure.task.TaskToRepository.TaskInfoFactory
 
 import java.util.UUID
 import scala.concurrent.{ExecutionContext, Future}

@@ -5,7 +5,7 @@ import akka.projection.eventsourced.EventEnvelope
 import akka.projection.scaladsl.Handler
 import rr64.developer.domain.{TaskInfo, TaskStatus}
 import rr64.developer.infrastructure.DeveloperBehavior.{Event, TaskWithId}
-import rr64.developer.infrastructure.task.TaskToRepository.TaskOps
+import rr64.developer.infrastructure.task.TaskToRepository.TaskInfoFactory
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -36,7 +36,7 @@ class TaskToRepository(repository: TaskRepository)
 }
 
 object TaskToRepository {
-  implicit class TaskOps(taskWithId: TaskWithId) {
+  implicit class TaskInfoFactory(taskWithId: TaskWithId) {
     def withStatus(status: TaskStatus): TaskInfo = TaskInfo(
       id = taskWithId.id,
       difficulty = taskWithId.task.difficulty,
