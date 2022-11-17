@@ -39,6 +39,7 @@ class DeveloperStateProjectionTestSuite
   private val defaultPersistenceId = "test-id"
 
   private val defaultTask1 = TaskWithId(Task(1), UUID.randomUUID())
+  private val defaultTask2 = TaskWithId(Task(5), UUID.randomUUID())
 
   private def provider(
     events: Seq[Event],
@@ -108,7 +109,7 @@ class DeveloperStateProjectionTestSuite
   /** Обработчик проекции должен обновлять состояние разработчика на "Свободен",
    * когда он отдохнул и у него нет задач */
   "The handler" should "update the state to Free after the developer rests if he has no more tasks" in {
-    val events = Event.TaskStarted(defaultTask1) :: // TODO Общий Task
+    val events = Event.TaskStarted(defaultTask1) ::
       Event.TaskFinished ::
       Event.Rested ::
       Nil
@@ -122,7 +123,7 @@ class DeveloperStateProjectionTestSuite
   /** Обработчик проекции не должен обновлять состояние разработчика при получении задачи, когда он работает */
   "The handler" should "not update the state after receiving a new task while working" in {
     val events = Event.TaskStarted(defaultTask1) ::
-      Event.TaskQueued(TaskWithId(Task(5), UUID.randomUUID())) ::
+      Event.TaskQueued(defaultTask2) ::
       Nil
     val projection = createProjection(events)
 
