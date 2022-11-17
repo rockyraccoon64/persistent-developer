@@ -57,11 +57,20 @@ class DeveloperStateProjectionTestSuite
     )
   }
 
+  private def createProjection(
+    sourceProvider: SourceProvider[Offset, EventEnvelope[Event]]
+  ): TestProjection[Offset, EventEnvelope[Event]] =
+    TestProjection(
+      projectionId = ProjectionId("dev-state-test", "0"),
+      sourceProvider = sourceProvider,
+      handler = () => handler
+    )
+
   /** Обработчик проекции должен обновлять состояние разработчика на "Работает", когда он начинает задачу */
   "The handler" should "update the developer state in the repository when a task is started" in {
     val events = Event.TaskStarted(TaskWithId(Task(1), UUID.randomUUID())) :: Nil
     val sourceProvider = provider(events)
-    val projection = TestProjection(ProjectionId("dev-state-test", "0"), sourceProvider, () => handler)
+    val projection = createProjection(sourceProvider)
 
     projectionTestKit.run(projection) {
       mockRepository.findById(defaultPersistenceId).futureValue shouldEqual Some(DeveloperState.Working)
@@ -73,8 +82,7 @@ class DeveloperStateProjectionTestSuite
     val events = Event.TaskStarted(TaskWithId(Task(1), UUID.randomUUID())) ::
       Event.TaskFinished :: Nil
     val sourceProvider = provider(events)
-
-    val projection = TestProjection(ProjectionId("dev-state-test", "0"), sourceProvider, () => handler)
+    val projection = createProjection(sourceProvider)
 
     projectionTestKit.run(projection) {
       mockRepository.findById(defaultPersistenceId).futureValue shouldEqual Some(DeveloperState.Resting)
