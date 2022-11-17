@@ -23,18 +23,22 @@ trait PostgresSpec
     password = "postgres",
     driver = driver)
 
-  Await.result(postgres.run {
-    sqlu"DROP DATABASE IF EXISTS #$dbname"
-  }, timeout)
+  override protected def beforeAll(): Unit = {
+    super.beforeAll()
+    Await.result(postgres.run {
+      sqlu"DROP DATABASE IF EXISTS #$dbname"
+    }, timeout)
 
-  Await.result(postgres.run {
-    sqlu"CREATE DATABASE #$dbname"
-  }, timeout)
+    Await.result(postgres.run {
+      sqlu"CREATE DATABASE #$dbname"
+    }, timeout)
+  }
 
-  override def afterAll() {
+  override protected def afterAll() {
     Await.result(postgres.run {
       sqlu"DROP DATABASE #$dbname"
     }, timeout)
+    super.afterAll()
   }
 
   val database = Database.forURL(
