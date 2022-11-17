@@ -19,9 +19,25 @@ class TasksFromRepositoryTestSuite extends AsyncFlatSpecLike with Matchers {
       override def save(taskInfo: TaskInfo): Future[_] = ???
       override def findById(id: UUID): Future[Option[TaskInfo]] =
         Future.successful(Some(task))
+      override def list: Future[Seq[TaskInfo]] = ???
     }
     val tasks = new TasksFromRepository(repository)
     tasks.findById(task.id).map(_ shouldEqual Some(task))
+  }
+
+  /** Запрос списка задач должен делегироваться репозиторию */
+  "Task list queries" should "be delegated to the repository" in {
+    val task1 = TaskInfo(UUID.randomUUID(), 33, TaskStatus.Queued)
+    val task2 = TaskInfo(UUID.randomUUID(), 85, TaskStatus.InProgress)
+    val repository = new TaskRepository { // TODO scalamock
+      override def save(taskInfo: TaskInfo): Future[_] = Future.unit
+      override def findById(id: UUID): Future[Option[TaskInfo]] =
+        Future.successful(Some(task1))
+      override def list: Future[Seq[TaskInfo]] =
+        Future.successful(Seq(task1, task2))
+    }
+    val tasks = new TasksFromRepository(repository)
+    tasks.list.map(_ shouldEqual Seq(task1, task2))
   }
 
 }
