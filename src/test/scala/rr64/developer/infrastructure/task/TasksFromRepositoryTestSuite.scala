@@ -22,6 +22,7 @@ class TasksFromRepositoryTestSuite
     val mockRepo = mock[TaskRepository]
     (mockRepo.findById _)
       .expects(task.id)
+      .once()
       .returning {
         Future.successful(Some(task))
       }
@@ -33,14 +34,14 @@ class TasksFromRepositoryTestSuite
   "Task list queries" should "be delegated to the repository" in {
     val task1 = TaskInfo(UUID.randomUUID(), 33, TaskStatus.Queued)
     val task2 = TaskInfo(UUID.randomUUID(), 85, TaskStatus.InProgress)
-    val repository = new TaskRepository { // TODO scalamock
-      override def save(taskInfo: TaskInfo): Future[_] = Future.unit
-      override def findById(id: UUID): Future[Option[TaskInfo]] =
-        Future.successful(Some(task1))
-      override def list: Future[Seq[TaskInfo]] =
+    val mockRepo = mock[TaskRepository]
+    (mockRepo.list _)
+      .expects()
+      .once()
+      .returning {
         Future.successful(Seq(task1, task2))
-    }
-    val tasks = new TasksFromRepository(repository)
+      }
+    val tasks = new TasksFromRepository(mockRepo)
     tasks.list.map(_ shouldEqual Seq(task1, task2))
   }
 
