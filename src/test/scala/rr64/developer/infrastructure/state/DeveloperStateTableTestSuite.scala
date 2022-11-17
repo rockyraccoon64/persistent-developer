@@ -52,4 +52,9 @@ class DeveloperStateTableTestSuite
     checkInsert("dev-2", DeveloperState.Working)
   }
 
+  /** Состояние "Отдыхает" должно добавляться и извлекаться из БД */
+  "The Resting developer state" should "be inserted and retrieved from the database" in {
+    checkInsert("dev-3", DeveloperState.Resting)
+  }
+
 }
