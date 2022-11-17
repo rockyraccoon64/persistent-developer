@@ -37,7 +37,7 @@ class TaskToRepositoryTestSuite
         tasks = tasks.updated(taskInfo.id, taskInfo)
         Future.unit
       }
-      override def findById(id: UUID): Future[Option[TaskInfo]] =
+      override def findById(id: UUID)(implicit ec: ExecutionContext): Future[Option[TaskInfo]] =
         Future.successful(tasks.get(id))
       override def list: Future[Seq[TaskInfo]] =
         Future.successful(tasks.values.toSeq)

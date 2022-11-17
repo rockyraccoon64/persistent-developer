@@ -1,9 +1,9 @@
 package rr64.developer.domain
 
 import java.util.UUID
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 trait Tasks {
-  def findById(id: UUID): Future[Option[TaskInfo]]
+  def findById(id: UUID)(implicit ec: ExecutionContext): Future[Option[TaskInfo]]
   def list: Future[Seq[TaskInfo]]
 }

@@ -7,7 +7,8 @@ import rr64.developer.domain.{Task, TaskStatus}
 import rr64.developer.infrastructure.TaskTestUtils.TaskWithIdFactory
 import rr64.developer.infrastructure.task.TaskToRepository.TaskInfoFactory
 
-import scala.concurrent.Future
+import java.util.UUID
+import scala.concurrent.{ExecutionContext, Future}
 
 /**
  * Тесты источника задач на основе репозитория
@@ -24,8 +25,8 @@ class TasksFromRepositoryTestSuite
   "Single task queries" should "be redirected to the repository" in {
     val task = task1
     val mockRepository = mock[TaskRepository]
-    (mockRepository.findById _)
-      .expects(task.id)
+    (mockRepository.findById(_: UUID)(_: ExecutionContext))
+      .expects(task.id, *)
       .once()
       .returning {
         Future.successful(Some(task))
