@@ -26,7 +26,7 @@ class DeveloperStateToRepositoryTestSuite
   private val projectionTestKit = ProjectionTestKit(system)
   private implicit val ec: ExecutionContext = system.executionContext
 
-  private val mockRepository = new DeveloperStateRepository {
+  private val mockRepository: DeveloperStateRepository = new DeveloperStateRepository {
     private var states: Map[String, DeveloperState] = Map.empty
     override def save(id: String, state: DeveloperState)(implicit ec: ExecutionContext): Future[Unit] = {
       states = states.updated(id, state)
