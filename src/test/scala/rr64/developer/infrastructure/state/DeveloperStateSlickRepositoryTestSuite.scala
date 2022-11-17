@@ -12,7 +12,12 @@ class DeveloperStateSlickRepositoryTestSuite extends PostgresSpec with AsyncFlat
 
   override protected def beforeAll(): Unit = {
     super.beforeAll()
-    database.run(DeveloperStateSlickRepository.states.schema.createIfNotExists)
+    database.run {
+      sqlu"""CREATE TABLE dev_state(
+            id VARCHAR(100) PRIMARY KEY,
+            state VARCHAR(10) NOT NULL
+          )"""
+    }
   }
 
   /** Состояние "Свободен" должно добавляться и извлекаться из репозитория */

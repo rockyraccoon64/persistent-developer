@@ -1,8 +1,6 @@
 package rr64.developer.infrastructure.state
 import rr64.developer.domain.DeveloperState
-import rr64.developer.infrastructure.state.DeveloperStateSlickRepository.states
 import slick.jdbc.PostgresProfile.api._
-import slick.lifted.ProvenShape
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -36,18 +34,5 @@ class DeveloperStateSlickRepository(db: Database) extends DeveloperStateReposito
         })
     }
   }
-
-
-}
-
-object DeveloperStateSlickRepository {
-
-  private[state] class DeveloperStateTable(tag: Tag) extends Table[(String, String)](tag, "dev_state") {
-    def id: Rep[String] = column[String]("id", O.PrimaryKey)
-    def state: Rep[String] = column[String]("state")
-    override def * : ProvenShape[(String, String)] = (id, state)
-  }
-
-  private[state] val states = TableQuery[DeveloperStateTable]
 
 }
