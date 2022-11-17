@@ -1,4 +1,4 @@
-package rr64.developer.infrastructure
+package rr64.developer.infrastructure.state
 
 import rr64.developer.domain.DeveloperState
 

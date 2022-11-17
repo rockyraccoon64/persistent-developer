@@ -7,6 +7,7 @@ import org.scalatest.flatspec.AsyncFlatSpecLike
 import rr64.developer.domain.{DeveloperReply, DeveloperState, Task}
 import rr64.developer.infrastructure.DeveloperBehavior.Command
 import rr64.developer.infrastructure.PersistentDeveloper.DeveloperRef
+import rr64.developer.infrastructure.state.DeveloperStateProvider
 
 import java.util.UUID
 import scala.concurrent.{ExecutionContext, Future}
