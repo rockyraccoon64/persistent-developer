@@ -88,4 +88,15 @@ class TaskToRepositoryTestSuite
     }
   }
 
+  /** Когда задача завершена, её текущее состояние должно сохраняться в репозиторий */
+  "The current task state" should "be saved to the repository when the task is finished" in new Fixture {
+    val taskWithId = TaskWithId(Task(77), UUID.randomUUID())
+    val taskInfo = taskWithId.withStatus(TaskStatus.Finished)
+    val events = Event.TaskFinished(taskWithId) :: Nil
+    val projection = projectionFromEvents(events)
+    projectionTestKit.run(projection) {
+      assertInfo(taskInfo)
+    }
+  }
+
 }
