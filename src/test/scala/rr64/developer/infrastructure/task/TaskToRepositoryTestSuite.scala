@@ -8,7 +8,6 @@ import akka.projection.eventsourced.EventEnvelope
 import akka.projection.scaladsl.{Handler, SourceProvider}
 import akka.projection.testkit.scaladsl.{ProjectionTestKit, TestProjection, TestSourceProvider}
 import akka.stream.scaladsl.Source
-import org.scalamock.scalatest.MockFactory
 import org.scalatest.flatspec.AnyFlatSpecLike
 import rr64.developer.domain.{Task, TaskInfo, TaskStatus}
 import rr64.developer.infrastructure.DeveloperBehavior.{Event, TaskWithId}
@@ -21,13 +20,22 @@ import scala.concurrent.{ExecutionContext, Future}
  */
 class TaskToRepositoryTestSuite
   extends ScalaTestWithActorTestKit
-    with MockFactory
     with AnyFlatSpecLike {
 
   private val projectionTestKit = ProjectionTestKit(system)
   private implicit val ec: ExecutionContext = system.executionContext
 
-  private val mockRepository = mock[TaskRepository]
+  private val mockRepository = new TaskRepository { // TODO Fixture
+    private var tasks: Map[UUID, TaskInfo] = Map.empty
+    override def save(taskInfo: TaskInfo): Future[_] = {
+      tasks = tasks.updated(taskInfo.id, taskInfo)
+      Future.unit
+    }
+    override def findById(id: UUID): Future[Option[TaskInfo]] =
+      Future.successful(tasks.get(id))
+    override def list: Future[Seq[TaskInfo]] =
+      Future.successful(tasks.values.toSeq)
+  }
 
   private val handler: Handler[EventEnvelope[Event]] = new TaskToRepository(mockRepository)
 
@@ -86,10 +94,7 @@ class TaskToRepositoryTestSuite
     val events = Event.TaskStarted(taskWithId) :: Nil
     val projection: TestProjection[Offset, EventEnvelope[Event]] = projectionFromEvents(events, "proj")
     projectionTestKit.run(projection) {
-      (mockRepository.save _)
-        .expects(taskInfo)
-        .once()
-        .returning(Future.unit)
+      mockRepository.findById(taskInfo.id).futureValue shouldEqual Some(taskInfo)
     }
   }
 
