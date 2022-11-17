@@ -14,6 +14,13 @@ class DeveloperStateTableTestSuite
 
   private val table = TableQuery[DeveloperStateTable]
 
+  override protected def beforeAll(): Unit = {
+    super.beforeAll()
+    database.run {
+      table.schema.createIfNotExists
+    }
+  }
+
   /** Состояние разработчика должно добавляться в БД */
   "The free developer state" should "be saved to the database" in {
     val state = ("dev-1", DeveloperState.Free)
@@ -29,5 +36,4 @@ class DeveloperStateTableTestSuite
       result shouldEqual Seq(state)
     }
   }
-
 }
