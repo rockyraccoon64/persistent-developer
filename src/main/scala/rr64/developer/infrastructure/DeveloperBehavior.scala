@@ -22,7 +22,7 @@ object DeveloperBehavior {
   case object Event {
     case class TaskStarted(taskWithId: TaskWithId) extends Event
     case class TaskQueued(taskWithId: TaskWithId) extends Event
-    case object TaskFinished extends Event
+    case class TaskFinished(taskWithId: TaskWithId) extends Event
     case object Rested extends Event
   }
 
@@ -64,7 +64,7 @@ object DeveloperBehavior {
       override def applyCommand(cmd: Command): Effect[Event, State] =
         cmd match {
           case FinishTask(id) if id == currentTask.id =>
-            Effect.persist(Event.TaskFinished)
+            Effect.persist(Event.TaskFinished(currentTask))
               .thenRun {
                 case Resting(millis, _) => setup.timer.startSingleTimer(StopResting, millis.millis)
                 case _ =>
@@ -81,7 +81,7 @@ object DeveloperBehavior {
 
       override def applyEvent(evt: Event): State =
         evt match {
-          case Event.TaskFinished => Resting(currentTask.task.difficulty * setup.restFactor, taskQueue)
+          case Event.TaskFinished(taskWithId) => Resting(taskWithId.task.difficulty * setup.restFactor, taskQueue)
           case Event.TaskQueued(newTask) => Working(currentTask, taskQueue :+ newTask)
         }
 

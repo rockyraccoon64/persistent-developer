@@ -18,7 +18,7 @@ class DeveloperStateToRepository(repository: DeveloperStateRepository)
   override def process(envelope: EventEnvelope[Event]): Future[Done] = envelope.event match {
     case Event.TaskStarted(_) =>
       save(envelope.persistenceId, DeveloperState.Working)
-    case Event.TaskFinished =>
+    case Event.TaskFinished(_) =>
       save(envelope.persistenceId, DeveloperState.Resting)
     case Event.Rested =>
       save(envelope.persistenceId, DeveloperState.Free)

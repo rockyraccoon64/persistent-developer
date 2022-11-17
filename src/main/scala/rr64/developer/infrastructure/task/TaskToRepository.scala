@@ -22,7 +22,8 @@ class TaskToRepository(repository: TaskRepository)
         val taskInfo = taskWithId.withStatus(TaskStatus.Queued)
         save(taskInfo)
 
-      case Event.TaskFinished => ???
+      case Event.TaskFinished(taskWithId) => ???
+
       case Event.Rested => ???
     }
 

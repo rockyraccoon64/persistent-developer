@@ -85,7 +85,7 @@ class DeveloperStateToRepositoryTestSuite
   /** Обработчик проекции должен обновлять состояние разработчика на "Отдых", когда он заканчивает задачу */
   "The handler" should "update the developer state in the repository when a task is finished" in new Fixture {
     val events = Event.TaskStarted(defaultTask1) ::
-      Event.TaskFinished :: Nil
+      Event.TaskFinished(defaultTask1) :: Nil
     val projection = projectionFromEvents(events)
 
     projectionTestKit.run(projection) {
@@ -97,7 +97,7 @@ class DeveloperStateToRepositoryTestSuite
    * когда он отдохнул и у него нет задач */
   "The handler" should "update the state to Free after the developer rests if he has no more tasks" in new Fixture {
     val events = Event.TaskStarted(defaultTask1) ::
-      Event.TaskFinished ::
+      Event.TaskFinished(defaultTask1) ::
       Event.Rested ::
       Nil
     val projection = projectionFromEvents(events)
@@ -122,7 +122,7 @@ class DeveloperStateToRepositoryTestSuite
   /** Обработчик проекции не должен обновлять состояние разработчика при получении задачи, когда он отдыхает */
   "The handler" should "not update the state when the developer receives a new task while resting" in new Fixture {
     val events = Event.TaskStarted(defaultTask1) ::
-      Event.TaskFinished ::
+      Event.TaskFinished(defaultTask1) ::
       Event.TaskQueued(defaultTask2) ::
       Nil
     val projection = projectionFromEvents(events)
@@ -135,7 +135,7 @@ class DeveloperStateToRepositoryTestSuite
   /** Для каждого разработчика состояние обновляется отдельно */
   "The handler" should "update states for different developers separately" in new Fixture {
     val differentPersistenceId = "test-id2"
-    val events1 = ProjectionTestUtils.envelopeSource[Event](Event.TaskStarted(defaultTask2) :: Event.TaskFinished :: Nil, defaultPersistenceId)
+    val events1 = ProjectionTestUtils.envelopeSource[Event](Event.TaskStarted(defaultTask2) :: Event.TaskFinished(defaultTask2) :: Nil, defaultPersistenceId)
     val events2 = ProjectionTestUtils.envelopeSource[Event](Event.TaskStarted(defaultTask1) :: Nil, differentPersistenceId, startOffset = 2)
 
     val projection = projectionFromSource(events1 concat events2)
