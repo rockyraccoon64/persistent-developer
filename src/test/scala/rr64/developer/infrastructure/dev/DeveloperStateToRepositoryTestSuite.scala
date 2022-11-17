@@ -11,9 +11,9 @@ import akka.stream.scaladsl.Source
 import org.scalatest.Assertion
 import org.scalatest.flatspec.AnyFlatSpecLike
 import rr64.developer.domain.{DeveloperState, Task}
-import rr64.developer.infrastructure.DeveloperBehavior.Event
 import rr64.developer.infrastructure.ProjectionTestUtils
 import rr64.developer.infrastructure.TaskTestUtils.TaskWithIdFactory
+import rr64.developer.infrastructure.dev.DeveloperBehavior.Event
 
 import scala.concurrent.{ExecutionContext, Future}
 

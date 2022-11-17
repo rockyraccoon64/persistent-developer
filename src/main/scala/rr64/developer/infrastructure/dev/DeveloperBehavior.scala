@@ -1,11 +1,10 @@
-package rr64.developer.infrastructure
+package rr64.developer.infrastructure.dev
 
 import akka.actor.typed.scaladsl.{Behaviors, TimerScheduler}
 import akka.actor.typed.{ActorRef, Behavior}
 import akka.persistence.typed.PersistenceId
 import akka.persistence.typed.scaladsl.{Effect, EventSourcedBehavior}
 import rr64.developer.domain.Task
-import rr64.developer.infrastructure.DeveloperBehavior.Replies.AddTaskResult
 
 import java.util.UUID
 import scala.concurrent.duration.DurationInt
@@ -13,7 +12,7 @@ import scala.concurrent.duration.DurationInt
 object DeveloperBehavior {
 
   sealed trait Command
-  case class AddTask(task: Task, replyTo: ActorRef[AddTaskResult]) extends Command
+  case class AddTask(task: Task, replyTo: ActorRef[Replies.AddTaskResult]) extends Command
   private case class FinishTask(id: UUID) extends Command
   private case object StopResting extends Command
 

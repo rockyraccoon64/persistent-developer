@@ -1,7 +1,7 @@
 package rr64.developer.infrastructure
 
 import rr64.developer.domain.Task
-import rr64.developer.infrastructure.DeveloperBehavior.TaskWithId
+import rr64.developer.infrastructure.dev.DeveloperBehavior.TaskWithId
 
 import java.util.UUID
 

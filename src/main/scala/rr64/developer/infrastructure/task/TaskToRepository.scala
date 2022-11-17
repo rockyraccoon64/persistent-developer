@@ -4,7 +4,7 @@ import akka.Done
 import akka.projection.eventsourced.EventEnvelope
 import akka.projection.scaladsl.Handler
 import rr64.developer.domain.{TaskInfo, TaskStatus}
-import rr64.developer.infrastructure.DeveloperBehavior.{Event, TaskWithId}
+import rr64.developer.infrastructure.dev.DeveloperBehavior.{Event, TaskWithId}
 import rr64.developer.infrastructure.task.TaskToRepository.TaskInfoFactory
 
 import scala.concurrent.{ExecutionContext, Future}
