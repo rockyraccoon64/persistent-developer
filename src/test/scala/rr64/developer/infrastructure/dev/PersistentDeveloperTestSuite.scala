@@ -1,4 +1,4 @@
-package rr64.developer.infrastructure
+package rr64.developer.infrastructure.dev
 
 import akka.actor.testkit.typed.scaladsl.ScalaTestWithActorTestKit
 import akka.actor.typed.scaladsl.Behaviors
@@ -7,7 +7,6 @@ import org.scalatest.flatspec.AsyncFlatSpecLike
 import rr64.developer.domain.{DeveloperReply, DeveloperState, Task}
 import rr64.developer.infrastructure.dev.DeveloperBehavior.Command
 import rr64.developer.infrastructure.dev.PersistentDeveloper.DeveloperRef
-import rr64.developer.infrastructure.dev.{DeveloperBehavior, DeveloperStateProvider, PersistentDeveloper}
 
 import java.util.UUID
 import scala.concurrent.{ExecutionContext, Future}
