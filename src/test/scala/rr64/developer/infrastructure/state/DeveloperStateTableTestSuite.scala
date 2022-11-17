@@ -21,7 +21,7 @@ class DeveloperStateTableTestSuite
     }
   }
 
-  /** Состояние разработчика должно добавляться в БД */
+  /** Состояние "Свободен" должно добавляться в БД */
   "The free developer state" should "be saved to the database" in {
     val id = "dev-1"
     val state = (id, DeveloperState.Free)
