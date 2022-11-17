@@ -50,14 +50,6 @@ class DeveloperStateProjectionTestSuite
       event.toEnvelope(persistenceId, startOffset + idx)
     }
 
-  private def provider(
-    events: Seq[Event],
-    persistenceId: String = defaultPersistenceId
-  ): SourceProvider[Offset, EventEnvelope[Event]] = {
-    val source = envelopeSource(events, persistenceId)
-    providerFromEnvelopeSource(source)
-  }
-
   private def providerFromEnvelopeSource(
     source: Source[EventEnvelope[Event], NotUsed]
   ): TestSourceProvider[Offset, EventEnvelope[Event]] =
@@ -79,7 +71,14 @@ class DeveloperStateProjectionTestSuite
     events: Seq[Event],
     persistenceId: String = defaultPersistenceId
   ): TestProjection[Offset, EventEnvelope[Event]] = {
-    val sourceProvider = provider(events, persistenceId)
+    val source = envelopeSource(events, persistenceId)
+    projectionFromSource(source)
+  }
+
+  private def projectionFromSource(
+    source: Source[EventEnvelope[Event], NotUsed]
+  ): TestProjection[Offset, EventEnvelope[Event]] = {
+    val sourceProvider = providerFromEnvelopeSource(source)
     createProjection(sourceProvider)
   }
 
@@ -156,8 +155,7 @@ class DeveloperStateProjectionTestSuite
     val events1 = envelopeSource(Event.TaskStarted(defaultTask2) :: Event.TaskFinished :: Nil)
     val events2 = envelopeSource(Event.TaskStarted(defaultTask1) :: Nil, differentPersistenceId, startOffset = 2)
 
-    val sourceProvider = providerFromEnvelopeSource(events1 concat events2)
-    val projection = createProjection(sourceProvider)
+    val projection = projectionFromSource(events1 concat events2)
 
     projectionTestKit.run(projection) {
       assertState(DeveloperState.Resting, defaultPersistenceId)
