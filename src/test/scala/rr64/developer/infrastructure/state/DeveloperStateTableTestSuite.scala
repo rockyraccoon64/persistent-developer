@@ -7,6 +7,9 @@ import rr64.developer.infrastructure.PostgresSpec
 import slick.lifted.TableQuery
 import slick.jdbc.PostgresProfile.api._
 
+/**
+ * Тесты DAO хранилища состояний разработчиков на PostgreSQL
+ */
 class DeveloperStateTableTestSuite
   extends PostgresSpec
     with AsyncFlatSpecLike
