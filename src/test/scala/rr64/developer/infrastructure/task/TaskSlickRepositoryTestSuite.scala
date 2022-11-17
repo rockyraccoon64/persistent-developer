@@ -57,6 +57,9 @@ class TaskSlickRepositoryTestSuite
       result shouldEqual Some(task)
     }
 
+  private def assertSaved(task: TaskInfo): Future[Assertion] =
+    for (taskOpt <- repository.findById(task.id)) yield taskOpt shouldEqual Some(task)
+
   /** Репозиторий должен сохранять задачи со статусом "В очереди" */
   "The repository" should "save queued tasks" in {
     assertTask(queuedTask)
@@ -97,10 +100,8 @@ class TaskSlickRepositoryTestSuite
     for {
       _ <- repository.save(initialTask)
       _ <- repository.save(updatedTask)
-      result <- repository.findById(updatedTask.id)
-    } yield {
-      result shouldEqual Some(initialTask)
-    }
+      succeeded <- assertSaved(initialTask)
+    } yield succeeded
   }
 
   /** Репозиторий должен находить существующие задачи */
