@@ -10,11 +10,7 @@ import scala.concurrent.{ExecutionContext, Future}
 class TaskSlickRepository(db: Database) extends TaskRepository {
 
   override def save(taskInfo: TaskInfo): Future[_] = db.run {
-    val status = taskInfo.status match {
-      case TaskStatus.InProgress => "InProgress"
-      case TaskStatus.Queued => "Queued"
-      case TaskStatus.Finished => "Finished"
-    }
+    val status = TaskStatusAdapter.toStringValue(taskInfo.status)
     sqlu"""INSERT INTO task(id, difficulty, status)
           VALUES (${taskInfo.id.toString}::uuid, ${taskInfo.difficulty}, $status)
           ON CONFLICT (id)
@@ -52,12 +48,20 @@ class TaskSlickRepository(db: Database) extends TaskRepository {
 
 object TaskSlickRepository {
 
-  object TaskStatusAdapter {
+  private object TaskStatusAdapter {
+
+    def toStringValue(status: TaskStatus): String = status match {
+      case TaskStatus.InProgress => "InProgress"
+      case TaskStatus.Queued => "Queued"
+      case TaskStatus.Finished => "Finished"
+    }
+
     def fromString(value: String): TaskStatus = value match {
       case "InProgress" => TaskStatus.InProgress
       case "Queued" => TaskStatus.Queued
       case "Finished" => TaskStatus.Finished
     }
+
   }
 
 }
