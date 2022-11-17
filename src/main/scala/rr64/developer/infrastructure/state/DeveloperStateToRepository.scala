@@ -20,6 +20,8 @@ class DeveloperStateToRepository(repository: DeveloperStateRepository)
       save(envelope.persistenceId, DeveloperState.Working)
     case Event.TaskFinished =>
       save(envelope.persistenceId, DeveloperState.Resting)
+    case Event.Rested =>
+      save(envelope.persistenceId, DeveloperState.Free)
   }
 
   /** Сохранить состояние разработчика в репозитории */
