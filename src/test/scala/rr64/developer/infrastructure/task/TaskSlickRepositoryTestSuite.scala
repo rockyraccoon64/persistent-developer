@@ -52,10 +52,8 @@ class TaskSlickRepositoryTestSuite
   private def saveAndAssert(task: TaskInfo): Future[Assertion] =
     for {
       _ <- repository.save(task)
-      result <- repository.findById(task.id)
-    } yield {
-      result shouldEqual Some(task)
-    }
+      succeeded <- assertSaved(task)
+    } yield succeeded
 
   private def assertSaved(task: TaskInfo): Future[Assertion] =
     for (taskOpt <- repository.findById(task.id)) yield taskOpt shouldEqual Some(task)
@@ -85,8 +83,8 @@ class TaskSlickRepositoryTestSuite
     val updatedTask = initialTask.copy(status = TaskStatus.Finished)
     for {
       _ <- repository.save(initialTask)
-      _ <- saveAndAssert(updatedTask)
-    } yield succeed
+      succeeded <- saveAndAssert(updatedTask)
+    } yield succeeded
   }
 
   /** Репозиторий не должен обновлять сложность у существующих задач */
