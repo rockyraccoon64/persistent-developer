@@ -22,7 +22,9 @@ class TaskToRepository(repository: TaskRepository)
         val taskInfo = taskWithId.withStatus(TaskStatus.Queued)
         save(taskInfo)
 
-      case Event.TaskFinished(taskWithId) => ???
+      case Event.TaskFinished(taskWithId) =>
+        val taskInfo = taskWithId.withStatus(TaskStatus.Finished)
+        save(taskInfo)
 
       case Event.Rested => ???
     }
