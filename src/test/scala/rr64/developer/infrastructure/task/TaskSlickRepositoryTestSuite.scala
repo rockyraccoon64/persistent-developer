@@ -15,6 +15,8 @@ class TaskSlickRepositoryTestSuite
     with AsyncFlatSpecLike
     with Matchers {
 
+  private val repository = new TaskSlickRepository(database)
+
   private val queuedTask = TaskInfo(
     id = UUID.fromString("30dbff1f-88dc-4972-aa70-a057bf5f1c88"),
     difficulty = 5,
@@ -42,7 +44,6 @@ class TaskSlickRepositoryTestSuite
 
   /** Репозиторий должен сохранять задачи со статусом "В очереди" */
   "The repository" should "save queued tasks" in {
-    val repository = new TaskSlickRepository(database)
     for {
       _ <- repository.save(queuedTask)
       result <- repository.findById(queuedTask.id)
@@ -53,7 +54,6 @@ class TaskSlickRepositoryTestSuite
 
   /** Репозиторий должен сохранять задачи со статусом "В разработке" */
   "The repository" should "save tasks in progress" in {
-    val repository = new TaskSlickRepository(database)
     for {
       _ <- repository.save(taskInProgress)
       result <- repository.findById(taskInProgress.id)
