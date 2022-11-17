@@ -66,7 +66,7 @@ class TaskToRepositoryTestSuite
     val taskWithId = TaskWithId(Task(90), UUID.randomUUID())
     val taskInfo = TaskInfo(taskWithId.id, taskWithId.task.difficulty, TaskStatus.InProgress)
     val events = Event.TaskStarted(taskWithId) :: Nil
-    val projection: TestProjection[Offset, EventEnvelope[Event]] = projectionFromEvents(events, "proj")
+    val projection = projectionFromEvents(events, "proj")
     projectionTestKit.run(projection) {
       mockRepository.findById(taskInfo.id).futureValue shouldEqual Some(taskInfo)
     }
@@ -77,7 +77,7 @@ class TaskToRepositoryTestSuite
     val taskWithId = TaskWithId(Task(100), UUID.randomUUID())
     val taskInfo = TaskInfo(taskWithId.id, taskWithId.task.difficulty, TaskStatus.Queued)
     val events = Event.TaskQueued(taskWithId) :: Nil
-    val projection: TestProjection[Offset, EventEnvelope[Event]] = projectionFromEvents(events, "proj")
+    val projection = projectionFromEvents(events, "proj")
     projectionTestKit.run(projection) {
       mockRepository.findById(taskInfo.id).futureValue shouldEqual Some(taskInfo)
     }
