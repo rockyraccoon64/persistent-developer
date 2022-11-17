@@ -49,14 +49,10 @@ class DeveloperStateSlickRepositoryTestSuite extends PostgresSpec with AsyncFlat
   /** Состояние разработчика должно обновляться */
   "The developer state" should "be updated in the repository" in {
     val id = "dev-4"
-    val lastState = DeveloperState.Resting
     for {
       _ <- repository.save(id, DeveloperState.Working)
-      _ <- repository.save(id, lastState)
-      state <- repository.findById(id)
-    } yield {
-      state shouldEqual Some(lastState)
-    }
+      succeeded <- checkInsert(id, DeveloperState.Resting)
+    } yield succeeded
   }
 
 }
