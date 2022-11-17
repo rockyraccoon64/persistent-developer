@@ -153,15 +153,10 @@ class DeveloperStateProjectionTestSuite
   /** Для каждого разработчика состояние обновляется отдельно */
   "The handler" should "update states for different developers separately" in {
     val differentPersistenceId = "test-id2"
-    val events1 = (Event.TaskStarted(defaultTask2) :: Event.TaskFinished :: Nil)
-      .zipWithIndex
-      .map { case (evt, idx) =>
-        evt.toEnvelope(defaultPersistenceId, idx)
-      }
-    val events2 = Event.TaskStarted(defaultTask1).toEnvelope(differentPersistenceId, events1.size) :: Nil
+    val events1 = envelopeSource(Event.TaskStarted(defaultTask2) :: Event.TaskFinished :: Nil)
+    val events2 = envelopeSource(Event.TaskStarted(defaultTask1) :: Nil, differentPersistenceId, startOffset = 2)
 
-    val source = Source(events1 ::: events2)
-    val sourceProvider = providerFromEnvelopeSource(source)
+    val sourceProvider = providerFromEnvelopeSource(events1 concat events2)
     val projection = createProjection(sourceProvider)
 
     projectionTestKit.run(projection) {
