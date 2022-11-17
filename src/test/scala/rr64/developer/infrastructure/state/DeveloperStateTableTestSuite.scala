@@ -24,8 +24,8 @@ class DeveloperStateTableTestSuite
     }
   }
 
-  /** Состояние "Свободен" должно добавляться в БД */
-  "The free developer state" should "be saved to the database" in { // TODO
+  /** Состояние "Свободен" должно добавляться и извлекаться из БД */
+  "The free developer state" should "be inserted and retrieved from the database" in {
     val id = "dev-1"
     val state = (id, DeveloperState.Free)
     for {
