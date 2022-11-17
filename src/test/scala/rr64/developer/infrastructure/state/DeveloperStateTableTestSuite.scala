@@ -1,11 +1,14 @@
 package rr64.developer.infrastructure.state
 
-import org.scalatest.flatspec.{AnyFlatSpecLike, AsyncFlatSpecLike}
+import org.scalatest.Assertion
+import org.scalatest.flatspec.AsyncFlatSpecLike
 import org.scalatest.matchers.should.Matchers
 import rr64.developer.domain.DeveloperState
 import rr64.developer.infrastructure.PostgresSpec
-import slick.lifted.TableQuery
 import slick.jdbc.PostgresProfile.api._
+import slick.lifted.TableQuery
+
+import scala.concurrent.Future
 
 /**
  * Тесты DAO хранилища состояний разработчиков на PostgreSQL
@@ -24,38 +27,29 @@ class DeveloperStateTableTestSuite
     }
   }
 
-  /** Состояние "Свободен" должно добавляться и извлекаться из БД */
-  "The free developer state" should "be inserted and retrieved from the database" in {
-    val id = "dev-1"
-    val state = (id, DeveloperState.Free)
+  private def checkInsert(id: String, state: DeveloperState): Future[Assertion] = {
+    val stateTuple = (id, state)
     for {
       count <- database.run {
-        table += state
+        table += stateTuple
       }
       result <- database.run {
         table.filter(_.id === id).result
       }
     } yield {
       count shouldEqual 1
-      result shouldEqual Seq(state)
+      result shouldEqual Seq(stateTuple)
     }
+  }
+
+  /** Состояние "Свободен" должно добавляться и извлекаться из БД */
+  "The free developer state" should "be inserted and retrieved from the database" in {
+    checkInsert("dev-1", DeveloperState.Free)
   }
 
   /** Состояние "Работает" должно добавляться и извлекаться из БД */
   "The Working developer state" should "be inserted and retrieved from the database" in {
-    val id = "dev-2"
-    val state = (id, DeveloperState.Working)
-    for {
-      count <- database.run {
-        table += state
-      }
-      result <- database.run {
-        table.filter(_.id === id).result
-      }
-    } yield {
-      count shouldEqual 1
-      result shouldEqual Seq(state)
-    }
+    checkInsert("dev-2", DeveloperState.Working)
   }
 
 }
