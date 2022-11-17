@@ -32,17 +32,17 @@ class DeveloperStateSlickRepositoryTestSuite extends PostgresSpec with AsyncFlat
     }
 
   /** Состояние "Свободен" должно добавляться и извлекаться из репозитория */
-  "The free developer state" should "be inserted" in {
+  "The free developer state" should "be inserted and retrieved from the repository" in {
     checkInsert("dev-1", DeveloperState.Free)
   }
 
   /** Состояние "Работает" должно добавляться и извлекаться из репозитория */
-  "The Working developer state" should "be inserted" in {
+  "The Working developer state" should "be inserted and retrieved from the repository" in {
     checkInsert("dev-2", DeveloperState.Working)
   }
 
   /** Состояние "Отдыхает" должно добавляться и извлекаться из репозитория */
-  "The Resting developer state" should "be inserted and retrieved from the database" in {
+  "The Resting developer state" should "be inserted and retrieved from the repository" in {
     checkInsert("dev-3", DeveloperState.Resting)
   }
 
