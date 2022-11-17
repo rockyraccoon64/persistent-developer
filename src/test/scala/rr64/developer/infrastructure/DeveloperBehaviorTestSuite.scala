@@ -7,13 +7,12 @@ import akka.persistence.typed.PersistenceId
 import org.scalatest.BeforeAndAfterEach
 import org.scalatest.Inside.inside
 import org.scalatest.flatspec.AnyFlatSpecLike
-import org.scalatest.matchers.should.Matchers
 import rr64.developer.domain.Task
 import rr64.developer.infrastructure.DeveloperBehavior.Replies.TaskQueued
 import rr64.developer.infrastructure.DeveloperBehavior.State.Working
 import rr64.developer.infrastructure.DeveloperBehavior._
+import rr64.developer.infrastructure.TaskTestUtils.TaskWithIdFactory
 
-import java.util.UUID
 import scala.concurrent.duration.DurationInt
 
 class DeveloperBehaviorTestSuite
@@ -148,7 +147,7 @@ class DeveloperBehaviorTestSuite
    * то при получении новой задачи он присваивает ей идентификатор
    * и отправляет его в ответе */
   "The developer" should "reply with an identifier after receiving a new task while working" in {
-    val currentTask = TaskWithId(Task(100), UUID.randomUUID())
+    val currentTask = Task(100).withRandomId
     val newTask = Task(10)
     developerTestKit.initialize(Event.TaskStarted(currentTask))
     val result = addTask(newTask, developerTestKit)

@@ -11,10 +11,10 @@ import akka.stream.scaladsl.Source
 import org.scalatest.Assertion
 import org.scalatest.flatspec.AnyFlatSpecLike
 import rr64.developer.domain.{DeveloperState, Task}
-import rr64.developer.infrastructure.DeveloperBehavior.{Event, TaskWithId}
+import rr64.developer.infrastructure.DeveloperBehavior.Event
 import rr64.developer.infrastructure.ProjectionTestUtils
+import rr64.developer.infrastructure.TaskTestUtils.TaskWithIdFactory
 
-import java.util.UUID
 import scala.concurrent.{ExecutionContext, Future}
 
 /**
@@ -69,8 +69,8 @@ class DeveloperStateToRepositoryTestSuite
 
   private val defaultPersistenceId = "test-id"
 
-  private val defaultTask1 = TaskWithId(Task(1), UUID.randomUUID())
-  private val defaultTask2 = TaskWithId(Task(5), UUID.randomUUID())
+  private val defaultTask1 = Task(1).withRandomId
+  private val defaultTask2 = Task(5).withRandomId
 
   /** Обработчик проекции должен обновлять состояние разработчика на "Работает", когда он начинает задачу */
   "The handler" should "update the developer state in the repository when a task is started" in new Fixture {
