@@ -43,10 +43,11 @@ class DeveloperStateProjectionTestSuite
 
   private def envelopeSource(
     events: Seq[Event],
-    persistenceId: String = defaultPersistenceId
+    persistenceId: String = defaultPersistenceId,
+    startOffset: Long = 0
   ): Source[EventEnvelope[Event], NotUsed] =
     Source(events).zipWithIndex.map { case (event, idx) =>
-      event.toEnvelope(persistenceId, idx)
+      event.toEnvelope(persistenceId, startOffset + idx)
     }
 
   private def provider(
