@@ -28,7 +28,7 @@ class TaskToRepositoryTestSuite
 
   trait Test {
 
-    protected val mockRepository: TaskRepository = new TaskRepository { // TODO Fixture
+    protected val mockRepository: TaskRepository = new TaskRepository {
       private var tasks: Map[UUID, TaskInfo] = Map.empty
       override def save(taskInfo: TaskInfo): Future[_] = {
         tasks = tasks.updated(taskInfo.id, taskInfo)
