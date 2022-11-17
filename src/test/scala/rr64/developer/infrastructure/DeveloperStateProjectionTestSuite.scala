@@ -5,7 +5,7 @@ import akka.actor.testkit.typed.scaladsl.ScalaTestWithActorTestKit
 import akka.persistence.query.Offset
 import akka.projection.ProjectionId
 import akka.projection.eventsourced.EventEnvelope
-import akka.projection.scaladsl.Handler
+import akka.projection.scaladsl.{Handler, SourceProvider}
 import akka.projection.testkit.scaladsl.{ProjectionTestKit, TestProjection, TestSourceProvider}
 import akka.stream.scaladsl.Source
 import org.scalatest.flatspec.AnyFlatSpecLike
@@ -35,26 +35,30 @@ class DeveloperStateProjectionTestSuite
 
   private val handler: Handler[EventEnvelope[Event]] = new DeveloperStateToRepository(mockRepository)
 
-  /** Обработчик проекции должен обновлять состояние разработчика на "Работает", когда он начинает задачу */
-  "The handler" should "update the developer state in the repository when a task is started" in {
-    val persistenceId = "test-id"
+  private def provider(persistenceId: String, events: Seq[Event]): SourceProvider[Offset, EventEnvelope[Event]] = {
     val source: Source[EventEnvelope[Event], NotUsed] =
-      Source(
+      Source(events).zipWithIndex.map { case (event, idx) =>
         EventEnvelope[Event](
-          offset = Offset.sequence(0),
+          offset = Offset.sequence(idx),
           persistenceId = persistenceId,
-          sequenceNr = 0,
-          event = Event.TaskStarted(
-            TaskWithId(Task(1), UUID.randomUUID())
-          ),
-          timestamp = 5
-        ) :: Nil
-      )
-    val sourceProvider = TestSourceProvider(
+          sequenceNr = idx,
+          event = event,
+          timestamp = idx
+        )
+      }
+    TestSourceProvider(
       source,
       (envelope: EventEnvelope[Event]) => envelope.offset
     )
+  }
 
+  /** Обработчик проекции должен обновлять состояние разработчика на "Работает", когда он начинает задачу */
+  "The handler" should "update the developer state in the repository when a task is started" in {
+    val persistenceId = "test-id"
+    val events = Seq(
+      Event.TaskStarted(TaskWithId(Task(1), UUID.randomUUID()))
+    )
+    val sourceProvider = provider(persistenceId, events)
     val projection = TestProjection(ProjectionId("dev-state-test", "0"), sourceProvider, () => handler)
 
     projectionTestKit.run(projection) {
@@ -65,28 +69,11 @@ class DeveloperStateProjectionTestSuite
   /** Обработчик проекции должен обновлять состояние разработчика на "Отдых", когда он заканчивает задачу */
   "The handler" should "update the developer state in the repository when a task is finished" in {
     val persistenceId = "test-id"
-    val source: Source[EventEnvelope[Event], NotUsed] =
-      Source(
-        EventEnvelope[Event](
-          offset = Offset.sequence(0),
-          persistenceId = persistenceId,
-          sequenceNr = 0,
-          event = Event.TaskStarted(
-            TaskWithId(Task(1), UUID.randomUUID())
-          ),
-          timestamp = 5
-        ) :: EventEnvelope[Event](
-          offset = Offset.sequence(1),
-          persistenceId = persistenceId,
-          sequenceNr = 1,
-          event = Event.TaskFinished,
-          timestamp = 7
-        ) :: Nil
-      )
-    val sourceProvider = TestSourceProvider(
-      source,
-      (envelope: EventEnvelope[Event]) => envelope.offset
+    val events = Seq(
+      Event.TaskStarted(TaskWithId(Task(1), UUID.randomUUID())),
+      Event.TaskFinished
     )
+    val sourceProvider = provider(persistenceId, events)
 
     val projection = TestProjection(ProjectionId("dev-state-test", "0"), sourceProvider, () => handler)
 
