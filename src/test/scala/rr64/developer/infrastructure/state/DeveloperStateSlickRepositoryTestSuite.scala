@@ -29,4 +29,16 @@ class DeveloperStateSlickRepositoryTestSuite extends PostgresSpec with AsyncFlat
       state shouldEqual Some(DeveloperState.Free)
     }
   }
+
+  /** Состояние "Работает" должно добавляться и извлекаться из репозитория */
+  "The Working developer state" should "be inserted" in {
+    for {
+      _ <- repository.save("dev-2", DeveloperState.Working)
+      state <- repository.findById("dev-2")
+    } yield {
+      state shouldEqual Some(DeveloperState.Working)
+    }
+  }
+
+
 }
