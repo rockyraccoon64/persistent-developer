@@ -1,4 +1,4 @@
-package rr64.developer.infrastructure
+package rr64.developer.infrastructure.state
 
 import akka.NotUsed
 import akka.actor.testkit.typed.scaladsl.ScalaTestWithActorTestKit
@@ -12,7 +12,6 @@ import org.scalatest.Assertion
 import org.scalatest.flatspec.AnyFlatSpecLike
 import rr64.developer.domain.{DeveloperState, Task}
 import rr64.developer.infrastructure.DeveloperBehavior.{Event, TaskWithId}
-import rr64.developer.infrastructure.state.{DeveloperStateRepository, DeveloperStateToRepository}
 
 import java.util.UUID
 import scala.concurrent.{ExecutionContext, Future}
