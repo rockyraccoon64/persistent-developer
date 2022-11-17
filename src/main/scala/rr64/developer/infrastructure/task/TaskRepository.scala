@@ -8,4 +8,5 @@ import scala.concurrent.Future
 trait TaskRepository {
   def save(taskInfo: TaskInfo): Future[_]
   def findById(id: UUID): Future[Option[TaskInfo]]
+  def list: Future[Seq[TaskInfo]]
 }
