@@ -16,9 +16,12 @@ class TasksFromRepositoryTestSuite
     with AsyncFlatSpecLike
     with Matchers {
 
+  private val task1 = TaskInfo(UUID.randomUUID(), 33, TaskStatus.Queued)
+  private val task2 = TaskInfo(UUID.randomUUID(), 85, TaskStatus.InProgress)
+
   /** Запрос информации о задаче должен делегироваться репозиторию */
   "Single task queries" should "be redirected to the repository" in {
-    val task = TaskInfo(UUID.randomUUID(), 33, TaskStatus.Queued)
+    val task = task1
     val mockRepo = mock[TaskRepository]
     (mockRepo.findById _)
       .expects(task.id)
@@ -32,17 +35,16 @@ class TasksFromRepositoryTestSuite
 
   /** Запрос списка задач должен делегироваться репозиторию */
   "Task list queries" should "be delegated to the repository" in {
-    val task1 = TaskInfo(UUID.randomUUID(), 33, TaskStatus.Queued)
-    val task2 = TaskInfo(UUID.randomUUID(), 85, TaskStatus.InProgress)
+    val taskSeq = Seq(task1, task2)
     val mockRepo = mock[TaskRepository]
     (mockRepo.list _)
       .expects()
       .once()
       .returning {
-        Future.successful(Seq(task1, task2))
+        Future.successful(taskSeq)
       }
     val tasks = new TasksFromRepository(mockRepo)
-    tasks.list.map(_ shouldEqual Seq(task1, task2))
+    tasks.list.map(_ should contain theSameElementsInOrderAs taskSeq)
   }
 
 }
