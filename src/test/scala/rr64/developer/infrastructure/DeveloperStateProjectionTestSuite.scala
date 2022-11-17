@@ -132,6 +132,19 @@ class DeveloperStateProjectionTestSuite
     }
   }
 
+  /** Обработчик проекции не должен обновлять состояние разработчика при получении задачи, когда он отдыхает */
+  "The handler" should "not update the state when the developer receives a new task while resting" in {
+    val events = Event.TaskStarted(defaultTask1) ::
+      Event.TaskFinished ::
+      Event.TaskQueued(defaultTask2) ::
+      Nil
+    val projection = createProjection(events)
+
+    projectionTestKit.run(projection) {
+      assertState(DeveloperState.Resting)
+    }
+  }
+
   /** Обработчик проекции не должен обновлять состояние разработчика, когда оно не изменяется */
 
   /** Для каждого разработчика хранится своё состояние */
