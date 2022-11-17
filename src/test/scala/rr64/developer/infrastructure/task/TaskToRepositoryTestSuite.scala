@@ -11,8 +11,9 @@ import akka.stream.scaladsl.Source
 import org.scalatest.Assertion
 import org.scalatest.flatspec.AnyFlatSpecLike
 import rr64.developer.domain.{Task, TaskInfo, TaskStatus}
-import rr64.developer.infrastructure.DeveloperBehavior.{Event, TaskWithId}
+import rr64.developer.infrastructure.DeveloperBehavior.Event
 import rr64.developer.infrastructure.ProjectionTestUtils
+import rr64.developer.infrastructure.TaskTestUtils.TaskWithIdFactory
 import rr64.developer.infrastructure.task.TaskToRepository.TaskOps
 
 import java.util.UUID
@@ -68,7 +69,7 @@ class TaskToRepositoryTestSuite
 
   /** В начале работы над задачей информация о текущем статусе должна сохраняться в репозиторий */
   "The current task state" should "be saved to the repository when the task is started" in new Fixture {
-    val taskWithId = TaskWithId(Task(90), UUID.randomUUID())
+    val taskWithId = Task(90).withRandomId
     val taskInfo = taskWithId.withStatus(TaskStatus.InProgress)
     val events = Event.TaskStarted(taskWithId) :: Nil
     val projection = projectionFromEvents(events)
@@ -79,7 +80,7 @@ class TaskToRepositoryTestSuite
 
   /** Когда задача ставится в очередь, её текущее состояние должно сохраняться в репозиторий */
   "The current task state" should "be saved to the repository when the task is queued" in new Fixture {
-    val taskWithId = TaskWithId(Task(100), UUID.randomUUID())
+    val taskWithId = Task(100).withRandomId
     val taskInfo = taskWithId.withStatus(TaskStatus.Queued)
     val events = Event.TaskQueued(taskWithId) :: Nil
     val projection = projectionFromEvents(events)
@@ -90,7 +91,7 @@ class TaskToRepositoryTestSuite
 
   /** Когда задача завершена, её текущее состояние должно сохраняться в репозиторий */
   "The current task state" should "be saved to the repository when the task is finished" in new Fixture {
-    val taskWithId = TaskWithId(Task(77), UUID.randomUUID())
+    val taskWithId = Task(77).withRandomId
     val taskInfo = taskWithId.withStatus(TaskStatus.Finished)
     val events = Event.TaskFinished(taskWithId) :: Nil
     val projection = projectionFromEvents(events)
@@ -101,8 +102,8 @@ class TaskToRepositoryTestSuite
 
   /** Когда событие не связано с задачей, обновления не происходит */
   "The task state" should "not be updated when there's no task events" in new Fixture {
-    val taskWithId1 = TaskWithId(Task(53), UUID.randomUUID()) // TODO Дублирование
-    val taskWithId2 = TaskWithId(Task(10), UUID.randomUUID())
+    val taskWithId1 = Task(53).withRandomId
+    val taskWithId2 = Task(10).withRandomId
     val taskInfo1 = taskWithId1.withStatus(TaskStatus.Queued)
     val taskInfo2 = taskWithId2.withStatus(TaskStatus.Finished)
     val events = Event.TaskQueued(taskWithId1) :: Event.TaskFinished(taskWithId2) :: Event.Rested :: Nil
