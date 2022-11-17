@@ -8,8 +8,8 @@ import rr64.developer.infrastructure.PostgresSpec
 import slick.jdbc.PostgresProfile.api._
 
 import java.util.UUID
-import scala.concurrent.{Await, Future}
 import scala.concurrent.duration.DurationInt
+import scala.concurrent.{Await, Future}
 
 class TaskSlickRepositoryTestSuite
   extends PostgresSpec
@@ -87,6 +87,21 @@ class TaskSlickRepositoryTestSuite
   }
 
   /** Репозиторий не должен обновлять сложность у существующих задач */
+  "The repository" should "not update existing tasks' difficulty" in {
+    val initialTask = TaskInfo(
+      id = UUID.fromString("8d22593a-f477-48a2-be4a-79f2d8e34f91"),
+      difficulty = 15,
+      status = TaskStatus.InProgress
+    )
+    val updatedTask = initialTask.copy(difficulty = 1)
+    for {
+      _ <- repository.save(initialTask)
+      _ <- repository.save(updatedTask)
+      result <- repository.findById(updatedTask.id)
+    } yield {
+      result shouldEqual Some(initialTask)
+    }
+  }
 
   /** Репозиторий должен находить существующие задачи */
 
