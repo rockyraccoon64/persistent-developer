@@ -121,5 +121,14 @@ class TaskSlickRepositoryTestSuite
   }
 
   /** Репозиторий должен возвращать список всех задач */
+  "The repository" should "list all tasks" in {
+    val tasks = Seq(queuedTask, finishedTask, taskInProgress)
+    for {
+      _ <- Future.traverse(tasks)(repository.save)
+      list <- repository.list
+    } yield {
+      list should contain theSameElementsAs tasks
+    }
+  }
 
 }
