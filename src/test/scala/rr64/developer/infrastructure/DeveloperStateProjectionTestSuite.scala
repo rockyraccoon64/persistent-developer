@@ -118,7 +118,7 @@ class DeveloperStateProjectionTestSuite
   }
 
   /** Обработчик проекции не должен обновлять состояние разработчика при получении задачи, когда он работает */
-  "The handler" should "not update the state after queueing a new task while working" in {
+  "The handler" should "not update the state after receiving a new task while working" in {
     val events = Event.TaskStarted(TaskWithId(Task(1), UUID.randomUUID())) ::
       Event.TaskQueued(TaskWithId(Task(5), UUID.randomUUID())) ::
       Nil
