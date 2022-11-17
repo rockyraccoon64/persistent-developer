@@ -99,4 +99,18 @@ class TaskToRepositoryTestSuite
     }
   }
 
+  /** Когда событие не связано с задачей, обновления не происходит */
+  "The task state" should "not be updated when there's no task events" in new Fixture {
+    val taskWithId1 = TaskWithId(Task(53), UUID.randomUUID()) // TODO Дублирование
+    val taskWithId2 = TaskWithId(Task(53), UUID.randomUUID())
+    val taskInfo1 = taskWithId1.withStatus(TaskStatus.Finished)
+    val taskInfo2 = taskWithId1.withStatus(TaskStatus.Finished)
+    val events = Event.TaskQueued(taskWithId1) :: Event.TaskFinished(taskWithId2) :: Event.Rested :: Nil
+    val projection = projectionFromEvents(events)
+    projectionTestKit.run(projection) {
+      assertInfo(taskInfo1)
+      assertInfo(taskInfo2)
+    }
+  }
+
 }
