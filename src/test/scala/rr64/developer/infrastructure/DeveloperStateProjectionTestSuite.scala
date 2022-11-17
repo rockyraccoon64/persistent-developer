@@ -54,11 +54,16 @@ class DeveloperStateProjectionTestSuite
     persistenceId: String = defaultPersistenceId
   ): SourceProvider[Offset, EventEnvelope[Event]] = {
     val source = envelopeSource(events, persistenceId)
+    providerFromEnvelopeSource(source)
+  }
+
+  private def providerFromEnvelopeSource(
+    source: Source[EventEnvelope[Event], NotUsed]
+  ): TestSourceProvider[Offset, EventEnvelope[Event]] =
     TestSourceProvider(
       source,
       (envelope: EventEnvelope[Event]) => envelope.offset
     )
-  }
 
   private def createProjection(
     sourceProvider: SourceProvider[Offset, EventEnvelope[Event]]
@@ -155,7 +160,7 @@ class DeveloperStateProjectionTestSuite
     val events2 = Event.TaskStarted(defaultTask1).toEnvelope(differentPersistenceId, events1.size) :: Nil
 
     val source = Source(events1 ::: events2)
-    val sourceProvider = TestSourceProvider(source, (envelope: EventEnvelope[Event]) => envelope.offset)
+    val sourceProvider = providerFromEnvelopeSource(source)
     val projection = createProjection(sourceProvider)
 
     projectionTestKit.run(projection) {
