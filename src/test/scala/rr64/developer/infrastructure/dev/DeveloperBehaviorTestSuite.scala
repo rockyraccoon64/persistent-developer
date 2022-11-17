@@ -1,4 +1,4 @@
-package rr64.developer.infrastructure
+package rr64.developer.infrastructure.dev
 
 import akka.actor.testkit.typed.scaladsl.{ManualTime, ScalaTestWithActorTestKit}
 import akka.persistence.testkit.scaladsl.EventSourcedBehaviorTestKit
@@ -9,7 +9,6 @@ import org.scalatest.Inside.inside
 import org.scalatest.flatspec.AnyFlatSpecLike
 import rr64.developer.domain.Task
 import rr64.developer.infrastructure.TaskTestUtils.TaskWithIdFactory
-import rr64.developer.infrastructure.dev.DeveloperBehavior
 import rr64.developer.infrastructure.dev.DeveloperBehavior.Replies.TaskQueued
 import rr64.developer.infrastructure.dev.DeveloperBehavior.State.Working
 import rr64.developer.infrastructure.dev.DeveloperBehavior._
