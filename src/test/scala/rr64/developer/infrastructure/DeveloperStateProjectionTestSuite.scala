@@ -23,6 +23,18 @@ class DeveloperStateProjectionTestSuite
   private val projectionTestKit = ProjectionTestKit(system)
   private implicit val ec: ExecutionContext = system.executionContext
 
+  private val mockRepository = new DeveloperStateRepository {
+    private var states: Map[String, DeveloperState] = Map.empty
+    override def save(id: String, state: DeveloperState)(implicit ec: ExecutionContext): Future[Unit] = {
+      states = states.updated(id, state)
+      Future.unit
+    }
+    override def findById(id: String)(implicit ec: ExecutionContext): Future[Option[DeveloperState]] =
+      Future.successful(states.get(id))
+  }
+
+  private val handler: Handler[EventEnvelope[Event]] = new DeveloperStateToRepository(mockRepository)
+
   /** Обработчик проекции должен обновлять состояние разработчика на "Работает", когда он начинает задачу */
   "The handler" should "update the developer state in the repository when a task is started" in {
     val persistenceId = "test-id"
@@ -43,21 +55,10 @@ class DeveloperStateProjectionTestSuite
       (envelope: EventEnvelope[Event]) => envelope.offset
     )
 
-    val mockRepo = new DeveloperStateRepository {
-      private var states: Map[String, DeveloperState] = Map.empty
-      override def save(id: String, state: DeveloperState)(implicit ec: ExecutionContext): Future[Unit] = {
-        states = states.updated(id, state)
-        Future.unit
-      }
-      override def findById(id: String)(implicit ec: ExecutionContext): Future[Option[DeveloperState]] =
-        Future.successful(states.get(id))
-    }
-    val handler: Handler[EventEnvelope[Event]] = new DeveloperStateToRepository(mockRepo)
-
     val projection = TestProjection(ProjectionId("dev-state-test", "0"), sourceProvider, () => handler)
 
     projectionTestKit.run(projection) {
-      mockRepo.findById(persistenceId).futureValue shouldEqual Some(DeveloperState.Working)
+      mockRepository.findById(persistenceId).futureValue shouldEqual Some(DeveloperState.Working)
     }
   }
 
@@ -87,21 +88,10 @@ class DeveloperStateProjectionTestSuite
       (envelope: EventEnvelope[Event]) => envelope.offset
     )
 
-    val mockRepo = new DeveloperStateRepository {
-      private var states: Map[String, DeveloperState] = Map.empty
-      override def save(id: String, state: DeveloperState)(implicit ec: ExecutionContext): Future[Unit] = {
-        states = states.updated(id, state)
-        Future.unit
-      }
-      override def findById(id: String)(implicit ec: ExecutionContext): Future[Option[DeveloperState]] =
-        Future.successful(states.get(id))
-    }
-    val handler: Handler[EventEnvelope[Event]] = new DeveloperStateToRepository(mockRepo)
-
     val projection = TestProjection(ProjectionId("dev-state-test", "0"), sourceProvider, () => handler)
 
     projectionTestKit.run(projection) {
-      mockRepo.findById(persistenceId).futureValue shouldEqual Some(DeveloperState.Resting)
+      mockRepository.findById(persistenceId).futureValue shouldEqual Some(DeveloperState.Resting)
     }
   }
 
