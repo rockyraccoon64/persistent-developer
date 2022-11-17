@@ -24,12 +24,10 @@ class DeveloperStateSlickRepository(db: Database) extends DeveloperStateReposito
   }
 
   override def findById(id: String)
-      (implicit ec: ExecutionContext): Future[Option[DeveloperState]] =
+      (implicit ec: ExecutionContext): Future[Option[DeveloperState]] = {
     db.run {
-      states.filter(_.id === id)
-        .map(_.state)
-        .take(1)
-        .result
+      sql"""SELECT state FROM dev_state WHERE id = $id"""
+        .as[String]
         .headOption
         .map(_.map {
           case "Free" => DeveloperState.Free
@@ -37,6 +35,7 @@ class DeveloperStateSlickRepository(db: Database) extends DeveloperStateReposito
           case "Resting" => DeveloperState.Resting
         })
     }
+  }
 
 
 }
