@@ -143,7 +143,7 @@ object DeveloperBehavior {
 
   def apply(persistenceId: PersistenceId, workFactor: Int, restFactor: Int): Behavior[Command] =
     Behaviors.withTimers { timer =>
-      implicit val setup: Setup = Setup(workFactor, restFactor, timer)
+      implicit val setup: Setup = Setup(workFactor, restFactor, timer) // TODO Передавать Setup в applyCommand и applyEvent, а не в состояние
       EventSourcedBehavior[Command, Event, State](
         persistenceId = persistenceId,
         emptyState = State.Free(),
