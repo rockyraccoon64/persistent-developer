@@ -14,5 +14,5 @@ class DeveloperStateFromRepository(
 ) extends DeveloperStateProvider {
   /** Состояние разработчика */
   override def state(implicit ec: ExecutionContext): Future[DeveloperState] =
-    repository.findById(developerId).map(_.get)
+    repository.findById(developerId).map(_.getOrElse(DeveloperState.InitialState))
 }
