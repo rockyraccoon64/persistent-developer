@@ -35,7 +35,7 @@ class DeveloperStateProjectionTestSuite
 
   private val handler: Handler[EventEnvelope[Event]] = new DeveloperStateToRepository(mockRepository)
 
-  private def provider(persistenceId: String, events: Seq[Event]): SourceProvider[Offset, EventEnvelope[Event]] = {
+  private def provider(events: Seq[Event], persistenceId: String): SourceProvider[Offset, EventEnvelope[Event]] = {
     val source: Source[EventEnvelope[Event], NotUsed] =
       Source(events).zipWithIndex.map { case (event, idx) =>
         EventEnvelope[Event](
@@ -58,7 +58,7 @@ class DeveloperStateProjectionTestSuite
     val events = Seq(
       Event.TaskStarted(TaskWithId(Task(1), UUID.randomUUID()))
     )
-    val sourceProvider = provider(persistenceId, events)
+    val sourceProvider = provider(events, persistenceId)
     val projection = TestProjection(ProjectionId("dev-state-test", "0"), sourceProvider, () => handler)
 
     projectionTestKit.run(projection) {
@@ -73,7 +73,7 @@ class DeveloperStateProjectionTestSuite
       Event.TaskStarted(TaskWithId(Task(1), UUID.randomUUID())),
       Event.TaskFinished
     )
-    val sourceProvider = provider(persistenceId, events)
+    val sourceProvider = provider(events, persistenceId)
 
     val projection = TestProjection(ProjectionId("dev-state-test", "0"), sourceProvider, () => handler)
 
