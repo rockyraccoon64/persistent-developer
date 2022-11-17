@@ -26,7 +26,7 @@ class TaskToRepositoryTestSuite
   private val projectionTestKit = ProjectionTestKit(system)
   private implicit val ec: ExecutionContext = system.executionContext
 
-  trait Test {
+  trait Fixture {
 
     protected val mockRepository: TaskRepository = new TaskRepository {
       private var tasks: Map[UUID, TaskInfo] = Map.empty
@@ -62,7 +62,7 @@ class TaskToRepositoryTestSuite
   }
 
   /** В начале работы над задачей информация о текущем статусе должна сохраняться в репозиторий */
-  "The current task state" should "be saved to the repository when the task is started" in new Test {
+  "The current task state" should "be saved to the repository when the task is started" in new Fixture {
     val taskWithId = TaskWithId(Task(90), UUID.randomUUID())
     val taskInfo = TaskInfo(taskWithId.id, taskWithId.task.difficulty, TaskStatus.InProgress)
     val events = Event.TaskStarted(taskWithId) :: Nil
