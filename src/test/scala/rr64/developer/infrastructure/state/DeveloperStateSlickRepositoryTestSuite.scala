@@ -46,4 +46,17 @@ class DeveloperStateSlickRepositoryTestSuite extends PostgresSpec with AsyncFlat
     checkInsert("dev-3", DeveloperState.Resting)
   }
 
+  /** Состояние разработчика должно обновляться */
+  "The developer state" should "be updated in the repository" in {
+    val id = "dev-4"
+    val lastState = DeveloperState.Resting
+    for {
+      _ <- repository.save(id, DeveloperState.Working)
+      _ <- repository.save(id, lastState)
+      state <- repository.findById(id)
+    } yield {
+      state shouldEqual Some(lastState)
+    }
+  }
+
 }
