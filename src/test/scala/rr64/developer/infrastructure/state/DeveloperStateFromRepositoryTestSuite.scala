@@ -7,7 +7,7 @@ import rr64.developer.domain.DeveloperState
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class DeveloperStateFromRepositoryTests extends AsyncFlatSpec with Matchers {
+class DeveloperStateFromRepositoryTestSuite extends AsyncFlatSpec with Matchers {
 
   private val dev1 = "walter"
   private val dev2 = "mark"
