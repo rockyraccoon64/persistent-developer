@@ -47,7 +47,14 @@ class DeveloperStateProjectionTestSuite
     startOffset: Long = 0
   ): Source[EventEnvelope[Event], NotUsed] =
     Source(events).zipWithIndex.map { case (event, idx) =>
-      event.toEnvelope(persistenceId, startOffset + idx)
+      val offset = startOffset + idx
+      EventEnvelope(
+        offset = Offset.sequence(offset),
+        persistenceId = persistenceId,
+        sequenceNr = offset,
+        event = event,
+        timestamp = offset
+      )
     }
 
   private def providerFromSource(
@@ -161,16 +168,6 @@ class DeveloperStateProjectionTestSuite
       assertState(DeveloperState.Resting, defaultPersistenceId)
       assertState(DeveloperState.Working, differentPersistenceId)
     }
-  }
-
-  implicit class EventOps(evt: Event) {
-    def toEnvelope(persistenceId: String, offset: Long): EventEnvelope[Event] = EventEnvelope(
-      offset = Offset.sequence(offset),
-      persistenceId = persistenceId,
-      sequenceNr = offset,
-      event = evt,
-      timestamp = offset
-    )
   }
 
 }
