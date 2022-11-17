@@ -42,13 +42,6 @@ class TaskToRepositoryTestSuite
 
     protected val handler: Handler[EventEnvelope[Event]] = new TaskToRepository(mockRepository)
 
-    protected def envelopeSource(
-      events: Seq[Event],
-      persistenceId: String,
-      startOffset: Long = 0
-    ): Source[EventEnvelope[Event], NotUsed] =
-      ProjectionTestUtils.envelopeSource(events, persistenceId, startOffset)
-
     protected def providerFromSource(
       source: Source[EventEnvelope[Event], NotUsed]
     ): TestSourceProvider[Offset, EventEnvelope[Event]] =
@@ -70,7 +63,7 @@ class TaskToRepositoryTestSuite
       events: Seq[Event],
       persistenceId: String
     ): TestProjection[Offset, EventEnvelope[Event]] = {
-      val source = envelopeSource(events, persistenceId)
+      val source = ProjectionTestUtils.envelopeSource(events, persistenceId)
       projectionFromSource(source)
     }
 
