@@ -8,10 +8,12 @@ import akka.projection.eventsourced.EventEnvelope
 import akka.projection.scaladsl.Handler
 import akka.projection.testkit.scaladsl.{ProjectionTestKit, TestProjection}
 import akka.stream.scaladsl.Source
+import org.scalatest.Assertion
 import org.scalatest.flatspec.AnyFlatSpecLike
 import rr64.developer.domain.{Task, TaskInfo, TaskStatus}
 import rr64.developer.infrastructure.DeveloperBehavior.{Event, TaskWithId}
 import rr64.developer.infrastructure.ProjectionTestUtils
+import rr64.developer.infrastructure.task.TaskToRepository.TaskOps
 
 import java.util.UUID
 import scala.concurrent.{ExecutionContext, Future}
@@ -59,27 +61,30 @@ class TaskToRepositoryTestSuite
         handler = () => handler
       )
 
+    protected def assertInfo(taskInfo: TaskInfo): Assertion =
+      mockRepository.findById(taskInfo.id).futureValue shouldEqual Some(taskInfo)
+
   }
 
   /** В начале работы над задачей информация о текущем статусе должна сохраняться в репозиторий */
   "The current task state" should "be saved to the repository when the task is started" in new Fixture {
     val taskWithId = TaskWithId(Task(90), UUID.randomUUID())
-    val taskInfo = TaskInfo(taskWithId.id, taskWithId.task.difficulty, TaskStatus.InProgress)
+    val taskInfo = taskWithId.withStatus(TaskStatus.InProgress)
     val events = Event.TaskStarted(taskWithId) :: Nil
     val projection = projectionFromEvents(events)
     projectionTestKit.run(projection) {
-      mockRepository.findById(taskInfo.id).futureValue shouldEqual Some(taskInfo)
+      assertInfo(taskInfo)
     }
   }
 
   /** Когда задача ставится в очередь, её текущее состояние должно сохраняться в репозиторий */
   "The current task state" should "be saved to the repository when the task is queued" in new Fixture {
     val taskWithId = TaskWithId(Task(100), UUID.randomUUID())
-    val taskInfo = TaskInfo(taskWithId.id, taskWithId.task.difficulty, TaskStatus.Queued)
+    val taskInfo = taskWithId.withStatus(TaskStatus.Queued)
     val events = Event.TaskQueued(taskWithId) :: Nil
     val projection = projectionFromEvents(events)
     projectionTestKit.run(projection) {
-      mockRepository.findById(taskInfo.id).futureValue shouldEqual Some(taskInfo)
+      assertInfo(taskInfo)
     }
   }
 
