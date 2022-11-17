@@ -95,7 +95,19 @@ class DeveloperStateProjectionTestSuite
     }
   }
 
-  /** Обработчик проекции должен обновлять состояние разработчика, когда он заканчивает отдых */
+  /** Обработчик проекции должен обновлять состояние разработчика на "Свободен",
+   * когда он отдохнул и у него нет задач */
+  "The handler" should "update the state to Free after the developer rests if he has no more tasks" in {
+    val events = Event.TaskStarted(TaskWithId(Task(1), UUID.randomUUID())) ::
+      Event.TaskFinished ::
+      Event.Rested ::
+      Nil
+    val projection = createProjection(events)
+
+    projectionTestKit.run(projection) {
+      mockRepository.findById(defaultPersistenceId).futureValue shouldEqual Some(DeveloperState.Free)
+    }
+  }
 
   /** Обработчик проекции не должен обновлять состояние разработчика, когда оно не изменяется */
 
