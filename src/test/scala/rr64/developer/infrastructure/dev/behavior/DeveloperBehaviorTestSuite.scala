@@ -248,7 +248,7 @@ class DeveloperBehaviorTestSuite
   /** Если актор упал в рабочем состоянии, соответствующий таймер запускается по новой */
   "The developer actor" should "start the work timer when completing recovery in a Working state" in {
     val taskWithId = TaskWithId(50, UUID.fromString("92ac4c4b-622f-44ba-b331-f1cf40a27c58"))
-    val workTime = calculateWorkTime(taskWithId.task.difficulty)
+    val workTime = calculateWorkTime(taskWithId.difficulty)
 
     developerTestKit.initialize(Event.TaskStarted(taskWithId))
     developerTestKit.restart()
@@ -263,7 +263,7 @@ class DeveloperBehaviorTestSuite
   /** Если актор упал в состоянии отдыха, соответствующий таймер запускается по новой */
   "The developer actor" should "start the rest timer when completing recovery in a Resting state" in {
     val taskWithId = TaskWithId(10, UUID.fromString("b807f5ff-6066-454e-8d53-2a90a3941cc4"))
-    val restTime = calculateRestTime(taskWithId.task.difficulty)
+    val restTime = calculateRestTime(taskWithId.difficulty)
 
     developerTestKit.initialize(Event.TaskStarted(taskWithId), Event.TaskFinished(taskWithId))
     developerTestKit.restart()
@@ -281,9 +281,9 @@ class DeveloperBehaviorTestSuite
     val taskQueue = TaskWithId(35, UUID.fromString("ba5be578-9af1-44a6-9b8b-0a11c340237b")) ::
       TaskWithId(19, UUID.fromString("da2b386f-a53e-44a8-b943-8e7491d1010e")) ::
       Nil
-    val restTime = calculateRestTime(lastCompleted.task.difficulty)
+    val restTime = calculateRestTime(lastCompleted.difficulty)
     val nextTask = taskQueue.head
-    val workTime = calculateWorkTime(nextTask.task.difficulty)
+    val workTime = calculateWorkTime(nextTask.difficulty)
 
     developerTestKit.initialize(State.Resting(lastCompleted, taskQueue))
 

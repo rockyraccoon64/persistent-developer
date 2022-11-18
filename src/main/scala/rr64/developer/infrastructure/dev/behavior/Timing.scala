@@ -21,7 +21,7 @@ object Timing {
     startTimer(
       timer = setup.timer,
       message = Command.FinishTask(taskWithId.id),
-      difficulty = taskWithId.task.difficulty,
+      difficulty = taskWithId.difficulty,
       factor = setup.workFactor
     )
 
@@ -31,7 +31,7 @@ object Timing {
     startTimer(
       timer = setup.timer,
       message = Command.StopResting,
-      difficulty = taskWithId.task.difficulty,
+      difficulty = taskWithId.difficulty,
       factor = setup.restFactor
     )
 

@@ -50,7 +50,7 @@ class EventSerializer extends SerializerWithStringManifest {
 
   private def taskToByteArray(taskWithId: TaskWithId): Array[Byte] = {
     val id = taskWithId.id
-    val difficulty = taskWithId.task.difficulty
+    val difficulty = taskWithId.difficulty
     ByteBuffer.allocate(20)
       .putLong(id.getMostSignificantBits)
       .putLong(id.getLeastSignificantBits)

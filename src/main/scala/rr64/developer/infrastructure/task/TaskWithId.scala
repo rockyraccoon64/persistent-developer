@@ -4,7 +4,9 @@ import rr64.developer.domain.Task
 
 import java.util.UUID
 
-case class TaskWithId(task: Task, id: UUID)
+case class TaskWithId(task: Task, id: UUID) {
+  def difficulty: Int = task.difficulty
+}
 
 object TaskWithId {
 

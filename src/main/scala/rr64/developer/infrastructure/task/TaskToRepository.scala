@@ -43,7 +43,7 @@ object TaskToRepository {
   implicit class TaskInfoFactory(taskWithId: TaskWithId) {
     def withStatus(status: TaskStatus): TaskInfo = TaskInfo(
       id = taskWithId.id,
-      difficulty = taskWithId.task.difficulty,
+      difficulty = taskWithId.difficulty,
       status = status
     )
   }
