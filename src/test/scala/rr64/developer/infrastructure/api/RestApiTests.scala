@@ -269,7 +269,14 @@ class RestApiTests
       }
     }
 
-    /** TODO Возвращать 500 Internal Server Error в случае синхронной ошибки */
+    /** Возвращать 500 Internal Server Error в случае синхронной ошибки */
+    "return 500 Internal Server Error when encountering a synchronous error" in {
+      mockService.throwing(new RuntimeException)
+
+      SendRequest ~> route ~> check {
+        status shouldEqual StatusCodes.InternalServerError
+      }
+    }
 
   }
 
