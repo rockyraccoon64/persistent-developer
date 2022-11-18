@@ -98,7 +98,7 @@ class DeveloperStateToRepositoryTestSuite
   "The handler" should "update the state to Free after the developer rests if he has no more tasks" in new Fixture {
     val events = Event.TaskStarted(defaultTask1) ::
       Event.TaskFinished(defaultTask1) ::
-      Event.Rested ::
+      Event.Rested(None) ::
       Nil
     val projection = projectionFromEvents(events)
 
@@ -106,6 +106,9 @@ class DeveloperStateToRepositoryTestSuite
       assertState(DeveloperState.Free)
     }
   }
+
+  /** TODO Обработчик проекции должен обновлять состояние разработчика на "Работает",
+   *   когда он отдохнул и у него нет задач */
 
   /** Обработчик проекции не должен обновлять состояние разработчика при получении задачи, когда он работает */
   "The handler" should "not update the state after receiving a new task while working" in new Fixture {

@@ -15,5 +15,5 @@ object Event {
   /** Задача завершена */
   case class TaskFinished(taskWithId: TaskWithId) extends Event
   /** Отдых завершён */
-  case object Rested extends Event
+  case class Rested(nextTask: Option[TaskWithId]) extends Event
 }

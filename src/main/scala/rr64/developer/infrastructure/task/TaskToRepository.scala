@@ -26,7 +26,11 @@ class TaskToRepository(repository: TaskRepository)
         val taskInfo = taskWithId.withStatus(TaskStatus.Finished)
         save(taskInfo)
 
-      case Event.Rested =>
+      case Event.Rested(Some(taskWithId)) =>
+        val taskInfo = taskWithId.withStatus(TaskStatus.InProgress)
+        save(taskInfo)
+
+      case Event.Rested(_) =>
         Future.successful(Done)
     }
 

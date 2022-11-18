@@ -76,7 +76,7 @@ object State {
       cmd match {
         case StopResting =>
           // Завершить отдых
-          Effect.persist(Event.Rested)
+          Effect.persist(Event.Rested(taskQueue.headOption))
             .thenRun((_: State) => taskQueue.headOption.foreach(Timing.startWorkTimer))
 
         case AddTask(task, replyTo) =>
@@ -91,11 +91,11 @@ object State {
 
     override def applyEvent(evt: Event)(implicit setup: Setup): State =
       evt match {
-        case Event.Rested =>
-          taskQueue match {
-            case head :: tail => Working(head, tail)
-            case Nil => State.Free
-          }
+        case Event.Rested(Some(task)) if taskQueue.headOption.contains(task) =>
+          Working(task, taskQueue.tail)
+
+        case Event.Rested(None) =>
+          State.Free
 
         case Event.TaskQueued(newTask) =>
           Resting(lastCompleted, taskQueue :+ newTask)

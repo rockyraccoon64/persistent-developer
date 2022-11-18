@@ -104,7 +104,7 @@ class TaskToRepositoryTestSuite
   "The current task state" should "be saved to the repository when the task is started after resting" in new Fixture {
     val taskWithId = TaskWithId(Task(35), UUID.fromString("f33b67f0-2324-4c7d-8b5f-59ab8e4f5bd7"))
     val taskInfo = taskWithId.withStatus(TaskStatus.InProgress)
-    val events = Event.Rested(taskWithId) :: Nil
+    val events = Event.Rested(Some(taskWithId)) :: Nil
     val projection = projectionFromEvents(events)
     projectionTestKit.run(projection) {
       assertInfo(taskInfo)
@@ -117,7 +117,7 @@ class TaskToRepositoryTestSuite
     val taskWithId2 = Task(10).withRandomId
     val taskInfo1 = taskWithId1.withStatus(TaskStatus.Queued)
     val taskInfo2 = taskWithId2.withStatus(TaskStatus.Finished)
-    val events = Event.TaskQueued(taskWithId1) :: Event.TaskFinished(taskWithId2) :: Event.Rested :: Nil
+    val events = Event.TaskQueued(taskWithId1) :: Event.TaskFinished(taskWithId2) :: Event.Rested(None) :: Nil
     val projection = projectionFromEvents(events)
     projectionTestKit.run(projection) {
       assertInfo(taskInfo1)

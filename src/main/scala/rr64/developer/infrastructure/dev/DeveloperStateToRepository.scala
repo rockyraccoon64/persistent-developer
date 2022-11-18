@@ -16,11 +16,11 @@ class DeveloperStateToRepository(repository: DeveloperStateRepository)
 
   /** Обработать событие */
   override def process(envelope: EventEnvelope[Event]): Future[Done] = envelope.event match {
-    case Event.TaskStarted(_) =>
+    case Event.TaskStarted(_) | Event.Rested(Some(_)) =>
       save(envelope.persistenceId, DeveloperState.Working)
     case Event.TaskFinished(_) =>
       save(envelope.persistenceId, DeveloperState.Resting)
-    case Event.Rested =>
+    case Event.Rested(_) =>
       save(envelope.persistenceId, DeveloperState.Free)
     case Event.TaskQueued(_) =>
       Future.successful(Done)
