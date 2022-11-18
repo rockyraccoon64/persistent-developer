@@ -7,6 +7,8 @@ scalaVersion := "2.13.10"
 
 libraryDependencies ++= Seq(
   akkaActor,
+  akkaStream,
+  akkaHttp,
   akkaPersistence,
   akkaPersistenceJdbc,
   akkaPersistenceQuery,
@@ -18,6 +20,8 @@ libraryDependencies ++= Seq(
   logback,
   akkaPersistenceTestkit % Test,
   akkaProjectionTestkit % Test,
+  akkaStreamTestkit % Test,
+  akkaHttpTestkit % Test,
   scalatest % Test,
   scalamock % Test
 )
