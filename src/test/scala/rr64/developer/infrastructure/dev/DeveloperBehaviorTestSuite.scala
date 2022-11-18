@@ -11,7 +11,7 @@ import rr64.developer.domain.Task
 import rr64.developer.infrastructure.TaskTestUtils.TaskWithIdFactory
 import rr64.developer.infrastructure.dev.DeveloperBehavior.State.Working
 import rr64.developer.infrastructure.dev.DeveloperBehavior._
-import rr64.developer.infrastructure.dev.behavior.Replies
+import rr64.developer.infrastructure.dev.behavior.{Event, Replies}
 import rr64.developer.infrastructure.task.TaskWithId
 
 import java.util.UUID
@@ -26,7 +26,7 @@ class DeveloperBehaviorTestSuite
 
   private type Kit = EventSourcedBehaviorTestKit[
     DeveloperBehavior.Command,
-    DeveloperBehavior.Event,
+    Event,
     DeveloperBehavior.State
   ]
 
