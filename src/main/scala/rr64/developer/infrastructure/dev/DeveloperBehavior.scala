@@ -2,8 +2,8 @@ package rr64.developer.infrastructure.dev
 
 import akka.actor.typed.scaladsl.{Behaviors, TimerScheduler}
 import akka.actor.typed.{ActorRef, Behavior}
-import akka.persistence.typed.PersistenceId
 import akka.persistence.typed.scaladsl.{Effect, EventSourcedBehavior}
+import akka.persistence.typed.{PersistenceId, RecoveryCompleted}
 import rr64.developer.domain.Task
 
 import java.util.UUID
@@ -147,7 +147,11 @@ object DeveloperBehavior {
         emptyState = State.Free,
         commandHandler = (state, cmd) => state.applyCommand(cmd),
         eventHandler = (state, evt) => state.applyEvent(evt)
-      )
+      ).receiveSignal {
+        case (State.Working(taskWithId, _), RecoveryCompleted) =>
+          val timeNeeded = taskWithId.task.difficulty * setup.workFactor // TODO Дублирование
+          timer.startSingleTimer(FinishTask(taskWithId.id), timeNeeded.millis)
+      }
     }
 
 }

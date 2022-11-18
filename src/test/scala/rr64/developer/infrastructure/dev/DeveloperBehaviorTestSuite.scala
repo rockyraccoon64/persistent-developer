@@ -13,6 +13,7 @@ import rr64.developer.infrastructure.dev.DeveloperBehavior.Replies.TaskQueued
 import rr64.developer.infrastructure.dev.DeveloperBehavior.State.Working
 import rr64.developer.infrastructure.dev.DeveloperBehavior._
 
+import java.util.UUID
 import scala.concurrent.duration.DurationInt
 
 class DeveloperBehaviorTestSuite
@@ -260,6 +261,19 @@ class DeveloperBehaviorTestSuite
   }
 
   /** Если актор упал в рабочем состоянии, соответствующий таймер запускается по новой */
+  "The developer actor" should "start the work timer when completing recovery in a Working state" in {
+    val taskWithId = TaskWithId(Task(50), UUID.fromString("92ac4c4b-622f-44ba-b331-f1cf40a27c58"))
+    val workTime = workTimeMs(taskWithId.task.difficulty)
+
+    developerTestKit.initialize(Event.TaskStarted(taskWithId))
+    developerTestKit.restart()
+
+    manualTime.timePasses((workTime - 1).millis)
+    developerTestKit.getState() shouldEqual Working(taskWithId, Nil)
+
+    manualTime.timePasses(1.millis)
+    developerTestKit.getState() shouldBe a [State.Resting]
+  }
 
   /** Если актор упал в состоянии отдыха, соответствующий таймер запускается по новой */
 
