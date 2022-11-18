@@ -70,13 +70,24 @@ class RestApiTests
       }
     }
 
-    /** При ошибке в сервисе возвращается 500 Internal Server Error */
-    "return 500 Internal Server Error when encountering a service error" in {
+    /** При асинхронной ошибке в сервисе возвращается 500 Internal Server Error */
+    "return 500 Internal Server Error when encountering an asynchronous exception" in {
       val id = UUID.fromString("f01c667d-7bc6-481e-a0e9-de1ced7a2f0d")
 
       mockExpects(id).returning(
         Future.failed(new RuntimeException)
       )
+
+      Get(s"$baseUrl/$id") ~> route ~> check {
+        status shouldEqual StatusCodes.InternalServerError
+      }
+    }
+
+    /** При синхронном исключении возвращается 500 Internal Server Error */
+    "return 500 Internal Server Error when encountering a synchronous exception" in {
+      val id = UUID.fromString("4bd97557-b3a1-4404-84c9-bc6a9e96723c")
+
+      mockExpects(id).throwing(new RuntimeException)
 
       Get(s"$baseUrl/$id") ~> route ~> check {
         status shouldEqual StatusCodes.InternalServerError
