@@ -30,27 +30,20 @@ class DeveloperBehaviorTestSuite
     DeveloperBehavior.State
   ]
 
-  private def createTestKit(
-    persistenceId: String,
-    workFactor: Int,
-    restFactor: Int
-  ): Kit = {
+  private val manualTime = ManualTime()
+
+  private val workFactor = 10
+  private val restFactor = 5
+  private val developerTestKit: Kit =
     EventSourcedBehaviorTestKit(
       system = system,
       behavior = DeveloperBehavior(
-        persistenceId = PersistenceId.ofUniqueId(persistenceId),
+        persistenceId = PersistenceId.ofUniqueId("dev-test"),
         workFactor = workFactor,
         restFactor = restFactor
       ),
       SerializationSettings.disabled
     )
-  }
-
-  private val manualTime = ManualTime()
-
-  private val workFactor = 10
-  private val restFactor = 5
-  private val developerTestKit = createTestKit("dev-test", workFactor, restFactor)
 
   private def addTask(task: Task, kit: Kit = developerTestKit) =
     kit.runCommand(AddTask(task, _))
