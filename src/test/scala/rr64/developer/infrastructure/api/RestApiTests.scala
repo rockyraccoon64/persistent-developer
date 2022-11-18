@@ -1,15 +1,15 @@
 package rr64.developer.infrastructure.api
 
 import akka.http.scaladsl.testkit.ScalatestRouteTest
-import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 import rr64.developer.domain._
 
 import java.util.UUID
 import scala.concurrent.{ExecutionContext, Future}
 
 class RestApiTests
-  extends AnyFlatSpec
+  extends AnyWordSpec
     with Matchers
     with ScalatestRouteTest {
 
@@ -21,5 +21,16 @@ class RestApiTests
   }
 
   private val route = new RestApi(service).route
+
+  "The service" should {
+
+    /** Запрос состояния разработчика */
+    "return the developer state" in {
+      Get("/api/query/developer-state") ~> route ~> check {
+        responseAs[ApiDeveloperState] shouldEqual ApiDeveloperState.Working
+      }
+    }
+
+  }
 
 }
