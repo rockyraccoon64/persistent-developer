@@ -157,11 +157,13 @@ class RestApiTests
       val id = UUID.fromString("f03fb7d3-2e2b-4965-b85c-f91692a583ff")
       val reply = DeveloperReply.TaskStarted(id)
 
+      val apiCommand = ApiTaskToAdd(task.difficulty)
+
       (service.addTask(_: Task)(_: ExecutionContext))
         .expects(task, *)
         .returning(Future.successful(reply))
 
-      Post("/api/command/add-task") ~> route ~> check {
+      Post("/api/command/add-task", apiCommand) ~> route ~> check {
         responseAs[ApiReply] shouldEqual ApiReply(id, "Started")
       }
     }
