@@ -61,8 +61,11 @@ class DeveloperBehaviorTestSuite
     TaskWithId(task, id)
   }
 
-  private def workTimeMs(difficulty: Int): FiniteDuration = DeveloperBehavior.calculateTime(difficulty, workFactor)
-  private def restTimeMs(difficulty: Int): FiniteDuration = DeveloperBehavior.calculateTime(difficulty, restFactor)
+  private def calculateWorkTime(difficulty: Int): FiniteDuration =
+    DeveloperBehavior.calculateTime(difficulty, workFactor)
+
+  private def calculateRestTime(difficulty: Int): FiniteDuration =
+    DeveloperBehavior.calculateTime(difficulty, restFactor)
 
   override protected def beforeEach(): Unit = {
     super.beforeEach()
@@ -97,7 +100,7 @@ class DeveloperBehaviorTestSuite
   "The developer" should "work until the task is done" in {
     val difficulty = 10
     val task = Task(difficulty)
-    val workTime = workTimeMs(difficulty)
+    val workTime = calculateWorkTime(difficulty)
 
     addTask(task)
 
@@ -116,7 +119,7 @@ class DeveloperBehaviorTestSuite
   "The developer" should "rest after completing a task" in {
     val difficulty = 50
     val task = Task(difficulty)
-    val workTime = workTimeMs(difficulty)
+    val workTime = calculateWorkTime(difficulty)
 
     addTask(task)
 
@@ -132,8 +135,8 @@ class DeveloperBehaviorTestSuite
   "The developer" should "only rest for a designated time period" in {
     val difficulty = 50
     val task = Task(difficulty)
-    val workTime = workTimeMs(difficulty)
-    val restTime = restTimeMs(difficulty)
+    val workTime = calculateWorkTime(difficulty)
+    val restTime = calculateRestTime(difficulty)
 
     addTask(task)
 
@@ -190,7 +193,7 @@ class DeveloperBehaviorTestSuite
     val secondTaskWithId = queueTask(secondTask)
     val thirdTaskWithId = queueTask(thirdTask)
 
-    val workTime = workTimeMs(firstTask.difficulty)
+    val workTime = calculateWorkTime(firstTask.difficulty)
 
     manualTime.timePasses(workTime)
 
@@ -211,8 +214,8 @@ class DeveloperBehaviorTestSuite
     val secondTaskWithId = queueTask(secondTask)
     val thirdTaskWithId = queueTask(thirdTask)
 
-    val workTime = workTimeMs(firstTask.difficulty)
-    val restTime = restTimeMs(firstTask.difficulty)
+    val workTime = calculateWorkTime(firstTask.difficulty)
+    val restTime = calculateRestTime(firstTask.difficulty)
 
     manualTime.timePasses(workTime)
     manualTime.timePasses(restTime)
@@ -228,8 +231,8 @@ class DeveloperBehaviorTestSuite
   "The developer" should "be free after resting if there are no more tasks in the queue" in {
     val difficulty = 50
     val task = Task(difficulty)
-    val workTime = workTimeMs(difficulty)
-    val restTime = restTimeMs(difficulty)
+    val workTime = calculateWorkTime(difficulty)
+    val restTime = calculateRestTime(difficulty)
 
     addTask(task)
 
@@ -242,7 +245,7 @@ class DeveloperBehaviorTestSuite
   /** Если разработчик отдыхает, новые задачи ставятся в очередь */
   "The developer" should "queue tasks while resting" in {
     val initialTask = Task(1)
-    val workTime = workTimeMs(initialTask.difficulty)
+    val workTime = calculateWorkTime(initialTask.difficulty)
 
     addTask(initialTask, developerTestKit)
 
@@ -262,7 +265,7 @@ class DeveloperBehaviorTestSuite
   /** Если актор упал в рабочем состоянии, соответствующий таймер запускается по новой */
   "The developer actor" should "start the work timer when completing recovery in a Working state" in {
     val taskWithId = TaskWithId(Task(50), UUID.fromString("92ac4c4b-622f-44ba-b331-f1cf40a27c58"))
-    val workTime = workTimeMs(taskWithId.task.difficulty)
+    val workTime = calculateWorkTime(taskWithId.task.difficulty)
 
     developerTestKit.initialize(Event.TaskStarted(taskWithId))
     developerTestKit.restart()
@@ -277,7 +280,7 @@ class DeveloperBehaviorTestSuite
   /** Если актор упал в состоянии отдыха, соответствующий таймер запускается по новой */
   "The developer actor" should "start the rest timer when completing recovery in a Resting state" in {
     val taskWithId = TaskWithId(Task(10), UUID.fromString("b807f5ff-6066-454e-8d53-2a90a3941cc4"))
-    val restTime = restTimeMs(taskWithId.task.difficulty)
+    val restTime = calculateRestTime(taskWithId.task.difficulty)
 
     developerTestKit.initialize(Event.TaskStarted(taskWithId), Event.TaskFinished(taskWithId))
     developerTestKit.restart()
@@ -295,9 +298,9 @@ class DeveloperBehaviorTestSuite
     val taskQueue = TaskWithId(Task(35), UUID.fromString("ba5be578-9af1-44a6-9b8b-0a11c340237b")) ::
       TaskWithId(Task(19), UUID.fromString("da2b386f-a53e-44a8-b943-8e7491d1010e")) ::
       Nil
-    val restTime = restTimeMs(lastCompleted.task.difficulty)
+    val restTime = calculateRestTime(lastCompleted.task.difficulty)
     val nextTask = taskQueue.head
-    val workTime = workTimeMs(nextTask.task.difficulty)
+    val workTime = calculateWorkTime(nextTask.task.difficulty)
 
     developerTestKit.initialize(State.Resting(lastCompleted, taskQueue))
 
