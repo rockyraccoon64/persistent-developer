@@ -7,7 +7,6 @@ import java.util.UUID
 case class TaskWithId(task: Task, id: UUID)
 
 object TaskWithId {
-  def generateTaskId(): UUID = UUID.randomUUID()
   def createTaskWithId(task: Task): TaskWithId =
-    TaskWithId(task, generateTaskId())
+    TaskWithId(task, UUID.randomUUID())
 }
