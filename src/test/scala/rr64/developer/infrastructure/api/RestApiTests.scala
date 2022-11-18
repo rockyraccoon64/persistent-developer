@@ -73,9 +73,14 @@ class RestApiTests
       }
     }
 
-    /** TODO При ошибке при запросе информации о задаче возвращается 500 */
+    /** При ошибке в UUID запроса информации о задаче возвращается 400 Bad Request */
+    "return 400 Bad Request when given an invalid UUID" in {
+      Get("/api/query/task-info/123") ~> route ~> check {
+        status shouldEqual StatusCodes.BadRequest
+      }
+    }
 
-    /** TODO При ошибке в UUID запроса информации о задаче возвращается ??? */
+    /** TODO При ошибке при запросе информации о задаче возвращается 500 */
 
   }
 
