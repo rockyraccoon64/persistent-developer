@@ -6,6 +6,7 @@ import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
 import rr64.developer.domain._
 import rr64.developer.infrastructure.api.ApiDeveloperState._
+import spray.json.DefaultJsonProtocol._
 
 class RestApi(service: DeveloperService) {
 
@@ -40,11 +41,19 @@ class RestApi(service: DeveloperService) {
       }
     }
 
+  private val taskListRoute =
+    (path("task-list") & extractExecutionContext) { implicit exec =>
+      onSuccess(service.tasks) { taskList =>
+        complete(taskList.map(taskInfoAdapter.convert))
+      }
+    }
+
   val route: Route = Route.seal(
     pathPrefix("api") {
       (pathPrefix("query") & get) {
         developerStateRoute ~
-        taskInfoRoute
+        taskInfoRoute ~
+        taskListRoute
       } ~
       (pathPrefix("command") & post) {
         addTaskRoute
