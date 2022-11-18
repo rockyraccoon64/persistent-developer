@@ -7,7 +7,7 @@ import akka.persistence.typed.{PersistenceId, RecoveryCompleted}
 import rr64.developer.domain.Task
 
 import java.util.UUID
-import scala.concurrent.duration.DurationInt
+import scala.concurrent.duration.{DurationInt, FiniteDuration}
 
 object DeveloperBehavior {
 
@@ -41,8 +41,8 @@ object DeveloperBehavior {
             val taskWithId = createTaskWithId(task)
             Effect.persist(Event.TaskStarted(taskWithId))
               .thenRun { _: State =>
-                val timeNeeded = task.difficulty * setup.workFactor
-                setup.timer.startSingleTimer(FinishTask(taskWithId.id), timeNeeded.millis) // TODO Не будет выполнено, если упадёт во время работы
+                val timeNeeded = workTime(task.difficulty, setup.workFactor)
+                setup.timer.startSingleTimer(FinishTask(taskWithId.id), timeNeeded)
               }
               .thenReply(replyTo)(_ => Replies.TaskStarted(taskWithId.id))
           case _ =>
@@ -149,12 +149,14 @@ object DeveloperBehavior {
         eventHandler = (state, evt) => state.applyEvent(evt)
       ).receiveSignal {
         case (State.Working(taskWithId, _), RecoveryCompleted) =>
-          val timeNeeded = taskWithId.task.difficulty * setup.workFactor // TODO Дублирование
-          timer.startSingleTimer(FinishTask(taskWithId.id), timeNeeded.millis)
+          val timeNeeded = workTime(taskWithId.task.difficulty, workFactor)
+          timer.startSingleTimer(FinishTask(taskWithId.id), timeNeeded)
 
         case (State.Resting(millis, _), RecoveryCompleted) =>
           timer.startSingleTimer(StopResting, millis.millis)
       }
     }
+
+  def workTime(difficulty: Int, factor: Int): FiniteDuration = (difficulty * factor).millis
 
 }
