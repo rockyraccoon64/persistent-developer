@@ -26,8 +26,8 @@ class RestApiTests
 
   "The service" should {
 
-    /** Запрос состояния разработчика */
-    "return the developer state" in {
+    /** Запрос состояния разработчика, когда он работает */
+    "return the Working developer state" in {
       Get("/api/query/developer-state") ~> route ~> check {
         responseAs[ApiDeveloperState] shouldEqual ApiDeveloperState.Working
       }
