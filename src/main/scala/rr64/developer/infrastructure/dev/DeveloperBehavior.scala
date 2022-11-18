@@ -84,7 +84,9 @@ object DeveloperBehavior {
 
       override def applyCommand(cmd: Command)(implicit setup: Setup): Effect[Event, State] =
         cmd match {
-          case StopResting => Effect.persist(Event.Rested)
+          case StopResting =>
+            Effect.persist(Event.Rested)
+              .thenRun((_: State) => taskQueue.headOption.foreach(startWorkTimer))
 
           case AddTask(task, replyTo) =>
             val taskWithId = createTaskWithId(task)
