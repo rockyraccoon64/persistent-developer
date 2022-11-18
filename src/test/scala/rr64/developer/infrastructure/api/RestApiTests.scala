@@ -114,7 +114,7 @@ class RestApiTests
     def mockService =
       (service.developerState(_: ExecutionContext)).expects(*)
 
-    /** Возвращается текущее состояние разработчика */
+    /** Возвращается текущее состояние */
     "return the current state" in {
       def checkState(domainState: DeveloperState, expectedApiState: ApiDeveloperState): Assertion = {
         mockService.returning(Future.successful(domainState))
@@ -127,9 +127,17 @@ class RestApiTests
       checkState(DeveloperState.Resting, ApiDeveloperState.Resting)
     }
 
-    /** При ошибке при запросе состояния разработчика возвращается 500 Internal Server Error when */
-    "return 500 Internal Server Error when encountering an exception" in {
+    /** При асинхронной ошибке возвращается 500 Internal Server Error */
+    "return 500 Internal Server Error when encountering an asynchronous exception" in {
       mockService.returning(Future.failed(new RuntimeException))
+      StateRequest ~> route ~> check {
+        status shouldEqual StatusCodes.InternalServerError
+      }
+    }
+
+    /** При синхронной ошибке возвращается 500 Internal Server Error */
+    "return 500 Internal Server Error when encountering a synchronous exception" in {
+      mockService.throwing(new RuntimeException)
       StateRequest ~> route ~> check {
         status shouldEqual StatusCodes.InternalServerError
       }
