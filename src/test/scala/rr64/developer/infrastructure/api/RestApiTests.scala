@@ -38,6 +38,7 @@ class RestApiTests
 
       Get(s"$baseUrl/$id") ~> route ~> check {
         responseAs[ApiTaskInfo] shouldEqual ApiTaskInfo(id, difficulty, apiStatus)
+        response.status shouldEqual StatusCodes.OK
       }
     }
 
@@ -118,6 +119,7 @@ class RestApiTests
       mockService.returning(Future.successful(domain))
       StateRequest ~> route ~> check {
         responseAs[ApiDeveloperState] shouldEqual api
+        status shouldEqual StatusCodes.OK
       }
     }
 
@@ -160,7 +162,8 @@ class RestApiTests
         .returning(Future.successful(domainReply))
 
       Post("/api/command/add-task", postEntity) ~> route ~> check {
-        responseAs[ApiReply] shouldEqual apiReply // TODO status
+        responseAs[ApiReply] shouldEqual apiReply
+        status shouldEqual StatusCodes.OK
       }
     }
 
