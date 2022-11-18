@@ -8,6 +8,7 @@ import org.scalamock.scalatest.MockFactory
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import rr64.developer.domain._
+import spray.json.JsObject
 
 import java.util.UUID
 import scala.concurrent.{ExecutionContext, Future}
@@ -191,7 +192,13 @@ class RestApiTests
       checkReply(difficulty, domainReply, apiReply)
     }
 
-    /** TODO Некорректный формат сущности */
+    /** В случае некорректного формата сущности возвращается 400 Bad Request */
+    "return 400 Bad Request when encountering an invalid entity" in {
+      val postEntity = JsObject()
+      Post(url, postEntity) ~> route ~> check {
+        status shouldEqual StatusCodes.BadRequest
+      }
+    }
 
     /** TODO Сущность отсутствует */
 
