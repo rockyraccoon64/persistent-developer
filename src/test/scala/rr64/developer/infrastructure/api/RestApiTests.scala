@@ -1,6 +1,7 @@
 package rr64.developer.infrastructure.api
 
 import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport._
+import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.testkit.ScalatestRouteTest
 import org.scalamock.scalatest.MockFactory
 import org.scalatest.Assertion
@@ -59,7 +60,18 @@ class RestApiTests
 
     /** TODO Запрос информации о задаче со статусом Finished */
 
-    /** TODO При запросе информации о несуществующей задаче возвращается 404 */
+    /** При запросе информации о несуществующей задаче возвращается 404 */
+    "return 404 when there is no task with the provided id" in {
+      val id = UUID.fromString("352bb20e-b593-4934-a60f-9374da5a1f5a")
+      (service.taskInfo(_: UUID)(_: ExecutionContext))
+        .expects(id, *)
+        .returning(
+          Future.successful(None)
+        )
+      Get(s"/api/query/task-info/${id.toString}") ~> route ~> check {
+        status shouldEqual StatusCodes.NotFound
+      }
+    }
 
     /** TODO При ошибке при запросе информации о задаче возвращается 500 */
 
