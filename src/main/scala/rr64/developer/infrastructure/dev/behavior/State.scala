@@ -22,6 +22,7 @@ object State {
     override def applyCommand(cmd: Command)(implicit setup: Setup): Effect[Event, State] =
       cmd match {
         case AddTask(task, replyTo) =>
+          // Начать работу над задачей
           val taskWithId = TaskWithId.fromTask(task)
           Effect.persist(Event.TaskStarted(taskWithId))
             .thenRun((_: State) => Timing.startWorkTimer(taskWithId))
@@ -45,10 +46,12 @@ object State {
     override def applyCommand(cmd: Command)(implicit setup: Setup): Effect[Event, State] =
       cmd match {
         case FinishTask(id) if id == currentTask.id =>
+          // Завершить работу над задачей
           Effect.persist(Event.TaskFinished(currentTask))
             .thenRun((_: State) => Timing.startRestTimer(currentTask))
 
         case AddTask(task, replyTo) =>
+          // Поставить задачу в очередь
           val taskWithId = TaskWithId.fromTask(task)
           Effect.persist(Event.TaskQueued(taskWithId))
             .thenReply(replyTo)(_ => Replies.TaskQueued(taskWithId.id))
@@ -72,10 +75,12 @@ object State {
     override def applyCommand(cmd: Command)(implicit setup: Setup): Effect[Event, State] =
       cmd match {
         case StopResting =>
+          // Завершить отдых
           Effect.persist(Event.Rested)
             .thenRun((_: State) => taskQueue.headOption.foreach(Timing.startWorkTimer))
 
         case AddTask(task, replyTo) =>
+          // Поставить задачу в очередь
           val taskWithId = TaskWithId.fromTask(task)
           Effect.persist(Event.TaskQueued(taskWithId))
             .thenReply(replyTo)(_ => Replies.TaskQueued(taskWithId.id))
