@@ -31,23 +31,38 @@ class RestApiTests
       (service.taskInfo(_: UUID)(_: ExecutionContext))
         .expects(id, *)
 
-    /** Когда задача существует, возвращается информация о ней */
-    "return the existing task info for a given UUID" in {
-      val id = UUID.fromString("6f9ed143-70f4-4406-9c6b-2d9ddd297304")
-      val difficulty = 35
-      val taskInfo = TaskInfo(id, difficulty, TaskStatus.InProgress)
+    def checkTask(id: UUID, difficulty: Int, status: TaskStatus, apiStatus: String) = {
+      val taskInfo = TaskInfo(id, difficulty, status)
 
       val taskInfoFound = Future.successful(Some(taskInfo))
       mockExpects(id).returning(taskInfoFound)
 
       Get(s"$baseUrl/$id") ~> route ~> check {
-        responseAs[ApiTaskInfo] shouldEqual ApiTaskInfo(id, difficulty, "InProgress")
+        responseAs[ApiTaskInfo] shouldEqual ApiTaskInfo(id, difficulty, apiStatus)
       }
     }
 
-    /** TODO Запрос информации о задаче со статусом Queued */
-
-    /** TODO Запрос информации о задаче со статусом Finished */
+    /** Когда задача существует, возвращается информация о ней */
+    "return the existing task info for a given id" in {
+      checkTask(
+        id = UUID.fromString("6f9ed143-70f4-4406-9c6b-2d9ddd297304"),
+        difficulty = 35,
+        status = TaskStatus.InProgress,
+        apiStatus = "InProgress"
+      )
+      checkTask(
+        id = UUID.fromString("5f4e32f8-fc81-49c4-a05c-efbf5aa0d47d"),
+        difficulty = 99,
+        status = TaskStatus.Queued,
+        apiStatus = "Queued"
+      )
+      checkTask(
+        id = UUID.fromString("374b7d13-8174-4476-b1d6-1d8759d2a6ed"),
+        difficulty = 1,
+        status = TaskStatus.Finished,
+        apiStatus = "Finished"
+      )
+    }
 
     /** При запросе информации о несуществующей задаче возвращается 404 Not Found */
     "return 404 when there is no task with the provided id" in {
