@@ -60,7 +60,7 @@ class RestApiTests
 
     /** TODO Запрос информации о задаче со статусом Finished */
 
-    /** При запросе информации о несуществующей задаче возвращается 404 */
+    /** При запросе информации о несуществующей задаче возвращается 404 Not Found */
     "return 404 when there is no task with the provided id" in {
       val id = UUID.fromString("352bb20e-b593-4934-a60f-9374da5a1f5a")
       (service.taskInfo(_: UUID)(_: ExecutionContext))
@@ -73,10 +73,10 @@ class RestApiTests
       }
     }
 
-    /** При ошибке в UUID запроса информации о задаче возвращается 400 Bad Request */
-    "return 400 Bad Request when given an invalid UUID" in {
+    /** При ошибке в UUID запроса информации о задаче возвращается 404 Not Found */
+    "return 404 Not Found when given an invalid UUID" in {
       Get("/api/query/task-info/123") ~> route ~> check {
-        status shouldEqual StatusCodes.BadRequest
+        status shouldEqual StatusCodes.NotFound
       }
     }
 

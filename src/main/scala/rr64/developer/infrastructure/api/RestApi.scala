@@ -14,7 +14,7 @@ class RestApi(service: DeveloperService) {
   private val developerStateAdapter = implicitly[Adapter[DeveloperState, ApiDeveloperState]]
   private val taskInfoAdapter = implicitly[Adapter[TaskInfo, ApiTaskInfo]]
 
-  val route: Route =
+  val route: Route = Route.seal(
     pathPrefix("api") {
       pathPrefix("query") {
         path("developer-state") {
@@ -38,5 +38,6 @@ class RestApi(service: DeveloperService) {
         }
       }
     }
+  )
 
 }
