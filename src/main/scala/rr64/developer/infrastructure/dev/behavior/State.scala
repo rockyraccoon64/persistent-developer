@@ -2,7 +2,6 @@ package rr64.developer.infrastructure.dev.behavior
 
 import akka.persistence.typed.scaladsl.Effect
 import rr64.developer.domain.Task
-import rr64.developer.infrastructure.dev.behavior.DeveloperBehavior.{startRestTimer, startWorkTimer}
 import rr64.developer.infrastructure.task.TaskWithId
 
 import java.util.UUID
@@ -24,7 +23,7 @@ object State {
         case AddTask(task, replyTo) =>
           val taskWithId = TaskWithId.fromTask(task)
           Effect.persist(Event.TaskStarted(taskWithId))
-            .thenRun((_: State) => startWorkTimer(taskWithId))
+            .thenRun((_: State) => Timing.startWorkTimer(taskWithId))
             .thenReply(replyTo)(_ => Replies.TaskStarted(taskWithId.id))
 
         case _ =>
@@ -46,7 +45,7 @@ object State {
       cmd match {
         case FinishTask(id) if id == currentTask.id =>
           Effect.persist(Event.TaskFinished(currentTask))
-            .thenRun((_: State) => startRestTimer(currentTask))
+            .thenRun((_: State) => Timing.startRestTimer(currentTask))
 
         case AddTask(task, replyTo) =>
           val taskWithId = TaskWithId.fromTask(task)
@@ -73,7 +72,7 @@ object State {
       cmd match {
         case StopResting =>
           Effect.persist(Event.Rested)
-            .thenRun((_: State) => taskQueue.headOption.foreach(startWorkTimer))
+            .thenRun((_: State) => taskQueue.headOption.foreach(Timing.startWorkTimer))
 
         case AddTask(task, replyTo) =>
           val taskWithId = TaskWithId.fromTask(task)
