@@ -40,9 +40,9 @@ class EventSerializer extends SerializerWithStringManifest {
     case Manifests.TaskQueued =>
       Event.TaskQueued(taskFromByteArray(bytes))
     case Manifests.TaskStarted =>
-      Event.TaskQueued(taskFromByteArray(bytes))
+      Event.TaskStarted(taskFromByteArray(bytes))
     case Manifests.TaskFinished =>
-      Event.TaskQueued(taskFromByteArray(bytes))
+      Event.TaskFinished(taskFromByteArray(bytes))
     case Manifests.Rested if bytes.nonEmpty =>
       Event.Rested(Some(taskFromByteArray(bytes)))
     case Manifests.Rested =>
