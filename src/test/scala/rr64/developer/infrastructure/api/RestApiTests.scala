@@ -191,14 +191,15 @@ class RestApiTests
 
     /** TODO Некорректный формат сущности */
 
+    /** TODO Сущность отсутствует */
+
     /** В случае асинхронной ошибки возвращается 500 Internal Server Error */
     "return 500 Internal Server Error when encountering an asynchronous error" in {
-      val task = Task(5)
-      val postEntity = ApiTaskToAdd(task.difficulty)
-
       (service.addTask(_: Task)(_: ExecutionContext))
-        .expects(task, *)
+        .expects(*, *)
         .returning(Future.failed(new RuntimeException))
+
+      val postEntity = ApiTaskToAdd(99)
 
       Post(url, postEntity) ~> route ~> check {
         status shouldEqual StatusCodes.InternalServerError
