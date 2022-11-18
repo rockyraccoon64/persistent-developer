@@ -156,7 +156,7 @@ class RestApiTests
 
     val url = "/api/command/add-task"
 
-    def mockExpect(task: MockParameter[Task]) =
+    def mockExpects(task: MockParameter[Task]) =
       (service.addTask(_: Task)(_: ExecutionContext)).expects(task, *)
 
     def checkReply(difficulty: Int, domainReply: DeveloperReply, apiReply: ApiReply) {
@@ -164,7 +164,7 @@ class RestApiTests
       val postEntity = ApiTaskToAdd(difficulty)
 
       val replyFuture = Future.successful(domainReply)
-      mockExpect(task).returning(replyFuture)
+      mockExpects(task).returning(replyFuture)
 
       Post(url, postEntity) ~> route ~> check {
         responseAs[ApiReply] shouldEqual apiReply
@@ -209,7 +209,7 @@ class RestApiTests
 
     /** В случае асинхронной ошибки возвращается 500 Internal Server Error */
     "return 500 Internal Server Error when encountering an asynchronous error" in {
-      mockExpect(*).returning(Future.failed(new RuntimeException))
+      mockExpects(*).returning(Future.failed(new RuntimeException))
       val postEntity = ApiTaskToAdd(99)
       Post(url, postEntity) ~> route ~> check {
         status shouldEqual StatusCodes.InternalServerError
@@ -218,7 +218,7 @@ class RestApiTests
 
     /** В случае синхронной ошибки возвращается 500 Internal Server Error */
     "return 500 Internal Server Error when encountering a synchronous error" in {
-      mockExpect(*).throwing(new RuntimeException)
+      mockExpects(*).throwing(new RuntimeException)
       val postEntity = ApiTaskToAdd(5)
       Post(url, postEntity) ~> route ~> check {
         status shouldEqual StatusCodes.InternalServerError
