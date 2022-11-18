@@ -40,10 +40,7 @@ object DeveloperBehavior {
           case AddTask(task, replyTo) =>
             val taskWithId = createTaskWithId(task)
             Effect.persist(Event.TaskStarted(taskWithId))
-              .thenRun { _: State =>
-                val timeNeeded = workTime(task.difficulty, setup.workFactor)
-                setup.timer.startSingleTimer(FinishTask(taskWithId.id), timeNeeded)
-              }
+              .thenRun((_: State) => startWorkTimer(taskWithId))
               .thenReply(replyTo)(_ => Replies.TaskStarted(taskWithId.id))
           case _ =>
             Effect.unhandled
@@ -149,8 +146,7 @@ object DeveloperBehavior {
         eventHandler = (state, evt) => state.applyEvent(evt)
       ).receiveSignal {
         case (State.Working(taskWithId, _), RecoveryCompleted) =>
-          val timeNeeded = workTime(taskWithId.task.difficulty, workFactor)
-          timer.startSingleTimer(FinishTask(taskWithId.id), timeNeeded)
+          startWorkTimer(taskWithId)
 
         case (State.Resting(millis, _), RecoveryCompleted) =>
           timer.startSingleTimer(StopResting, millis.millis)
@@ -158,5 +154,11 @@ object DeveloperBehavior {
     }
 
   def workTime(difficulty: Int, factor: Int): FiniteDuration = (difficulty * factor).millis
+
+  private def startWorkTimer(taskWithId: TaskWithId)(implicit setup: Setup): Unit = {
+    val delay = workTime(taskWithId.task.difficulty, setup.workFactor)
+    val message = FinishTask(taskWithId.id)
+    setup.timer.startSingleTimer(message, delay)
+  }
 
 }
