@@ -17,12 +17,10 @@ class RestApi(service: DeveloperService) {
   val route: Route = Route.seal(
     pathPrefix("api") {
       (pathPrefix("query") & get) {
-        path("developer-state") {
-          extractExecutionContext { implicit exec =>
-            onComplete(service.developerState) {
-              case Success(value) => complete(developerStateAdapter.convert(value))
-              case Failure(exception) => complete(StatusCodes.InternalServerError)
-            }
+        (path("developer-state") & extractExecutionContext) { implicit exec =>
+          onComplete(service.developerState) {
+            case Success(value) => complete(developerStateAdapter.convert(value))
+            case Failure(exception) => complete(StatusCodes.InternalServerError)
           }
         } ~
         path("task-info" / JavaUUID) { id =>
