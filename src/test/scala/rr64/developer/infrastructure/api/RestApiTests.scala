@@ -151,38 +151,38 @@ class RestApiTests
   /** Команда поручения задачи */
   "The service processing the Add Task command" should {
 
-    /** Когда задача начата, возвращается её идентификатор и соответствующий признак */
-    "return the Task Started reply" in {
-      val task = Task(9)
-      val id = UUID.fromString("f03fb7d3-2e2b-4965-b85c-f91692a583ff")
-      val reply = DeveloperReply.TaskStarted(id)
+    def SuccessTest(difficulty: Int, id: UUID, domainReply: DeveloperReply, apiReply: ApiReply) {
+      val task = Task(difficulty)
 
-      val apiCommand = ApiTaskToAdd(task.difficulty)
+      val postEntity = ApiTaskToAdd(task.difficulty)
 
       (service.addTask(_: Task)(_: ExecutionContext))
         .expects(task, *)
-        .returning(Future.successful(reply))
+        .returning(Future.successful(domainReply))
 
-      Post("/api/command/add-task", apiCommand) ~> route ~> check {
-        responseAs[ApiReply] shouldEqual ApiReply(id, "Started")
+      Post("/api/command/add-task", postEntity) ~> route ~> check {
+        responseAs[ApiReply] shouldEqual apiReply
       }
+    }
+
+    /** Когда задача начата, возвращается её идентификатор и соответствующий признак */
+    "return the Task Started reply" in {
+      val difficulty = 9
+      val id = UUID.fromString("f03fb7d3-2e2b-4965-b85c-f91692a583ff")
+      val domainReply = DeveloperReply.TaskStarted(id)
+      val apiReply = ApiReply(id, "Started")
+
+      SuccessTest(difficulty, id, domainReply, apiReply)
     }
 
     /** Когда задача поставлена в очередь, возвращается её идентификатор и соответствующий признак */
     "return the Task Queued reply" in {
-      val task = Task(10)
+      val difficulty = 10
       val id = UUID.fromString("f89474c0-8c5a-4f3f-8e8c-92c483c30bd1")
-      val reply = DeveloperReply.TaskQueued(id)
+      val domainReply = DeveloperReply.TaskQueued(id)
+      val apiReply = ApiReply(id, "Queued")
 
-      val apiCommand = ApiTaskToAdd(task.difficulty)
-
-      (service.addTask(_: Task)(_: ExecutionContext))
-        .expects(task, *)
-        .returning(Future.successful(reply))
-
-      Post("/api/command/add-task", apiCommand) ~> route ~> check {
-        responseAs[ApiReply] shouldEqual ApiReply(id, "Queued")
-      }
+      SuccessTest(difficulty, id, domainReply, apiReply)
     }
 
   }
