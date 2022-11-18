@@ -1,11 +1,10 @@
-package rr64.developer.infrastructure.dev
+package rr64.developer.infrastructure.dev.behavior
 
 import akka.actor.typed.scaladsl.{Behaviors, TimerScheduler}
 import akka.actor.typed.{ActorRef, Behavior}
 import akka.persistence.typed.scaladsl.{Effect, EventSourcedBehavior}
 import akka.persistence.typed.{PersistenceId, RecoveryCompleted}
 import rr64.developer.domain.Task
-import rr64.developer.infrastructure.dev.behavior.{Event, Replies}
 import rr64.developer.infrastructure.task.TaskWithId
 
 import java.util.UUID

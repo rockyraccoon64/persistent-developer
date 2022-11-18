@@ -5,8 +5,8 @@ import akka.actor.typed.scaladsl.Behaviors
 import akka.actor.typed.{Behavior, Scheduler}
 import org.scalatest.flatspec.AsyncFlatSpecLike
 import rr64.developer.domain.{DeveloperReply, DeveloperState, Task}
-import rr64.developer.infrastructure.dev.DeveloperBehavior.Command
 import rr64.developer.infrastructure.dev.PersistentDeveloper.DeveloperRef
+import rr64.developer.infrastructure.dev.behavior.DeveloperBehavior.Command
 import rr64.developer.infrastructure.dev.behavior.Replies
 
 import java.util.UUID

@@ -9,9 +9,9 @@ import org.scalatest.Inside.inside
 import org.scalatest.flatspec.AnyFlatSpecLike
 import rr64.developer.domain.Task
 import rr64.developer.infrastructure.TaskTestUtils.TaskWithIdFactory
-import rr64.developer.infrastructure.dev.DeveloperBehavior.State.Working
-import rr64.developer.infrastructure.dev.DeveloperBehavior._
-import rr64.developer.infrastructure.dev.behavior.{Event, Replies}
+import rr64.developer.infrastructure.dev.behavior.DeveloperBehavior.State.Working
+import rr64.developer.infrastructure.dev.behavior.DeveloperBehavior._
+import rr64.developer.infrastructure.dev.behavior.{DeveloperBehavior, Event, Replies}
 import rr64.developer.infrastructure.task.TaskWithId
 
 import java.util.UUID

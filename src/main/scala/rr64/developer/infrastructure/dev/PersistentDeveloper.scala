@@ -4,9 +4,9 @@ import akka.actor.typed.scaladsl.AskPattern.Askable
 import akka.actor.typed.{ActorRef, Scheduler}
 import akka.util.Timeout
 import rr64.developer.domain._
-import rr64.developer.infrastructure.dev.DeveloperBehavior.Command
 import rr64.developer.infrastructure.dev.PersistentDeveloper.DeveloperRef
-import rr64.developer.infrastructure.dev.behavior.Replies
+import rr64.developer.infrastructure.dev.behavior.DeveloperBehavior.Command
+import rr64.developer.infrastructure.dev.behavior.{DeveloperBehavior, Replies}
 
 import scala.concurrent.{ExecutionContext, Future}
 
