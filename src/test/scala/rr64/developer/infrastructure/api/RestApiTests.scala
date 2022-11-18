@@ -153,14 +153,14 @@ class RestApiTests
 
     def checkReply(difficulty: Int, domainReply: DeveloperReply, apiReply: ApiReply) {
       val task = Task(difficulty)
-      val postEntity = ApiTaskToAdd(task.difficulty)
+      val postEntity = ApiTaskToAdd(difficulty)
 
       (service.addTask(_: Task)(_: ExecutionContext))
         .expects(task, *)
         .returning(Future.successful(domainReply))
 
       Post("/api/command/add-task", postEntity) ~> route ~> check {
-        responseAs[ApiReply] shouldEqual apiReply
+        responseAs[ApiReply] shouldEqual apiReply // TODO status
       }
     }
 
@@ -182,6 +182,22 @@ class RestApiTests
       val apiReply = ApiReply(id, "Queued")
 
       checkReply(difficulty, domainReply, apiReply)
+    }
+
+    /** TODO Некорректный формат сущности */
+
+    /** В случае асинхронной ошибки возвращается 500 Internal Server Error */
+    "return 500 Internal Server Error when encountering an asynchronous error" in {
+      val task = Task(5)
+      val postEntity = ApiTaskToAdd(task.difficulty)
+
+      (service.addTask(_: Task)(_: ExecutionContext))
+        .expects(task, *)
+        .returning(Future.failed(new RuntimeException))
+
+      Post("/api/command/add-task", postEntity) ~> route ~> check {
+        status shouldEqual StatusCodes.InternalServerError
+      }
     }
 
   }
