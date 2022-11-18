@@ -111,14 +111,13 @@ class RestApiTests
 
     val StateRequest = Get("/api/query/developer-state")
 
+    def mockService =
+      (service.developerState(_: ExecutionContext)).expects(*)
+
     /** Возвращается текущее состояние разработчика */
     "return the current state" in {
       def checkState(domainState: DeveloperState, expectedApiState: ApiDeveloperState): Assertion = {
-        (service.developerState(_: ExecutionContext))
-          .expects(*)
-          .returning(
-            Future.successful(domainState)
-          )
+        mockService.returning(Future.successful(domainState))
         StateRequest ~> route ~> check {
           responseAs[ApiDeveloperState] shouldEqual expectedApiState
         }
@@ -130,11 +129,7 @@ class RestApiTests
 
     /** При ошибке при запросе состояния разработчика возвращается 500 Internal Server Error when */
     "return 500 Internal Server Error when encountering an exception" in {
-      (service.developerState(_: ExecutionContext))
-        .expects(*)
-        .returning(
-          Future.failed(new RuntimeException)
-        )
+      mockService.returning(Future.failed(new RuntimeException))
       StateRequest ~> route ~> check {
         status shouldEqual StatusCodes.InternalServerError
       }
