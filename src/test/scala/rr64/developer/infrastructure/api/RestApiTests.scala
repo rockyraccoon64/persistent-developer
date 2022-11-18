@@ -248,6 +248,7 @@ class RestApiTests
 
       SendRequest ~> route ~> check {
         responseAs[Seq[ApiTaskInfo]] should contain theSameElementsInOrderAs apiTasks
+        status shouldEqual StatusCodes.OK
       }
     }
 
