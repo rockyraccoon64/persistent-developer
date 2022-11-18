@@ -78,12 +78,13 @@ class RestApiTests
       }
 
     }
+
   }
 
-  "The service" should {
+  /** Запрос состояния разработчика */
+  it when "processing the developer state query" should {
 
-    /** Запрос состояния разработчика */
-    "return the developer state" in {
+    "return the current state" in {
       def checkState(domainState: DeveloperState, expectedApiState: ApiDeveloperState): Assertion = {
         (service.developerState(_: ExecutionContext))
           .expects(*)
