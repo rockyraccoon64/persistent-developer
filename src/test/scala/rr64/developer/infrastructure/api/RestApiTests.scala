@@ -109,6 +109,8 @@ class RestApiTests
   /** Запрос состояния разработчика */
   "The service processing a developer state query" should {
 
+    val StateRequest = Get("/api/query/developer-state")
+
     /** Возвращается текущее состояние разработчика */
     "return the current state" in {
       def checkState(domainState: DeveloperState, expectedApiState: ApiDeveloperState): Assertion = {
@@ -117,7 +119,7 @@ class RestApiTests
           .returning(
             Future.successful(domainState)
           )
-        Get("/api/query/developer-state") ~> route ~> check {
+        StateRequest ~> route ~> check {
           responseAs[ApiDeveloperState] shouldEqual expectedApiState
         }
       }
@@ -133,7 +135,7 @@ class RestApiTests
         .returning(
           Future.failed(new RuntimeException)
         )
-      Get("/api/query/developer-state") ~> route ~> check {
+      StateRequest ~> route ~> check {
         status shouldEqual StatusCodes.InternalServerError
       }
     }
