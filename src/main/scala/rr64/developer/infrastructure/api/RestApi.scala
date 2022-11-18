@@ -8,6 +8,9 @@ import rr64.developer.domain._
 import rr64.developer.infrastructure.api.ApiDeveloperState._
 import spray.json.DefaultJsonProtocol._
 
+/**
+ * REST API сервиса разработки
+ */
 class RestApi(service: DeveloperService) {
 
   private val developerStateAdapter = implicitly[Adapter[DeveloperState, ApiDeveloperState]]
