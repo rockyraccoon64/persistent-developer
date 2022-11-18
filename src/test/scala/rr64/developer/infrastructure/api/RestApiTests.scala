@@ -151,9 +151,8 @@ class RestApiTests
   /** Команда поручения задачи */
   "The service processing the Add Task command" should {
 
-    def SuccessTest(difficulty: Int, id: UUID, domainReply: DeveloperReply, apiReply: ApiReply) {
+    def checkReply(difficulty: Int, domainReply: DeveloperReply, apiReply: ApiReply) {
       val task = Task(difficulty)
-
       val postEntity = ApiTaskToAdd(task.difficulty)
 
       (service.addTask(_: Task)(_: ExecutionContext))
@@ -172,7 +171,7 @@ class RestApiTests
       val domainReply = DeveloperReply.TaskStarted(id)
       val apiReply = ApiReply(id, "Started")
 
-      SuccessTest(difficulty, id, domainReply, apiReply)
+      checkReply(difficulty, domainReply, apiReply)
     }
 
     /** Когда задача поставлена в очередь, возвращается её идентификатор и соответствующий признак */
@@ -182,7 +181,7 @@ class RestApiTests
       val domainReply = DeveloperReply.TaskQueued(id)
       val apiReply = ApiReply(id, "Queued")
 
-      SuccessTest(difficulty, id, domainReply, apiReply)
+      checkReply(difficulty, domainReply, apiReply)
     }
 
   }
