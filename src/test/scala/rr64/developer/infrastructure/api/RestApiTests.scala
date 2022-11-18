@@ -126,7 +126,17 @@ class RestApiTests
       checkState(DeveloperState.Resting, ApiDeveloperState.Resting)
     }
 
-    /** TODO При ошибке при запросе состояния разработчика возвращается 500 */
+    /** При ошибке при запросе состояния разработчика возвращается 500 Internal Server Error when */
+    "return 500 Internal Server Error when encountering an exception" in {
+      (service.developerState(_: ExecutionContext))
+        .expects(*)
+        .returning(
+          Future.failed(new RuntimeException)
+        )
+      Get("/api/query/developer-state") ~> route ~> check {
+        status shouldEqual StatusCodes.InternalServerError
+      }
+    }
 
   }
 
