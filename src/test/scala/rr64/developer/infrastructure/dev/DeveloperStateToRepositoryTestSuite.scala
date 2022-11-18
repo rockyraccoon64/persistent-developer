@@ -107,8 +107,20 @@ class DeveloperStateToRepositoryTestSuite
     }
   }
 
-  /** TODO Обработчик проекции должен обновлять состояние разработчика на "Работает",
-   *   когда он отдохнул и у него нет задач */
+  /** Обработчик проекции должен обновлять состояние разработчика на "Работает",
+   * когда он отдохнул и в очереди есть задача */
+  "The handler" should "update the state to Working after the developer rests if there is a task in the queue" in new Fixture {
+    val events = Event.TaskStarted(defaultTask1) ::
+      Event.TaskQueued(defaultTask2) ::
+      Event.TaskFinished(defaultTask1) ::
+      Event.Rested(Some(defaultTask2)) ::
+      Nil
+    val projection = projectionFromEvents(events)
+
+    projectionTestKit.run(projection) {
+      assertState(DeveloperState.Working)
+    }
+  }
 
   /** Обработчик проекции не должен обновлять состояние разработчика при получении задачи, когда он работает */
   "The handler" should "not update the state after receiving a new task while working" in new Fixture {
