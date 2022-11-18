@@ -128,7 +128,7 @@ object DeveloperBehavior {
     case class TaskQueued(id: UUID) extends AddTaskResult
   }
 
-  case class Setup(workFactor: Int, restFactor: Int, timer: TimerScheduler[Command])
+  private case class Setup(workFactor: Int, restFactor: Int, timer: TimerScheduler[Command])
 
   def apply(persistenceId: PersistenceId, workFactor: Int, restFactor: Int): Behavior[Command] =
     Behaviors.withTimers { timer =>
