@@ -24,7 +24,7 @@ class DeveloperBehaviorTestSuite
     with BeforeAndAfterEach {
 
   private type Kit = EventSourcedBehaviorTestKit[
-    DeveloperBehavior.Command,
+    Command,
     Event,
     DeveloperBehavior.State
   ]

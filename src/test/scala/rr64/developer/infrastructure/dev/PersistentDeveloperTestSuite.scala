@@ -6,8 +6,7 @@ import akka.actor.typed.{Behavior, Scheduler}
 import org.scalatest.flatspec.AsyncFlatSpecLike
 import rr64.developer.domain.{DeveloperReply, DeveloperState, Task}
 import rr64.developer.infrastructure.dev.PersistentDeveloper.DeveloperRef
-import rr64.developer.infrastructure.dev.behavior.DeveloperBehavior.Command
-import rr64.developer.infrastructure.dev.behavior.Replies
+import rr64.developer.infrastructure.dev.behavior.{Command, Replies}
 
 import java.util.UUID
 import scala.concurrent.{ExecutionContext, Future}

@@ -1,7 +1,7 @@
 package rr64.developer.infrastructure.dev.behavior
 
+import akka.actor.typed.Behavior
 import akka.actor.typed.scaladsl.{Behaviors, TimerScheduler}
-import akka.actor.typed.{ActorRef, Behavior}
 import akka.persistence.typed.scaladsl.{Effect, EventSourcedBehavior}
 import akka.persistence.typed.{PersistenceId, RecoveryCompleted}
 import rr64.developer.domain.Task
@@ -11,14 +11,6 @@ import java.util.UUID
 import scala.concurrent.duration.{DurationInt, FiniteDuration}
 
 object DeveloperBehavior {
-
-  sealed trait Command
-
-  object Command {
-    case class AddTask(task: Task, replyTo: ActorRef[Replies.AddTaskResult]) extends Command
-    private[DeveloperBehavior] case class FinishTask(id: UUID) extends Command
-    private[DeveloperBehavior] case object StopResting extends Command
-  }
 
   sealed trait State {
     def applyCommand(cmd: Command)(implicit setup: Setup): Effect[Event, State]

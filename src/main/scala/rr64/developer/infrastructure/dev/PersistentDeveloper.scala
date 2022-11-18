@@ -5,8 +5,7 @@ import akka.actor.typed.{ActorRef, Scheduler}
 import akka.util.Timeout
 import rr64.developer.domain._
 import rr64.developer.infrastructure.dev.PersistentDeveloper.DeveloperRef
-import rr64.developer.infrastructure.dev.behavior.DeveloperBehavior.Command
-import rr64.developer.infrastructure.dev.behavior.{DeveloperBehavior, Replies}
+import rr64.developer.infrastructure.dev.behavior.{Command, Replies}
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -35,7 +34,7 @@ class PersistentDeveloper(
 
 object PersistentDeveloper {
 
-  type DeveloperRef = ActorRef[DeveloperBehavior.Command]
+  type DeveloperRef = ActorRef[Command]
 
   def apply(developerRef: DeveloperRef, stateProvider: DeveloperStateProvider)
     (implicit timeout: Timeout, scheduler: Scheduler): PersistentDeveloper =
