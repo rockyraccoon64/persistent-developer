@@ -14,6 +14,7 @@ libraryDependencies ++= Seq(
   akkaPersistenceJdbc,
   akkaPersistenceQuery,
   akkaProjectionEventSourced,
+  akkaProjectionJdbc,
   slick,
   slickHikariCp,
   scalactic,

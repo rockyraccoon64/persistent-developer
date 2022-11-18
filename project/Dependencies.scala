@@ -28,6 +28,7 @@ object Dependencies {
   val akkaPersistenceQuery: ModuleID = "com.typesafe.akka" %% "akka-persistence-query" % Versions.Akka
   val akkaPersistenceTestkit: ModuleID = "com.typesafe.akka" %% "akka-persistence-testkit" % Versions.Akka
   val akkaProjectionEventSourced: ModuleID = "com.lightbend.akka" %% "akka-projection-eventsourced" % Versions.AkkaProjection
+  val akkaProjectionJdbc: ModuleID = "com.lightbend.akka" %% "akka-projection-jdbc" % Versions.AkkaProjection
   val akkaProjectionTestkit: ModuleID = "com.lightbend.akka" %% "akka-projection-testkit" % Versions.AkkaProjection
   val akkaStreamTestkit: ModuleID = "com.typesafe.akka" %% "akka-stream-testkit" % Versions.Akka
   val akkaHttpTestkit: ModuleID = "com.typesafe.akka" %% "akka-http-testkit" % Versions.AkkaHttp
