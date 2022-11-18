@@ -1,4 +1,4 @@
-package rr64.developer.infrastructure.dev
+package rr64.developer.infrastructure.dev.behavior
 
 import akka.actor.testkit.typed.scaladsl.{ManualTime, ScalaTestWithActorTestKit}
 import akka.persistence.testkit.scaladsl.EventSourcedBehaviorTestKit
@@ -11,7 +11,6 @@ import rr64.developer.domain.Task
 import rr64.developer.infrastructure.TaskTestUtils.TaskWithIdFactory
 import rr64.developer.infrastructure.dev.behavior.DeveloperBehavior.State.Working
 import rr64.developer.infrastructure.dev.behavior.DeveloperBehavior._
-import rr64.developer.infrastructure.dev.behavior.{DeveloperBehavior, Event, Replies}
 import rr64.developer.infrastructure.task.TaskWithId
 
 import java.util.UUID
