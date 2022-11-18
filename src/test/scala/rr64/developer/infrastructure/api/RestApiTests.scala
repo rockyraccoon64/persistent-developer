@@ -16,7 +16,8 @@ class RestApiTests
 
   private val service = new DeveloperService {
     override def addTask(task: Task)(implicit ec: ExecutionContext): Future[DeveloperReply] = ???
-    override def developerState(implicit ec: ExecutionContext): Future[DeveloperState] = ???
+    override def developerState(implicit ec: ExecutionContext): Future[DeveloperState] =
+      Future.successful(DeveloperState.Working)
     override def taskInfo(id: UUID)(implicit ec: ExecutionContext): Future[Option[TaskInfo]] = ???
     override def tasks(implicit ec: ExecutionContext): Future[Seq[TaskInfo]] = ???
   }
