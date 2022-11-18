@@ -41,12 +41,16 @@ class EventSerializerTestSuite extends AnyFlatSpec with Matchers {
   }
 
   /** Сериализация события "Отдых завершён" с задачей в очереди */
-  "The Rested event" should "be serialized" in {
+  "The Rested event" should "be serialized when there's a next task" in {
     val task = TaskWithId(55, UUID.fromString("54ef15ab-8eb5-4a96-ad52-cd608b0f86f7"))
     val event = Event.Rested(Some(task))
     assertSerialized(event)
   }
 
   /** Сериализация события "Отдых завершён" без задач в очереди */
+  "The Rested event" should "be serialized when there is no next task" in {
+    val event = Event.Rested(None)
+    assertSerialized(event)
+  }
 
 }
