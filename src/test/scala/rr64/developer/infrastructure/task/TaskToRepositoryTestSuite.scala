@@ -102,7 +102,7 @@ class TaskToRepositoryTestSuite
 
   /** В начале работы над задачей после отдыха её статус должен сохраняться в репозиторий */
   "The current task state" should "be saved to the repository when the task is started after resting" in new Fixture {
-    val taskWithId = TaskWithId(Task(35), UUID.fromString("f33b67f0-2324-4c7d-8b5f-59ab8e4f5bd7"))
+    val taskWithId = TaskWithId(35, UUID.fromString("f33b67f0-2324-4c7d-8b5f-59ab8e4f5bd7"))
     val taskInfo = taskWithId.withStatus(TaskStatus.InProgress)
     val events = Event.Rested(Some(taskWithId)) :: Nil
     val projection = projectionFromEvents(events)

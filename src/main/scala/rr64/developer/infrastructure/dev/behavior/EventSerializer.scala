@@ -1,7 +1,6 @@
 package rr64.developer.infrastructure.dev.behavior
 
 import akka.serialization.SerializerWithStringManifest
-import rr64.developer.domain.Task
 import rr64.developer.infrastructure.task.TaskWithId
 
 import java.nio.ByteBuffer
@@ -65,7 +64,7 @@ class EventSerializer extends SerializerWithStringManifest {
     val long2 = buffer.getLong()
     val difficulty = buffer.getInt()
     val id = new UUID(long1, long2)
-    TaskWithId(Task(difficulty), id)
+    TaskWithId(difficulty, id)
   }
 
 }

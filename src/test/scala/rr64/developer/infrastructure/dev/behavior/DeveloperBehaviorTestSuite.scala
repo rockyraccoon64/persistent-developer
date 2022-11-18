@@ -247,7 +247,7 @@ class DeveloperBehaviorTestSuite
 
   /** Если актор упал в рабочем состоянии, соответствующий таймер запускается по новой */
   "The developer actor" should "start the work timer when completing recovery in a Working state" in {
-    val taskWithId = TaskWithId(Task(50), UUID.fromString("92ac4c4b-622f-44ba-b331-f1cf40a27c58"))
+    val taskWithId = TaskWithId(50, UUID.fromString("92ac4c4b-622f-44ba-b331-f1cf40a27c58"))
     val workTime = calculateWorkTime(taskWithId.task.difficulty)
 
     developerTestKit.initialize(Event.TaskStarted(taskWithId))
@@ -262,7 +262,7 @@ class DeveloperBehaviorTestSuite
 
   /** Если актор упал в состоянии отдыха, соответствующий таймер запускается по новой */
   "The developer actor" should "start the rest timer when completing recovery in a Resting state" in {
-    val taskWithId = TaskWithId(Task(10), UUID.fromString("b807f5ff-6066-454e-8d53-2a90a3941cc4"))
+    val taskWithId = TaskWithId(10, UUID.fromString("b807f5ff-6066-454e-8d53-2a90a3941cc4"))
     val restTime = calculateRestTime(taskWithId.task.difficulty)
 
     developerTestKit.initialize(Event.TaskStarted(taskWithId), Event.TaskFinished(taskWithId))
@@ -277,9 +277,9 @@ class DeveloperBehaviorTestSuite
 
   /** После отдыха разработчик выполняет следующую задачу из очереди до конца */
   "After resting the developer" should "fully complete the next task in the queue" in {
-    val lastCompleted = TaskWithId(Task(12), UUID.fromString("6bf0af94-4ee3-4857-9a38-3e31e529b37d"))
-    val taskQueue = TaskWithId(Task(35), UUID.fromString("ba5be578-9af1-44a6-9b8b-0a11c340237b")) ::
-      TaskWithId(Task(19), UUID.fromString("da2b386f-a53e-44a8-b943-8e7491d1010e")) ::
+    val lastCompleted = TaskWithId(12, UUID.fromString("6bf0af94-4ee3-4857-9a38-3e31e529b37d"))
+    val taskQueue = TaskWithId(35, UUID.fromString("ba5be578-9af1-44a6-9b8b-0a11c340237b")) ::
+      TaskWithId(19, UUID.fromString("da2b386f-a53e-44a8-b943-8e7491d1010e")) ::
       Nil
     val restTime = calculateRestTime(lastCompleted.task.difficulty)
     val nextTask = taskQueue.head
