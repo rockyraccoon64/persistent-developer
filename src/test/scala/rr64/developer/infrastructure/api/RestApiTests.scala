@@ -227,4 +227,17 @@ class RestApiTests
 
   }
 
+  /** Во время обработки запроса списка задач API должен */
+  "The service processing the task list request" should {
+
+    /** TODO Возвращать JSON-массив всех имеющихся задач */
+
+    /** TODO Возвращать пустой массив JSON, если задач нет */
+
+    /** TODO Возвращать 500 Internal Server Error в случае асинхронной ошибки */
+
+    /** TODO Возвращать 500 Internal Server Error в случае синхронной ошибки */
+
+  }
+
 }
