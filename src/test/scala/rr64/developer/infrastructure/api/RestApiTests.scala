@@ -249,7 +249,16 @@ class RestApiTests
       }
     }
 
-    /** TODO Возвращать пустой массив JSON, если задач нет */
+    /** Возвращать пустой массив, если задач нет */
+    "return an empty list when there are no tasks" in {
+      (service.tasks(_: ExecutionContext))
+        .expects(*)
+        .returning(Future.successful(Nil))
+
+      Get("/api/query/task-list") ~> route ~> check {
+        responseAs[Seq[ApiTaskInfo]] should have size 0
+      }
+    }
 
     /** TODO Возвращать 500 Internal Server Error в случае асинхронной ошибки */
 
