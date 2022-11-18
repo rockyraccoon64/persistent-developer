@@ -5,7 +5,6 @@ import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.testkit.ScalatestRouteTest
 import org.scalamock.matchers.MockParameter
 import org.scalamock.scalatest.MockFactory
-import org.scalatest.Assertion
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import rr64.developer.domain._
@@ -114,18 +113,22 @@ class RestApiTests
     def mockService =
       (service.developerState(_: ExecutionContext)).expects(*)
 
-    /** Возвращается текущее состояние */
-    "return the current state" in {
-      def checkState(domainState: DeveloperState, expectedApiState: ApiDeveloperState): Assertion = {
-        mockService.returning(Future.successful(domainState))
-        StateRequest ~> route ~> check {
-          responseAs[ApiDeveloperState] shouldEqual expectedApiState
-        }
+    /** Проверка текущего состояния */
+    class StateTest(domain: DeveloperState, api: ApiDeveloperState) {
+      mockService.returning(Future.successful(domain))
+      StateRequest ~> route ~> check {
+        responseAs[ApiDeveloperState] shouldEqual api
       }
-      checkState(DeveloperState.Free, ApiDeveloperState.Free)
-      checkState(DeveloperState.Working, ApiDeveloperState.Working)
-      checkState(DeveloperState.Resting, ApiDeveloperState.Resting)
     }
+
+    /** Состояние "Свободен" */
+    "return the Free state" in new StateTest(DeveloperState.Free, ApiDeveloperState.Free)
+
+    /** Состояние "Работает" */
+    "return the Working state" in new StateTest(DeveloperState.Working, ApiDeveloperState.Working)
+
+    /** Состояние "Отдыхает" */
+    "return the Resting state" in new StateTest(DeveloperState.Resting, ApiDeveloperState.Resting)
 
     /** При асинхронной ошибке возвращается 500 Internal Server Error */
     "return 500 Internal Server Error when encountering an asynchronous exception" in {
