@@ -2,7 +2,6 @@ package rr64.developer.infrastructure.dev.behavior
 
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
-import rr64.developer.domain.Task
 import rr64.developer.infrastructure.task.TaskWithId
 
 import java.util.UUID
@@ -18,13 +17,13 @@ class EventSerializerTestSuite extends AnyFlatSpec with Matchers {
   }
 
   "The TaskQueued event" should "be serialized" in {
-    val task = TaskWithId(Task(3), UUID.randomUUID())
+    val task = TaskWithId(3, UUID.randomUUID())
     val event = Event.TaskQueued(task)
     assertSerialized(event)
   }
 
   "The TaskStarted event" should "be serialized" in {
-    val task = TaskWithId(Task(3), UUID.randomUUID())
+    val task = TaskWithId(3, UUID.randomUUID())
     val event = Event.TaskStarted(task)
     assertSerialized(event)
   }
