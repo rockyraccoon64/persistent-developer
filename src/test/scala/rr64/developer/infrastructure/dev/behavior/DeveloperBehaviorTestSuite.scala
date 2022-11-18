@@ -9,8 +9,6 @@ import org.scalatest.Inside.inside
 import org.scalatest.flatspec.AnyFlatSpecLike
 import rr64.developer.domain.Task
 import rr64.developer.infrastructure.TaskTestUtils.TaskWithIdFactory
-import rr64.developer.infrastructure.dev.behavior.DeveloperBehavior.State.Working
-import rr64.developer.infrastructure.dev.behavior.DeveloperBehavior._
 import rr64.developer.infrastructure.task.TaskWithId
 
 import java.util.UUID
@@ -26,7 +24,7 @@ class DeveloperBehaviorTestSuite
   private type Kit = EventSourcedBehaviorTestKit[
     Command,
     Event,
-    DeveloperBehavior.State
+    State
   ]
 
   private val manualTime = ManualTime()
@@ -74,7 +72,7 @@ class DeveloperBehaviorTestSuite
   "The developer" should "accept the task he's given when he's free" in {
     val task = Task(5)
     val result = addTask(task)
-    val state = result.stateOfType[Working]
+    val state = result.stateOfType[State.Working]
     state.task shouldEqual task
   }
 
@@ -85,7 +83,7 @@ class DeveloperBehaviorTestSuite
     val result = addTask(task)
     val reply = result.replyOfType[Replies.TaskStarted]
     reply.id should not be null
-    result.stateOfType[Working].taskId shouldEqual reply.id
+    result.stateOfType[State.Working].taskId shouldEqual reply.id
   }
 
   /** До выполнения задачи разработчик работает */
@@ -97,7 +95,7 @@ class DeveloperBehaviorTestSuite
 
     manualTime.timePasses(workTime - 1.millis)
     inside(developerTestKit.getState()) {
-      case working: Working => working.task shouldEqual task
+      case working: State.Working => working.task shouldEqual task
     }
 
     manualTime.timePasses(1.millis)
@@ -207,7 +205,7 @@ class DeveloperBehaviorTestSuite
     manualTime.timePasses(restTime)
 
     inside(developerTestKit.getState()) {
-      case Working(currentTask, taskQueue) =>
+      case State.Working(currentTask, taskQueue) =>
         currentTask shouldEqual secondTaskWithId
         taskQueue should contain theSameElementsInOrderAs Seq(thirdTaskWithId)
     }
