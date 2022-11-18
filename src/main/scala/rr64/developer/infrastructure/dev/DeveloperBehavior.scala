@@ -61,7 +61,7 @@ object DeveloperBehavior {
           case FinishTask(id) if id == currentTask.id =>
             Effect.persist(Event.TaskFinished(currentTask))
               .thenRun {
-                case Resting(millis, _) => setup.timer.startSingleTimer(StopResting, millis.millis)
+                case Resting(millis, _) => startRestTimer(millis)
                 case _ =>
               }
 
@@ -149,16 +149,21 @@ object DeveloperBehavior {
           startWorkTimer(taskWithId)
 
         case (State.Resting(millis, _), RecoveryCompleted) =>
-          timer.startSingleTimer(StopResting, millis.millis)
+          startRestTimer(millis)
       }
     }
 
   def workTime(difficulty: Int, factor: Int): FiniteDuration = (difficulty * factor).millis
+  def restTime(difficulty: Int, factor: Int): FiniteDuration = (difficulty * factor).millis
 
   private def startWorkTimer(taskWithId: TaskWithId)(implicit setup: Setup): Unit = {
     val delay = workTime(taskWithId.task.difficulty, setup.workFactor)
     val message = FinishTask(taskWithId.id)
     setup.timer.startSingleTimer(message, delay)
   }
+
+  private def startRestTimer(millis: Int)(implicit setup: Setup): Unit =
+    setup.timer.startSingleTimer(StopResting, millis.millis)
+
 
 }
