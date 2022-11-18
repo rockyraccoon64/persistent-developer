@@ -19,4 +19,12 @@ class EventSerializerTestSuite extends AnyFlatSpec with Matchers {
     serializer.fromBinary(bytes, manifest) shouldEqual event
   }
 
+  "The TaskStarted event" should "be serialized" in {
+    val task = TaskWithId(Task(3), UUID.randomUUID())
+    val event = Event.TaskStarted(task)
+    val bytes = serializer.toBinary(event)
+    val manifest = serializer.manifest(event)
+    serializer.fromBinary(bytes, manifest) shouldEqual event
+  }
+
 }
