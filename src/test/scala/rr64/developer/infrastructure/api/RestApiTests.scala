@@ -24,6 +24,8 @@ class RestApiTests
   /** Запрос информации о задаче */
   "The service processing a single task info request" should {
 
+    val baseUrl = "/api/query/task-info"
+
     /** Когда задача существует, возвращается информация о ней */
     "return the existing task info for a given UUID" in {
       val id = UUID.fromString("6f9ed143-70f4-4406-9c6b-2d9ddd297304")
@@ -33,7 +35,7 @@ class RestApiTests
         .returning(
           Future.successful(Some(taskInfo))
         )
-      Get(s"/api/query/task-info/${id.toString}") ~> route ~> check {
+      Get(s"$baseUrl/$id") ~> route ~> check {
         responseAs[ApiTaskInfo] shouldEqual ApiTaskInfo(id, 35, "InProgress")
       }
     }
@@ -50,14 +52,14 @@ class RestApiTests
         .returning(
           Future.successful(None)
         )
-      Get(s"/api/query/task-info/${id.toString}") ~> route ~> check {
+      Get(s"$baseUrl/$id") ~> route ~> check {
         status shouldEqual StatusCodes.NotFound
       }
     }
 
     /** При ошибке в UUID запроса информации о задаче возвращается 404 Not Found */
     "return 404 Not Found when given an invalid UUID" in {
-      Get("/api/query/task-info/123") ~> route ~> check {
+      Get(s"$baseUrl/123") ~> route ~> check {
         status shouldEqual StatusCodes.NotFound
       }
     }
@@ -70,7 +72,7 @@ class RestApiTests
         .returning(
           Future.failed(new RuntimeException)
         )
-      Get(s"/api/query/task-info/$id") ~> route ~> check {
+      Get(s"$baseUrl/$id") ~> route ~> check {
         status shouldEqual StatusCodes.InternalServerError
       }
     }
