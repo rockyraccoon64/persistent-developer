@@ -28,4 +28,10 @@ class EventSerializerTestSuite extends AnyFlatSpec with Matchers {
     assertSerialized(event)
   }
 
+  "The Task Finished event" should "be serialized" in {
+    val task = TaskWithId(97, UUID.fromString("94b9c4e5-03f8-4f2c-aed9-1f1a22fd1e3b"))
+    val event = Event.TaskFinished(task)
+    assertSerialized(event)
+  }
+
 }
