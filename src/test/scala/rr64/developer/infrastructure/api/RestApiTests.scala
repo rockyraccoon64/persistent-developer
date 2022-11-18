@@ -200,7 +200,12 @@ class RestApiTests
       }
     }
 
-    /** TODO Сущность отсутствует */
+    /** Если сущность отсутствует, возвращается 400 Bad Request */
+    "return 400 Bad Request when the task info is missing" in {
+      Post(url) ~> route ~> check {
+        status shouldEqual StatusCodes.BadRequest
+      }
+    }
 
     /** В случае асинхронной ошибки возвращается 500 Internal Server Error */
     "return 500 Internal Server Error when encountering an asynchronous error" in {
