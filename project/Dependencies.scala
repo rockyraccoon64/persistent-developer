@@ -22,6 +22,7 @@ object Dependencies {
   val akkaActor: ModuleID = "com.typesafe.akka" %% "akka-actor-typed" % Versions.Akka
   val akkaStream: ModuleID = "com.typesafe.akka" %% "akka-stream" % Versions.Akka
   val akkaHttp: ModuleID = "com.typesafe.akka" %% "akka-http" % Versions.AkkaHttp
+  val akkaHttpSprayJson: ModuleID = "com.typesafe.akka" %% "akka-http-spray-json" % Versions.AkkaHttp
   val akkaPersistence: ModuleID = "com.typesafe.akka" %% "akka-persistence-typed" % Versions.Akka
   val akkaPersistenceJdbc: ModuleID = "com.lightbend.akka" %% "akka-persistence-jdbc" % Versions.AkkaPersistenceJdbc
   val akkaPersistenceQuery: ModuleID = "com.typesafe.akka" %% "akka-persistence-query" % Versions.Akka

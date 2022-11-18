@@ -9,6 +9,7 @@ libraryDependencies ++= Seq(
   akkaActor,
   akkaStream,
   akkaHttp,
+  akkaHttpSprayJson,
   akkaPersistence,
   akkaPersistenceJdbc,
   akkaPersistenceQuery,
