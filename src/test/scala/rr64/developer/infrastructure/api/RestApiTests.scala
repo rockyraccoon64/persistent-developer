@@ -231,6 +231,8 @@ class RestApiTests
   /** Во время обработки запроса списка задач API должен */
   "The service processing the task list request" should {
 
+    val SendRequest = Get("/api/query/task-list")
+
     def mockService = (service.tasks(_: ExecutionContext)).expects(*)
 
     /** Возвращать список всех имеющихся задач */
@@ -244,7 +246,7 @@ class RestApiTests
 
       mockService.returning(Future.successful(domainTasks))
 
-      Get("/api/query/task-list") ~> route ~> check {
+      SendRequest ~> route ~> check {
         responseAs[Seq[ApiTaskInfo]] should contain theSameElementsInOrderAs apiTasks
       }
     }
@@ -253,7 +255,7 @@ class RestApiTests
     "return an empty list when there are no tasks" in {
       mockService.returning(Future.successful(Nil))
 
-      Get("/api/query/task-list") ~> route ~> check {
+      SendRequest ~> route ~> check {
         responseAs[Seq[ApiTaskInfo]] should have size 0
       }
     }
