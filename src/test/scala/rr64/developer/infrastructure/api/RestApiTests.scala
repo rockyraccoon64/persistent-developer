@@ -21,6 +21,18 @@ class RestApiTests
 
   "The service" should {
 
+    /** Запрос состояния разработчика, когда он свободен */
+    "return the Free developer state" in {
+      (service.developerState(_: ExecutionContext))
+        .expects(*)
+        .returning(
+          Future.successful(DeveloperState.Free)
+        )
+      Get("/api/query/developer-state") ~> route ~> check {
+        responseAs[ApiDeveloperState] shouldEqual ApiDeveloperState.Free
+      }
+    }
+
     /** Запрос состояния разработчика, когда он работает */
     "return the Working developer state" in {
       (service.developerState(_: ExecutionContext))
