@@ -19,7 +19,7 @@ object DeveloperBehavior {
 
   sealed trait Event
 
-  case object Event {
+  object Event {
     case class TaskStarted(taskWithId: TaskWithId) extends Event
     case class TaskQueued(taskWithId: TaskWithId) extends Event
     case class TaskFinished(taskWithId: TaskWithId) extends Event
