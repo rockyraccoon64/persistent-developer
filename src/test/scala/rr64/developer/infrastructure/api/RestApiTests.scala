@@ -153,6 +153,8 @@ class RestApiTests
   /** Команда поручения задачи */
   "The service processing the Add Task command" should {
 
+    val url = "/api/command/add-task"
+
     def checkReply(difficulty: Int, domainReply: DeveloperReply, apiReply: ApiReply) {
       val task = Task(difficulty)
       val postEntity = ApiTaskToAdd(difficulty)
@@ -161,7 +163,7 @@ class RestApiTests
         .expects(task, *)
         .returning(Future.successful(domainReply))
 
-      Post("/api/command/add-task", postEntity) ~> route ~> check {
+      Post(url, postEntity) ~> route ~> check {
         responseAs[ApiReply] shouldEqual apiReply
         status shouldEqual StatusCodes.OK
       }
@@ -198,7 +200,7 @@ class RestApiTests
         .expects(task, *)
         .returning(Future.failed(new RuntimeException))
 
-      Post("/api/command/add-task", postEntity) ~> route ~> check {
+      Post(url, postEntity) ~> route ~> check {
         status shouldEqual StatusCodes.InternalServerError
       }
     }
