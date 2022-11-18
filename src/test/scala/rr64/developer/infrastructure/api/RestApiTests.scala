@@ -80,7 +80,18 @@ class RestApiTests
       }
     }
 
-    /** TODO При ошибке при запросе информации о задаче возвращается 500 */
+    /** При ошибке при запросе информации о задаче возвращается 500 Internal Server Error */
+    "return 500 Internal Server Error when encountering an error" in {
+      val id = UUID.fromString("f01c667d-7bc6-481e-a0e9-de1ced7a2f0d")
+      (service.taskInfo(_: UUID)(_: ExecutionContext))
+        .expects(id, *)
+        .returning(
+          Future.failed(new RuntimeException)
+        )
+      Get(s"/api/query/task-info/$id") ~> route ~> check {
+        status shouldEqual StatusCodes.InternalServerError
+      }
+    }
 
   }
 
