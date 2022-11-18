@@ -12,22 +12,28 @@ class RestApi(service: DeveloperService) {
   private val developerStateAdapter = implicitly[Adapter[DeveloperState, ApiDeveloperState]]
   private val taskInfoAdapter = implicitly[Adapter[TaskInfo, ApiTaskInfo]]
 
+  private val developerStateRoute =
+    (path("developer-state") & extractExecutionContext) { implicit exec =>
+      onSuccess(service.developerState) { value =>
+        complete(developerStateAdapter.convert(value))
+      }
+    }
+
+  private val taskInfoRoute =
+    path("task-info" / JavaUUID) { id =>
+      extractExecutionContext { implicit exec =>
+        onSuccess(service.taskInfo(id)) {
+          case Some(value) => complete(taskInfoAdapter.convert(value))
+          case None => complete(StatusCodes.NotFound)
+        }
+      }
+    }
+
   val route: Route = Route.seal(
     pathPrefix("api") {
       (pathPrefix("query") & get) {
-        (path("developer-state") & extractExecutionContext) { implicit exec =>
-          onSuccess(service.developerState) { value =>
-            complete(developerStateAdapter.convert(value))
-          }
-        } ~
-        path("task-info" / JavaUUID) { id =>
-          extractExecutionContext { implicit exec =>
-            onSuccess(service.taskInfo(id)) {
-              case Some(value) => complete(taskInfoAdapter.convert(value))
-              case None => complete(StatusCodes.NotFound)
-            }
-          }
-        }
+        developerStateRoute ~
+        taskInfoRoute
       }
     }
   )
