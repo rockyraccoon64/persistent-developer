@@ -151,6 +151,9 @@ object DeveloperBehavior {
         case (State.Working(taskWithId, _), RecoveryCompleted) =>
           val timeNeeded = taskWithId.task.difficulty * setup.workFactor // TODO Дублирование
           timer.startSingleTimer(FinishTask(taskWithId.id), timeNeeded.millis)
+
+        case (State.Resting(millis, _), RecoveryCompleted) =>
+          timer.startSingleTimer(StopResting, millis.millis)
       }
     }
 

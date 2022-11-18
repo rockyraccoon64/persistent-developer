@@ -269,12 +269,25 @@ class DeveloperBehaviorTestSuite
     developerTestKit.restart()
 
     manualTime.timePasses((workTime - 1).millis)
-    developerTestKit.getState() shouldEqual Working(taskWithId, Nil)
+    developerTestKit.getState() shouldBe a [State.Working]
 
     manualTime.timePasses(1.millis)
     developerTestKit.getState() shouldBe a [State.Resting]
   }
 
   /** Если актор упал в состоянии отдыха, соответствующий таймер запускается по новой */
+  "The developer actor" should "start the rest timer when completing recovery in a Resting state" in {
+    val taskWithId = TaskWithId(Task(10), UUID.fromString("b807f5ff-6066-454e-8d53-2a90a3941cc4"))
+    val restTime = restTimeMs(taskWithId.task.difficulty)
+
+    developerTestKit.initialize(Event.TaskStarted(taskWithId), Event.TaskFinished(taskWithId))
+    developerTestKit.restart()
+
+    manualTime.timePasses((restTime - 1).millis)
+    developerTestKit.getState() shouldBe a [State.Resting]
+
+    manualTime.timePasses(1.millis)
+    developerTestKit.getState() shouldBe State.Free
+  }
 
 }
