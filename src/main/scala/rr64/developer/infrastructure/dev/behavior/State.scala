@@ -2,7 +2,7 @@ package rr64.developer.infrastructure.dev.behavior
 
 import akka.persistence.typed.scaladsl.Effect
 import rr64.developer.domain.Task
-import rr64.developer.infrastructure.dev.behavior.DeveloperBehavior.{Setup, startRestTimer, startWorkTimer}
+import rr64.developer.infrastructure.dev.behavior.DeveloperBehavior.{startRestTimer, startWorkTimer}
 import rr64.developer.infrastructure.task.TaskWithId
 
 import java.util.UUID

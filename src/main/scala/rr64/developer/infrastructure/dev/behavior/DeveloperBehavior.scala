@@ -10,8 +10,6 @@ import scala.concurrent.duration.{DurationInt, FiniteDuration}
 
 object DeveloperBehavior {
 
-  private[behavior] case class Setup(workFactor: Int, restFactor: Int, timer: TimerScheduler[Command])
-
   def apply(persistenceId: PersistenceId, workFactor: Int, restFactor: Int): Behavior[Command] =
     Behaviors.withTimers { timer =>
       implicit val setup: Setup = Setup(workFactor, restFactor, timer)
