@@ -12,6 +12,7 @@ import rr64.developer.infrastructure.TaskTestUtils.TaskWithIdFactory
 import rr64.developer.infrastructure.dev.DeveloperBehavior.Replies.TaskQueued
 import rr64.developer.infrastructure.dev.DeveloperBehavior.State.Working
 import rr64.developer.infrastructure.dev.DeveloperBehavior._
+import rr64.developer.infrastructure.task.TaskWithId
 
 import java.util.UUID
 import scala.concurrent.duration.{DurationInt, FiniteDuration}

@@ -5,6 +5,8 @@ import akka.actor.typed.{ActorRef, Behavior}
 import akka.persistence.typed.scaladsl.{Effect, EventSourcedBehavior}
 import akka.persistence.typed.{PersistenceId, RecoveryCompleted}
 import rr64.developer.domain.Task
+import rr64.developer.infrastructure.task.TaskWithId
+import rr64.developer.infrastructure.task.TaskWithId.createTaskWithId
 
 import java.util.UUID
 import scala.concurrent.duration.{DurationInt, FiniteDuration}
@@ -128,12 +130,6 @@ object DeveloperBehavior {
   }
 
   case class Setup(workFactor: Int, restFactor: Int, timer: TimerScheduler[Command])
-
-  case class TaskWithId(task: Task, id: UUID) // TODO move
-
-  private def generateTaskId(): UUID = UUID.randomUUID()
-  private def createTaskWithId(task: Task): TaskWithId =
-    TaskWithId(task, generateTaskId())
 
   def apply(persistenceId: PersistenceId, workFactor: Int, restFactor: Int): Behavior[Command] =
     Behaviors.withTimers { timer =>
