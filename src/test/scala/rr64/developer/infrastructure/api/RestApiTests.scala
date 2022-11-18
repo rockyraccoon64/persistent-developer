@@ -169,7 +169,7 @@ class RestApiTests
 
       Post(url, postEntity) ~> route ~> check {
         responseAs[ApiReply] shouldEqual apiReply
-        status shouldEqual StatusCodes.OK
+        status shouldEqual StatusCodes.Created
       }
     }
 

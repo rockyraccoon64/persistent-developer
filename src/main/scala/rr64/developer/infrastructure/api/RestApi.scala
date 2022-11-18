@@ -36,7 +36,7 @@ class RestApi(service: DeveloperService) {
       extractExecutionContext { implicit exec =>
         val task = Task(taskToAdd.difficulty)
         onSuccess(service.addTask(task)) { reply =>
-          complete(replyAdapter.convert(reply))
+          complete(StatusCodes.Created, replyAdapter.convert(reply))
         }
       }
     }
