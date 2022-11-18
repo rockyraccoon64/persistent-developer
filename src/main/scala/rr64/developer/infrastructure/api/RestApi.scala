@@ -30,7 +30,8 @@ class RestApi(service: DeveloperService) {
         (path("task-info" / JavaUUID) & get) { id =>
           extractExecutionContext { implicit exec =>
             onComplete(service.taskInfo(id)) {
-              case Success(value) => complete(value.map(taskInfoAdapter.convert))
+              case Success(Some(value)) => complete(taskInfoAdapter.convert(value))
+              case Success(None) => complete(StatusCodes.NotFound)
               case Failure(exception) => complete(StatusCodes.InternalServerError)
             }
           }
