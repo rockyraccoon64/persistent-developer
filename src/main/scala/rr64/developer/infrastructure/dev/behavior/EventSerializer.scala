@@ -6,6 +6,9 @@ import rr64.developer.infrastructure.task.TaskWithId
 import java.nio.ByteBuffer
 import java.util.UUID
 
+/**
+ * Сериализатор событий актора разработчика
+ */
 class EventSerializer extends SerializerWithStringManifest {
 
   private object Manifests {
