@@ -62,7 +62,7 @@ class DeveloperBehaviorTestSuite
   }
 
   private def workTimeMs(difficulty: Int): FiniteDuration = DeveloperBehavior.workTime(difficulty, workFactor)
-  private def restTimeMs(difficulty: Int): Int = difficulty * restFactor
+  private def restTimeMs(difficulty: Int): FiniteDuration = DeveloperBehavior.restTime(difficulty, restFactor)
 
   override protected def beforeEach(): Unit = {
     super.beforeEach()
@@ -133,12 +133,12 @@ class DeveloperBehaviorTestSuite
     val difficulty = 50
     val task = Task(difficulty)
     val workTime = workTimeMs(difficulty)
-    val restingTime = restTimeMs(difficulty)
+    val restTime = restTimeMs(difficulty)
 
     addTask(task)
 
     manualTime.timePasses(workTime)
-    manualTime.timePasses(restingTime.millis)
+    manualTime.timePasses(restTime)
 
     developerTestKit.getState() should not be a [State.Resting]
   }
@@ -215,7 +215,7 @@ class DeveloperBehaviorTestSuite
     val restTime = restTimeMs(firstTask.difficulty)
 
     manualTime.timePasses(workTime)
-    manualTime.timePasses(restTime.millis)
+    manualTime.timePasses(restTime)
 
     inside(developerTestKit.getState()) {
       case Working(currentTask, taskQueue) =>
@@ -229,12 +229,12 @@ class DeveloperBehaviorTestSuite
     val difficulty = 50
     val task = Task(difficulty)
     val workTime = workTimeMs(difficulty)
-    val restingTime = restTimeMs(difficulty)
+    val restTime = restTimeMs(difficulty)
 
     addTask(task)
 
     manualTime.timePasses(workTime)
-    manualTime.timePasses(restingTime.millis)
+    manualTime.timePasses(restTime)
 
     developerTestKit.getState() shouldEqual State.Free
   }
@@ -282,7 +282,7 @@ class DeveloperBehaviorTestSuite
     developerTestKit.initialize(Event.TaskStarted(taskWithId), Event.TaskFinished(taskWithId))
     developerTestKit.restart()
 
-    manualTime.timePasses((restTime - 1).millis)
+    manualTime.timePasses(restTime - 1.millis)
     developerTestKit.getState() shouldBe a [State.Resting]
 
     manualTime.timePasses(1.millis)
@@ -300,8 +300,8 @@ class DeveloperBehaviorTestSuite
     val workTime = workTimeMs(nextTask.task.difficulty)
 
     developerTestKit.initialize(State.Resting(lastCompleted, taskQueue))
-    manualTime.timePasses(restTime.millis)
 
+    manualTime.timePasses(restTime)
     developerTestKit.getState() shouldEqual State.Working(nextTask, taskQueue.tail)
     manualTime.timePasses(workTime - 1.millis)
     developerTestKit.getState() shouldEqual State.Working(nextTask, taskQueue.tail)
