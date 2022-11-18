@@ -5,6 +5,7 @@ import akka.actor.typed.{ActorRef, Behavior}
 import akka.persistence.typed.scaladsl.{Effect, EventSourcedBehavior}
 import akka.persistence.typed.{PersistenceId, RecoveryCompleted}
 import rr64.developer.domain.Task
+import rr64.developer.infrastructure.dev.behavior.Replies
 import rr64.developer.infrastructure.task.TaskWithId
 
 import java.util.UUID
@@ -124,15 +125,6 @@ object DeveloperBehavior {
       def taskId: UUID = working.currentTask.id
     }
 
-  }
-
-  object Replies {
-    /** Результат добавления задачи */
-    sealed trait AddTaskResult
-    /** Задача принята в работу */
-    case class TaskStarted(id: UUID) extends AddTaskResult
-    /** Задача поставлена в очередь */
-    case class TaskQueued(id: UUID) extends AddTaskResult
   }
 
   private case class Setup(workFactor: Int, restFactor: Int, timer: TimerScheduler[Command])

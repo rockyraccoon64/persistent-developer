@@ -7,6 +7,7 @@ import org.scalatest.flatspec.AsyncFlatSpecLike
 import rr64.developer.domain.{DeveloperReply, DeveloperState, Task}
 import rr64.developer.infrastructure.dev.DeveloperBehavior.Command
 import rr64.developer.infrastructure.dev.PersistentDeveloper.DeveloperRef
+import rr64.developer.infrastructure.dev.behavior.Replies
 
 import java.util.UUID
 import scala.concurrent.{ExecutionContext, Future}
@@ -57,7 +58,7 @@ class PersistentDeveloperTestSuite
     val id = UUID.randomUUID()
     val mockActor = mockDeveloperRef {
       case Command.AddTask(_, replyTo) =>
-        replyTo ! DeveloperBehavior.Replies.TaskStarted(id)
+        replyTo ! Replies.TaskStarted(id)
         Behaviors.same
     }
     val dev = createDeveloper(mockActor)
@@ -73,7 +74,7 @@ class PersistentDeveloperTestSuite
     val id = UUID.randomUUID()
     val mockActor = mockDeveloperRef {
       case Command.AddTask(_, replyTo) =>
-        replyTo ! DeveloperBehavior.Replies.TaskQueued(id)
+        replyTo ! Replies.TaskQueued(id)
         Behaviors.same
     }
     val dev = createDeveloper(mockActor)

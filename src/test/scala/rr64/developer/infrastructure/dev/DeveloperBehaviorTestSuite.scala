@@ -9,9 +9,9 @@ import org.scalatest.Inside.inside
 import org.scalatest.flatspec.AnyFlatSpecLike
 import rr64.developer.domain.Task
 import rr64.developer.infrastructure.TaskTestUtils.TaskWithIdFactory
-import rr64.developer.infrastructure.dev.DeveloperBehavior.Replies.TaskQueued
 import rr64.developer.infrastructure.dev.DeveloperBehavior.State.Working
 import rr64.developer.infrastructure.dev.DeveloperBehavior._
+import rr64.developer.infrastructure.dev.behavior.Replies
 import rr64.developer.infrastructure.task.TaskWithId
 
 import java.util.UUID
@@ -50,7 +50,7 @@ class DeveloperBehaviorTestSuite
 
   private def queueTask(task: Task, kit: Kit = developerTestKit): TaskWithId = {
     val result = addTask(task, kit)
-    val id = result.replyOfType[TaskQueued].id
+    val id = result.replyOfType[Replies.TaskQueued].id
     TaskWithId(task, id)
   }
 
