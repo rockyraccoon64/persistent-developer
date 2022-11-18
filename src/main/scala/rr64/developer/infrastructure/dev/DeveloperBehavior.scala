@@ -152,17 +152,16 @@ object DeveloperBehavior {
       }
     }
 
-  def workTime(difficulty: Int, factor: Int): FiniteDuration = (difficulty * factor).millis
-  def restTime(difficulty: Int, factor: Int): FiniteDuration = (difficulty * factor).millis
+  def calculateTime(difficulty: Int, factor: Int): FiniteDuration = (difficulty * factor).millis
 
   private def startWorkTimer(taskWithId: TaskWithId)(implicit setup: Setup): Unit = {
-    val delay = workTime(taskWithId.task.difficulty, setup.workFactor)
+    val delay = calculateTime(taskWithId.task.difficulty, setup.workFactor)
     val message = FinishTask(taskWithId.id)
     setup.timer.startSingleTimer(message, delay)
   }
 
   private def startRestTimer(taskWithId: TaskWithId)(implicit setup: Setup): Unit = {
-    val delay = restTime(taskWithId.task.difficulty, setup.restFactor)
+    val delay = calculateTime(taskWithId.task.difficulty, setup.restFactor)
     setup.timer.startSingleTimer(StopResting, delay)
   }
 

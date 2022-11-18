@@ -61,8 +61,8 @@ class DeveloperBehaviorTestSuite
     TaskWithId(task, id)
   }
 
-  private def workTimeMs(difficulty: Int): FiniteDuration = DeveloperBehavior.workTime(difficulty, workFactor)
-  private def restTimeMs(difficulty: Int): FiniteDuration = DeveloperBehavior.restTime(difficulty, restFactor)
+  private def workTimeMs(difficulty: Int): FiniteDuration = DeveloperBehavior.calculateTime(difficulty, workFactor)
+  private def restTimeMs(difficulty: Int): FiniteDuration = DeveloperBehavior.calculateTime(difficulty, restFactor)
 
   override protected def beforeEach(): Unit = {
     super.beforeEach()
