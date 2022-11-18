@@ -290,4 +290,6 @@ class DeveloperBehaviorTestSuite
     developerTestKit.getState() shouldBe State.Free
   }
 
+  /** После отдыха разработчик выполняет следующую задачу из очереди до конца */
+
 }
