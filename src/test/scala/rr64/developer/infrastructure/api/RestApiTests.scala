@@ -168,6 +168,23 @@ class RestApiTests
       }
     }
 
+    /** Когда задача поставлена в очередь, возвращается её идентификатор и соответствующий признак */
+    "return the Task Queued reply" in {
+      val task = Task(10)
+      val id = UUID.fromString("f89474c0-8c5a-4f3f-8e8c-92c483c30bd1")
+      val reply = DeveloperReply.TaskQueued(id)
+
+      val apiCommand = ApiTaskToAdd(task.difficulty)
+
+      (service.addTask(_: Task)(_: ExecutionContext))
+        .expects(task, *)
+        .returning(Future.successful(reply))
+
+      Post("/api/command/add-task", apiCommand) ~> route ~> check {
+        responseAs[ApiReply] shouldEqual ApiReply(id, "Queued")
+      }
+    }
+
   }
 
 }
