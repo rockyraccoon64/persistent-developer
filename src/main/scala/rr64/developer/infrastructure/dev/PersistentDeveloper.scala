@@ -4,7 +4,7 @@ import akka.actor.typed.scaladsl.AskPattern.Askable
 import akka.actor.typed.{ActorRef, Scheduler}
 import akka.util.Timeout
 import rr64.developer.domain._
-import rr64.developer.infrastructure.dev.DeveloperBehavior.Replies
+import rr64.developer.infrastructure.dev.DeveloperBehavior.{Command, Replies}
 import rr64.developer.infrastructure.dev.PersistentDeveloper.DeveloperRef
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -24,7 +24,7 @@ class PersistentDeveloper(
   /** Поручить разработчику задачу */
   override def addTask(task: Task)
       (implicit ec: ExecutionContext): Future[DeveloperReply] = {
-    developerRef.ask(DeveloperBehavior.AddTask(task, _)).map {
+    developerRef.ask(Command.AddTask(task, _)).map {
       case Replies.TaskStarted(id) => DeveloperReply.TaskStarted(id)
       case Replies.TaskQueued(id) => DeveloperReply.TaskQueued(id)
     }

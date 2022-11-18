@@ -48,7 +48,7 @@ class PersistentDeveloperTestSuite
     val task = Task(10)
     dev.addTask(task)
 
-    val command = probe.expectMessageType[DeveloperBehavior.AddTask]
+    val command = probe.expectMessageType[Command.AddTask]
     command.task shouldEqual task
   }
 
@@ -56,7 +56,7 @@ class PersistentDeveloperTestSuite
   "When a task is started, there" should "be a corresponding domain message" in {
     val id = UUID.randomUUID()
     val mockActor = mockDeveloperRef {
-      case DeveloperBehavior.AddTask(_, replyTo) =>
+      case Command.AddTask(_, replyTo) =>
         replyTo ! DeveloperBehavior.Replies.TaskStarted(id)
         Behaviors.same
     }
@@ -72,7 +72,7 @@ class PersistentDeveloperTestSuite
   "When a task is queued, there" should "be a corresponding domain message" in {
     val id = UUID.randomUUID()
     val mockActor = mockDeveloperRef {
-      case DeveloperBehavior.AddTask(_, replyTo) =>
+      case Command.AddTask(_, replyTo) =>
         replyTo ! DeveloperBehavior.Replies.TaskQueued(id)
         Behaviors.same
     }

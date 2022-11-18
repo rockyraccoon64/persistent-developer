@@ -13,9 +13,12 @@ import scala.concurrent.duration.{DurationInt, FiniteDuration}
 object DeveloperBehavior {
 
   sealed trait Command
-  case class AddTask(task: Task, replyTo: ActorRef[Replies.AddTaskResult]) extends Command
-  private case class FinishTask(id: UUID) extends Command
-  private case object StopResting extends Command
+
+  object Command {
+    case class AddTask(task: Task, replyTo: ActorRef[Replies.AddTaskResult]) extends Command
+    private[DeveloperBehavior] case class FinishTask(id: UUID) extends Command
+    private[DeveloperBehavior] case object StopResting extends Command
+  }
 
   sealed trait Event
 
@@ -35,6 +38,7 @@ object DeveloperBehavior {
 
     /** Разработчик свободен */
     case object Free extends State {
+      import Command._
 
       override def applyCommand(cmd: Command)(implicit setup: Setup): Effect[Event, State] =
         cmd match {
@@ -43,6 +47,7 @@ object DeveloperBehavior {
             Effect.persist(Event.TaskStarted(taskWithId))
               .thenRun((_: State) => startWorkTimer(taskWithId))
               .thenReply(replyTo)(_ => Replies.TaskStarted(taskWithId.id))
+
           case _ =>
             Effect.unhandled
         }
@@ -56,6 +61,7 @@ object DeveloperBehavior {
 
     /** Разработчик работает над задачей */
     case class Working(currentTask: TaskWithId, taskQueue: Seq[TaskWithId]) extends State {
+      import Command._
 
       override def applyCommand(cmd: Command)(implicit setup: Setup): Effect[Event, State] =
         cmd match {
@@ -82,6 +88,7 @@ object DeveloperBehavior {
 
     /** Разработчик отдыхает */
     case class Resting(lastCompleted: TaskWithId, taskQueue: Seq[TaskWithId]) extends State {
+      import Command._
 
       override def applyCommand(cmd: Command)(implicit setup: Setup): Effect[Event, State] =
         cmd match {
@@ -164,7 +171,7 @@ object DeveloperBehavior {
       (implicit setup: Setup): Unit =
     startTimer(
       timer = setup.timer,
-      message = FinishTask(taskWithId.id),
+      message = Command.FinishTask(taskWithId.id),
       difficulty = taskWithId.task.difficulty,
       factor = setup.workFactor
     )
@@ -173,7 +180,7 @@ object DeveloperBehavior {
       (implicit setup: Setup): Unit =
     startTimer(
       timer = setup.timer,
-      message = StopResting,
+      message = Command.StopResting,
       difficulty = taskWithId.task.difficulty,
       factor = setup.restFactor
     )

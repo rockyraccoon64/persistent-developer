@@ -46,7 +46,7 @@ class DeveloperBehaviorTestSuite
     )
 
   private def addTask(task: Task, kit: Kit = developerTestKit) =
-    kit.runCommand(AddTask(task, _))
+    kit.runCommand(Command.AddTask(task, _))
 
   private def queueTask(task: Task, kit: Kit = developerTestKit): TaskWithId = {
     val result = addTask(task, kit)
