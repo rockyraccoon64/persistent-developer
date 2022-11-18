@@ -290,5 +290,23 @@ class DeveloperBehaviorTestSuite
   }
 
   /** После отдыха разработчик выполняет следующую задачу из очереди до конца */
+  "After resting the developer" should "fully complete the next task in the queue" in {
+    val lastCompleted = TaskWithId(Task(12), UUID.fromString("6bf0af94-4ee3-4857-9a38-3e31e529b37d"))
+    val taskQueue = TaskWithId(Task(35), UUID.fromString("ba5be578-9af1-44a6-9b8b-0a11c340237b")) ::
+      TaskWithId(Task(19), UUID.fromString("da2b386f-a53e-44a8-b943-8e7491d1010e")) ::
+      Nil
+    val restTime = restTimeMs(lastCompleted.task.difficulty)
+    val nextTask = taskQueue.head
+    val workTime = workTimeMs(nextTask.task.difficulty)
+
+    developerTestKit.initialize(State.Resting(lastCompleted, taskQueue))
+    manualTime.timePasses(restTime.millis)
+
+    developerTestKit.getState() shouldEqual State.Working(nextTask, taskQueue.tail)
+    manualTime.timePasses(workTime - 1.millis)
+    developerTestKit.getState() shouldEqual State.Working(nextTask, taskQueue.tail)
+    manualTime.timePasses(1.millis)
+    developerTestKit.getState() shouldEqual State.Resting(nextTask, taskQueue.tail)
+  }
 
 }
