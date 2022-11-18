@@ -161,7 +161,7 @@ class RestApiTests
         .expects(task, *)
         .returning(Future.successful(reply))
 
-      Post("/api/command/add-task") ~> route ~> {
+      Post("/api/command/add-task") ~> route ~> check {
         responseAs[ApiReply] shouldEqual ApiReply(id, "Started")
       }
     }
