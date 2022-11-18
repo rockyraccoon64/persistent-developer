@@ -73,7 +73,7 @@ class DeveloperBehaviorTestSuite
     val task = Task(5)
     val result = addTask(task)
     val state = result.stateOfType[State.Working]
-    state.task shouldEqual task
+    state.currentTask.task shouldEqual task
   }
 
   /** Когда разработчик свободен, то при получении задачи
@@ -83,7 +83,7 @@ class DeveloperBehaviorTestSuite
     val result = addTask(task)
     val reply = result.replyOfType[Replies.TaskStarted]
     reply.id should not be null
-    result.stateOfType[State.Working].taskId shouldEqual reply.id
+    result.stateOfType[State.Working].currentTask.id shouldEqual reply.id
   }
 
   /** До выполнения задачи разработчик работает */
@@ -95,7 +95,7 @@ class DeveloperBehaviorTestSuite
 
     manualTime.timePasses(workTime - 1.millis)
     inside(developerTestKit.getState()) {
-      case working: State.Working => working.task shouldEqual task
+      case working: State.Working => working.currentTask.task shouldEqual task
     }
 
     manualTime.timePasses(1.millis)

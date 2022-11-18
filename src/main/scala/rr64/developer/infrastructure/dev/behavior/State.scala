@@ -1,14 +1,15 @@
 package rr64.developer.infrastructure.dev.behavior
 
 import akka.persistence.typed.scaladsl.Effect
-import rr64.developer.domain.Task
 import rr64.developer.infrastructure.task.TaskWithId
 
-import java.util.UUID
-
-
+/**
+ * Состояние актора разработчика
+ */
 sealed trait State {
+  /** Обработать команду */
   def applyCommand(cmd: Command)(implicit setup: Setup): Effect[Event, State]
+  /** Обработать событие */
   def applyEvent(evt: Event)(implicit setup: Setup): State
 }
 
@@ -95,11 +96,6 @@ object State {
           Resting(lastCompleted, taskQueue :+ newTask)
       }
 
-  }
-
-  implicit class WorkingOps(working: Working) {
-    def task: Task = working.currentTask.task
-    def taskId: UUID = working.currentTask.id
   }
 
 }
