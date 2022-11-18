@@ -45,13 +45,13 @@ class RestApiTests
     "return the task info" in {
       val id = UUID.fromString("6f9ed143-70f4-4406-9c6b-2d9ddd297304")
       val taskInfo = TaskInfo(id, 35, TaskStatus.InProgress)
-      (service.taskInfo(_)(_: ExecutionContext))
+      (service.taskInfo(_: UUID)(_: ExecutionContext))
         .expects(id, *)
         .returning(
           Future.successful(Some(taskInfo))
         )
       Get(s"/api/query/task-info/${id.toString}") ~> route ~> check {
-        responseAs[ApiTaskInfo] shouldEqual ApiTaskInfo(id, 35, ApiTaskStatus.InProgress)
+        responseAs[ApiTaskInfo] shouldEqual ApiTaskInfo(id, 35, "InProgress")
       }
     }
 
