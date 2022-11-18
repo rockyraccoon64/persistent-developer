@@ -20,9 +20,8 @@ class DeveloperBehaviorTestSuite
   extends ScalaTestWithActorTestKit(
     ManualTime.config
       .withFallback(EventSourcedBehaviorTestKit.config)
-  )
-  with AnyFlatSpecLike
-  with BeforeAndAfterEach {
+  ) with AnyFlatSpecLike
+    with BeforeAndAfterEach {
 
   private type Kit = EventSourcedBehaviorTestKit[
     DeveloperBehavior.Command,
