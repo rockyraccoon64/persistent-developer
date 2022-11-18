@@ -8,6 +8,7 @@ import org.scalamock.scalatest.MockFactory
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import rr64.developer.domain._
+import spray.json.DefaultJsonProtocol.immSeqFormat
 import spray.json.JsObject
 
 import java.util.UUID
@@ -230,7 +231,23 @@ class RestApiTests
   /** Во время обработки запроса списка задач API должен */
   "The service processing the task list request" should {
 
-    /** TODO Возвращать JSON-массив всех имеющихся задач */
+    /** Возвращать список всех имеющихся задач */
+    "return the task list" in {
+      val domainTasks = TaskInfo(UUID.randomUUID(), 99, TaskStatus.Finished) ::
+        TaskInfo(UUID.randomUUID(), 51, TaskStatus.InProgress) ::
+        TaskInfo(UUID.randomUUID(), 65, TaskStatus.Queued) ::
+        Nil
+
+      val apiTasks = domainTasks.map(ApiTaskInfo.adapter.convert)
+
+      (service.tasks(_: ExecutionContext))
+        .expects(*)
+        .returning(Future.successful(domainTasks))
+
+      Get("/api/query/task-list") ~> route ~> check {
+        responseAs[Seq[ApiTaskInfo]] should contain theSameElementsInOrderAs apiTasks
+      }
+    }
 
     /** TODO Возвращать пустой массив JSON, если задач нет */
 
