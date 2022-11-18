@@ -26,16 +26,16 @@ object DeveloperBehavior {
   }
 
   sealed trait State {
-    def applyCommand(cmd: Command): Effect[Event, State]
-    def applyEvent(evt: Event): State
+    def applyCommand(cmd: Command)(implicit setup: Setup): Effect[Event, State]
+    def applyEvent(evt: Event)(implicit setup: Setup): State
   }
 
   object State {
 
     /** Разработчик свободен */
-    case class Free()(implicit setup: Setup) extends State {
+    case object Free extends State {
 
-      override def applyCommand(cmd: Command): Effect[Event, State] =
+      override def applyCommand(cmd: Command)(implicit setup: Setup): Effect[Event, State] =
         cmd match {
           case AddTask(task, replyTo) =>
             val taskWithId = createTaskWithId(task)
@@ -49,7 +49,7 @@ object DeveloperBehavior {
             Effect.unhandled
         }
 
-      override def applyEvent(evt: Event): State =
+      override def applyEvent(evt: Event)(implicit setup: Setup): State =
         evt match {
           case Event.TaskStarted(taskWithId) => Working(taskWithId, Nil)
         }
@@ -57,10 +57,9 @@ object DeveloperBehavior {
     }
 
     /** Разработчик работает над задачей */
-    case class Working(currentTask: TaskWithId, taskQueue: Seq[TaskWithId])
-      (implicit setup: Setup) extends State {
+    case class Working(currentTask: TaskWithId, taskQueue: Seq[TaskWithId]) extends State {
 
-      override def applyCommand(cmd: Command): Effect[Event, State] =
+      override def applyCommand(cmd: Command)(implicit setup: Setup): Effect[Event, State] =
         cmd match {
           case FinishTask(id) if id == currentTask.id =>
             Effect.persist(Event.TaskFinished(currentTask))
@@ -78,7 +77,7 @@ object DeveloperBehavior {
             Effect.unhandled
         }
 
-      override def applyEvent(evt: Event): State =
+      override def applyEvent(evt: Event)(implicit setup: Setup): State =
         evt match {
           case Event.TaskFinished(taskWithId) => Resting(taskWithId.task.difficulty * setup.restFactor, taskQueue)
           case Event.TaskQueued(newTask) => Working(currentTask, taskQueue :+ newTask)
@@ -87,10 +86,9 @@ object DeveloperBehavior {
     }
 
     /** Разработчик отдыхает */
-    case class Resting(millis: Int, taskQueue: Seq[TaskWithId])
-        (implicit setup: Setup) extends State {
+    case class Resting(millis: Int, taskQueue: Seq[TaskWithId]) extends State {
 
-      override def applyCommand(cmd: Command): Effect[Event, State] =
+      override def applyCommand(cmd: Command)(implicit setup: Setup): Effect[Event, State] =
         cmd match {
           case StopResting => Effect.persist(Event.Rested)
 
@@ -103,12 +101,12 @@ object DeveloperBehavior {
             Effect.unhandled
         }
 
-      override def applyEvent(evt: Event): State =
+      override def applyEvent(evt: Event)(implicit setup: Setup): State =
         evt match {
           case Event.Rested =>
             taskQueue match {
               case head :: tail => Working(head, tail)
-              case Nil => State.Free()
+              case Nil => State.Free
             }
 
           case Event.TaskQueued(newTask) =>
@@ -143,10 +141,10 @@ object DeveloperBehavior {
 
   def apply(persistenceId: PersistenceId, workFactor: Int, restFactor: Int): Behavior[Command] =
     Behaviors.withTimers { timer =>
-      implicit val setup: Setup = Setup(workFactor, restFactor, timer) // TODO Передавать Setup в applyCommand и applyEvent, а не в состояние
+      implicit val setup: Setup = Setup(workFactor, restFactor, timer)
       EventSourcedBehavior[Command, Event, State](
         persistenceId = persistenceId,
-        emptyState = State.Free(),
+        emptyState = State.Free,
         commandHandler = (state, cmd) => state.applyCommand(cmd),
         eventHandler = (state, evt) => state.applyEvent(evt)
       )

@@ -71,7 +71,7 @@ class DeveloperBehaviorTestSuite
   /** Разработчик начинает в свободном состоянии */
   "The developer" should "start in a free state" in {
     val state = developerTestKit.getState()
-    state shouldBe a [State.Free]
+    state shouldEqual State.Free
   }
 
   /** Когда разработчик свободен, он принимает задачу в работу */
@@ -236,7 +236,7 @@ class DeveloperBehaviorTestSuite
     manualTime.timePasses(workTime.millis)
     manualTime.timePasses(restingTime.millis)
 
-    developerTestKit.getState() shouldBe a [State.Free]
+    developerTestKit.getState() shouldEqual State.Free
   }
 
   /** Если разработчик отдыхает, новые задачи ставятся в очередь */
