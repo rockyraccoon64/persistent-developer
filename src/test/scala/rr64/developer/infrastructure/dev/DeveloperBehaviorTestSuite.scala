@@ -117,7 +117,6 @@ class DeveloperBehaviorTestSuite
     val difficulty = 50
     val task = Task(difficulty)
     val workTime = workTimeMs(difficulty)
-    val restingTime = restTimeMs(difficulty)
 
     addTask(task)
 
@@ -125,7 +124,7 @@ class DeveloperBehaviorTestSuite
 
     inside(developerTestKit.getState()) {
       case resting: State.Resting =>
-        resting.millis shouldEqual restingTime
+        resting.lastCompleted.task shouldEqual task
     }
   }
 

@@ -60,10 +60,7 @@ object DeveloperBehavior {
         cmd match {
           case FinishTask(id) if id == currentTask.id =>
             Effect.persist(Event.TaskFinished(currentTask))
-              .thenRun {
-                case Resting(millis, _) => startRestTimer(millis)
-                case _ =>
-              }
+              .thenRun((_: State) => startRestTimer(currentTask))
 
           case AddTask(task, replyTo) =>
             val taskWithId = createTaskWithId(task)
@@ -76,14 +73,14 @@ object DeveloperBehavior {
 
       override def applyEvent(evt: Event)(implicit setup: Setup): State =
         evt match {
-          case Event.TaskFinished(taskWithId) => Resting(taskWithId.task.difficulty * setup.restFactor, taskQueue)
+          case Event.TaskFinished(taskWithId) => Resting(taskWithId, taskQueue)
           case Event.TaskQueued(newTask) => Working(currentTask, taskQueue :+ newTask)
         }
 
     }
 
     /** Разработчик отдыхает */
-    case class Resting(millis: Int, taskQueue: Seq[TaskWithId]) extends State {
+    case class Resting(lastCompleted: TaskWithId, taskQueue: Seq[TaskWithId]) extends State {
 
       override def applyCommand(cmd: Command)(implicit setup: Setup): Effect[Event, State] =
         cmd match {
@@ -107,7 +104,7 @@ object DeveloperBehavior {
             }
 
           case Event.TaskQueued(newTask) =>
-            Resting(millis, taskQueue :+ newTask)
+            Resting(lastCompleted, taskQueue :+ newTask)
         }
 
     }
@@ -148,8 +145,8 @@ object DeveloperBehavior {
         case (State.Working(taskWithId, _), RecoveryCompleted) =>
           startWorkTimer(taskWithId)
 
-        case (State.Resting(millis, _), RecoveryCompleted) =>
-          startRestTimer(millis)
+        case (State.Resting(lastCompleted, _), RecoveryCompleted) =>
+          startRestTimer(lastCompleted)
       }
     }
 
@@ -162,8 +159,10 @@ object DeveloperBehavior {
     setup.timer.startSingleTimer(message, delay)
   }
 
-  private def startRestTimer(millis: Int)(implicit setup: Setup): Unit =
-    setup.timer.startSingleTimer(StopResting, millis.millis)
+  private def startRestTimer(taskWithId: TaskWithId)(implicit setup: Setup): Unit = {
+    val delay = restTime(taskWithId.task.difficulty, setup.restFactor)
+    setup.timer.startSingleTimer(StopResting, delay)
+  }
 
 
 }
