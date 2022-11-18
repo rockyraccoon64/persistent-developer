@@ -82,7 +82,7 @@ class DeveloperBehaviorTestSuite
   /** Когда разработчик свободен, то при получении задачи
    * он присваивает ей идентификатор и отправляет его в ответе */
   "The developer" should "reply with a Task Started message when he's free" in {
-    val task = Task(5)
+    val task = Task(15)
     val result = addTask(task)
     val reply = result.replyOfType[Replies.TaskStarted]
     reply.id should not be null
@@ -91,33 +91,28 @@ class DeveloperBehaviorTestSuite
 
   /** До выполнения задачи разработчик работает */
   "The developer" should "work until the task is done" in {
-    val difficulty = 10
-    val task = Task(difficulty)
-    val workTime = calculateWorkTime(difficulty)
+    val task = Task(20)
+    val workTime = calculateWorkTime(task.difficulty)
 
     addTask(task)
 
     manualTime.timePasses(workTime - 1.millis)
-
     inside(developerTestKit.getState()) {
       case working: Working => working.task shouldEqual task
     }
 
     manualTime.timePasses(1.millis)
-
     developerTestKit.getState() should not be a [State.Working]
   }
 
   /** Завершив задачу, разработчик делает перерыв */
   "The developer" should "rest after completing a task" in {
-    val difficulty = 50
-    val task = Task(difficulty)
-    val workTime = calculateWorkTime(difficulty)
+    val task = Task(50)
+    val workTime = calculateWorkTime(task.difficulty)
 
     addTask(task)
 
     manualTime.timePasses(workTime)
-
     inside(developerTestKit.getState()) {
       case resting: State.Resting =>
         resting.lastCompleted.task shouldEqual task
@@ -126,10 +121,9 @@ class DeveloperBehaviorTestSuite
 
   /** Перерыв длится строго отведённое время */
   "The developer" should "only rest for a designated time period" in {
-    val difficulty = 50
-    val task = Task(difficulty)
-    val workTime = calculateWorkTime(difficulty)
-    val restTime = calculateRestTime(difficulty)
+    val task = Task(50)
+    val workTime = calculateWorkTime(task.difficulty)
+    val restTime = calculateRestTime(task.difficulty)
 
     addTask(task)
 
@@ -222,10 +216,9 @@ class DeveloperBehaviorTestSuite
 
   /** Если задач в очереди нет, после отдыха разработчик возвращается в свободное состояние */
   "The developer" should "be free after resting if there are no more tasks in the queue" in {
-    val difficulty = 50
-    val task = Task(difficulty)
-    val workTime = calculateWorkTime(difficulty)
-    val restTime = calculateRestTime(difficulty)
+    val task = Task(50)
+    val workTime = calculateWorkTime(task.difficulty)
+    val restTime = calculateRestTime(task.difficulty)
 
     addTask(task)
 
