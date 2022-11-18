@@ -148,4 +148,24 @@ class RestApiTests
 
   }
 
+  /** Команда поручения задачи */
+  "The service processing the Add Task command" should {
+
+    /** Когда задача начата, возвращается её идентификатор и соответствующий признак */
+    "return the Task Started reply" in {
+      val task = Task(9)
+      val id = UUID.fromString("f03fb7d3-2e2b-4965-b85c-f91692a583ff")
+      val reply = DeveloperReply.TaskStarted(id)
+
+      (service.addTask(_: Task)(_: ExecutionContext))
+        .expects(task, *)
+        .returning(Future.successful(reply))
+
+      Post("/api/command/add-task") ~> route ~> {
+        responseAs[ApiReply] shouldEqual ApiReply(id, "Started")
+      }
+    }
+
+  }
+
 }
