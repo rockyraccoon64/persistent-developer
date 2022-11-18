@@ -6,7 +6,6 @@ import akka.persistence.typed.scaladsl.{Effect, EventSourcedBehavior}
 import akka.persistence.typed.{PersistenceId, RecoveryCompleted}
 import rr64.developer.domain.Task
 import rr64.developer.infrastructure.task.TaskWithId
-import rr64.developer.infrastructure.task.TaskWithId.createTaskWithId
 
 import java.util.UUID
 import scala.concurrent.duration.{DurationInt, FiniteDuration}
@@ -40,7 +39,7 @@ object DeveloperBehavior {
       override def applyCommand(cmd: Command)(implicit setup: Setup): Effect[Event, State] =
         cmd match {
           case AddTask(task, replyTo) =>
-            val taskWithId = createTaskWithId(task)
+            val taskWithId = TaskWithId.fromTask(task)
             Effect.persist(Event.TaskStarted(taskWithId))
               .thenRun((_: State) => startWorkTimer(taskWithId))
               .thenReply(replyTo)(_ => Replies.TaskStarted(taskWithId.id))
@@ -65,7 +64,7 @@ object DeveloperBehavior {
               .thenRun((_: State) => startRestTimer(currentTask))
 
           case AddTask(task, replyTo) =>
-            val taskWithId = createTaskWithId(task)
+            val taskWithId = TaskWithId.fromTask(task)
             Effect.persist(Event.TaskQueued(taskWithId))
               .thenReply(replyTo)(_ => Replies.TaskQueued(taskWithId.id))
 
@@ -91,7 +90,7 @@ object DeveloperBehavior {
               .thenRun((_: State) => taskQueue.headOption.foreach(startWorkTimer))
 
           case AddTask(task, replyTo) =>
-            val taskWithId = createTaskWithId(task)
+            val taskWithId = TaskWithId.fromTask(task)
             Effect.persist(Event.TaskQueued(taskWithId))
               .thenReply(replyTo)(_ => Replies.TaskQueued(taskWithId.id))
 
