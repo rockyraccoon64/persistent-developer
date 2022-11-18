@@ -14,6 +14,9 @@ import spray.json.JsObject
 import java.util.UUID
 import scala.concurrent.{ExecutionContext, Future}
 
+/**
+ * Тесты REST API сервиса разработки
+ * */
 class RestApiTests
   extends AnyWordSpec
     with Matchers
