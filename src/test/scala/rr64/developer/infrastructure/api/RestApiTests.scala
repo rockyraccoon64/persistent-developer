@@ -3,6 +3,7 @@ package rr64.developer.infrastructure.api
 import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport._
 import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.testkit.ScalatestRouteTest
+import org.scalamock.matchers.MockParameter
 import org.scalamock.scalatest.MockFactory
 import org.scalatest.Assertion
 import org.scalatest.matchers.should.Matchers
@@ -26,15 +27,20 @@ class RestApiTests
 
     val baseUrl = "/api/query/task-info"
 
+    def mockExpects(id: MockParameter[UUID]) =
+      (service.taskInfo(_: UUID)(_: ExecutionContext))
+        .expects(id, *)
+
+
     /** Когда задача существует, возвращается информация о ней */
     "return the existing task info for a given UUID" in {
       val id = UUID.fromString("6f9ed143-70f4-4406-9c6b-2d9ddd297304")
       val taskInfo = TaskInfo(id, 35, TaskStatus.InProgress)
-      (service.taskInfo(_: UUID)(_: ExecutionContext))
-        .expects(id, *)
-        .returning(
-          Future.successful(Some(taskInfo))
-        )
+
+      mockExpects(id).returning(
+        Future.successful(Some(taskInfo))
+      )
+
       Get(s"$baseUrl/$id") ~> route ~> check {
         responseAs[ApiTaskInfo] shouldEqual ApiTaskInfo(id, 35, "InProgress")
       }
@@ -47,11 +53,11 @@ class RestApiTests
     /** При запросе информации о несуществующей задаче возвращается 404 Not Found */
     "return 404 when there is no task with the provided id" in {
       val id = UUID.fromString("352bb20e-b593-4934-a60f-9374da5a1f5a")
-      (service.taskInfo(_: UUID)(_: ExecutionContext))
-        .expects(id, *)
-        .returning(
-          Future.successful(None)
-        )
+
+      mockExpects(id).returning(
+        Future.successful(None)
+      )
+
       Get(s"$baseUrl/$id") ~> route ~> check {
         status shouldEqual StatusCodes.NotFound
       }
@@ -64,14 +70,14 @@ class RestApiTests
       }
     }
 
-    /** При ошибке при запросе информации о задаче возвращается 500 Internal Server Error */
-    "return 500 Internal Server Error when encountering an error" in {
+    /** При ошибке в сервисе возвращается 500 Internal Server Error */
+    "return 500 Internal Server Error when encountering a service error" in {
       val id = UUID.fromString("f01c667d-7bc6-481e-a0e9-de1ced7a2f0d")
-      (service.taskInfo(_: UUID)(_: ExecutionContext))
-        .expects(id, *)
-        .returning(
-          Future.failed(new RuntimeException)
-        )
+
+      mockExpects(id).returning(
+        Future.failed(new RuntimeException)
+      )
+
       Get(s"$baseUrl/$id") ~> route ~> check {
         status shouldEqual StatusCodes.InternalServerError
       }
