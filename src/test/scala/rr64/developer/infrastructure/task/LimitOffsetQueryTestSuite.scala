@@ -35,14 +35,17 @@ class LimitOffsetQueryTestSuite
 
     /** Должна иметь limit по умолчанию больше, чем 0 */
     "have a default limit greater than zero" in {
-      assertIllegal(defaultLimit = 0, maxLimit = 30)
       assertIllegal(defaultLimit = -1, maxLimit = 30)
+      assertIllegal(defaultLimit = 0, maxLimit = 30)
+      assertLegal(defaultLimit = 1, maxLimit = 30)
     }
 
     /** Должна иметь максимальный limit больше, чем 0 */
     "have a max limit greater than zero" in {
-      assertIllegal(defaultLimit = 10, maxLimit = 0)
-      assertIllegal(defaultLimit = 10, maxLimit = -1)
+      assertIllegal(defaultLimit = 1, maxLimit = -1)
+      assertIllegal(defaultLimit = 1, maxLimit = 0)
+      assertLegal(defaultLimit = 1, maxLimit = 1)
+      assertLegal(defaultLimit = 1, maxLimit = 10)
     }
 
     /** Должна limit по умолчанию меньше или равный, чем максимальный */
