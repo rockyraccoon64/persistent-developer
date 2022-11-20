@@ -13,20 +13,20 @@ class LimitOffsetQueryTestSuite
 
     def assertException(defaultLimit: Int, maxLimit: Int): Assertion = {
       assertThrows[IllegalArgumentException] {
-        new QueryFactory(defaultLimit = defaultLimit, maxLimit = maxLimit)
+        new LimitOffsetQueryFactory(defaultLimit = defaultLimit, maxLimit = maxLimit)
       }
     }
 
     def assertNoException(defaultLimit: Int, maxLimit: Int): Assertion =
       noException should be thrownBy {
-        new QueryFactory(defaultLimit = defaultLimit, maxLimit = maxLimit)
+        new LimitOffsetQueryFactory(defaultLimit = defaultLimit, maxLimit = maxLimit)
       }
 
   }
 
   trait LimitOffsetTest {
 
-    private val factory = new QueryFactory(defaultLimit = 10, maxLimit = 30)
+    private val factory = new LimitOffsetQueryFactory(defaultLimit = 10, maxLimit = 30)
 
     def assertException(limit: Int = 10, offset: Int = 0): Assertion =
       assertThrows[LimitOffsetException] {
