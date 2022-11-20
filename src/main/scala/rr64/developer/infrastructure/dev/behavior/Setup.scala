@@ -10,3 +10,7 @@ private[behavior] case class Setup(
   restFactor: Int,
   timer: TimerScheduler[Command]
 )
+
+object Setup {
+  class FactorException extends RuntimeException
+}

@@ -2,6 +2,7 @@ package rr64.developer.infrastructure.dev.behavior
 
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
+import rr64.developer.infrastructure.dev.behavior.Setup.FactorException
 
 class SetupTestSuite extends AnyWordSpec with Matchers {
 
