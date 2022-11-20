@@ -121,17 +121,6 @@ class TaskSlickRepositoryTestSuite
     } yield taskOpt shouldEqual None
   }
 
-  /** Репозиторий должен возвращать список всех задач */
-  "The repository" should "list all tasks" in {
-    val tasks = Seq(queuedTask, finishedTask, taskInProgress)
-    for {
-      _ <- Future.traverse(tasks)(repository.save)
-      list <- repository.list(LimitOffsetQuery.Default)
-    } yield {
-      list should contain theSameElementsAs tasks
-    }
-  }
-
   /** Репозиторий должен ограничить количество возвращаемых задач переданным в limit числом */
   "The repository" should "limit the number of returned tasks" in {
     val tasks = Seq(queuedTask, finishedTask, taskInProgress)
