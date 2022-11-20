@@ -1,7 +1,7 @@
 package rr64.developer.infrastructure.dev.behavior
 
 import akka.actor.typed.scaladsl.TimerScheduler
-import rr64.developer.domain.{Difficulty, Factor, TaskTiming}
+import rr64.developer.domain.{Difficulty, Factor, Timing}
 import rr64.developer.infrastructure.task.TaskWithId
 
 /**
@@ -37,7 +37,7 @@ object Timers {
     difficulty: Difficulty,
     factor: Factor
   ): Unit = {
-    val delay = TaskTiming.calculateTime(difficulty, factor)
+    val delay = Timing.calculateTime(difficulty, factor)
     timer.startSingleTimer(message, delay)
   }
 
