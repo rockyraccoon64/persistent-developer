@@ -150,4 +150,21 @@ class TaskSlickRepositoryTestSuite
     }
   }
 
+  /** Если задач меньше, чем limit, возвращаются все задачи */
+  "The repository" should "return all tasks if the limit exceeds their amount" in {
+    val tasks = Seq(queuedTask, finishedTask, taskInProgress)
+    val query = LimitOffsetQuery(
+      limit = 4,
+      offset = 0
+    )
+    for {
+      _ <- tasks.foldLeft[Future[Any]](Future.unit) { (acc, task) =>
+        acc.flatMap(_ => repository.save(task))
+      }
+      list <- repository.list(query)
+    } yield {
+      list should contain theSameElementsInOrderAs tasks
+    }
+  }
+
 }
