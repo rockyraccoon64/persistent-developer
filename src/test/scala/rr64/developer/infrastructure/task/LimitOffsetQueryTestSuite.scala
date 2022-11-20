@@ -33,7 +33,7 @@ class LimitOffsetQueryTestSuite
     }
 
     /** Должна иметь максимальный limit больше, чем 0 */
-    "have a default limit greater than zero" in {
+    "have a max limit greater than zero" in {
       assertThrows[IllegalArgumentException] {
         new QueryFactory(defaultLimit = 10, maxLimit = 0)
       }
