@@ -11,7 +11,7 @@ object LimitOffsetQuery {
   class LimitOffsetException extends RuntimeException
 }
 
-class QueryFactory(defaultLimit: Int) { // TODO app.conf
+class QueryFactory(defaultLimit: Int, maxLimit: Int) { // TODO app.conf
 
   val Default: LimitOffsetQuery = create()
 

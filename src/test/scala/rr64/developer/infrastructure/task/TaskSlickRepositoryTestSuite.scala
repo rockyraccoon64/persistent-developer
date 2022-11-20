@@ -123,7 +123,7 @@ class TaskSlickRepositoryTestSuite
     } yield taskOpt shouldEqual None
   }
 
-  private val queryFactory = new QueryFactory(defaultLimit = 20)
+  private val queryFactory = new QueryFactory(defaultLimit = 20, maxLimit = 100)
 
   def listTest(
     limit: Int,
