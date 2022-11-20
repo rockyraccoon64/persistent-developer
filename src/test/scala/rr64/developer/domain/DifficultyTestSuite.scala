@@ -6,9 +6,9 @@ import org.scalatest.wordspec.AnyWordSpec
 import rr64.developer.domain.Difficulty.TaskDifficultyException
 
 /**
- * Тесты создания задач
+ * Тесты сложности задач
  */
-class TaskTestSuite extends AnyWordSpec with Matchers {
+class DifficultyTestSuite extends AnyWordSpec with Matchers {
 
   "Tasks" should {
 
