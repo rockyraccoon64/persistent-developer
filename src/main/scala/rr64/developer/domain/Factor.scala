@@ -1,4 +1,4 @@
-package rr64.developer.infrastructure.dev.behavior
+package rr64.developer.domain
 
 case class Factor private(value: Int)
 

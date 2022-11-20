@@ -7,7 +7,7 @@ import akka.persistence.typed.PersistenceId
 import org.scalatest.BeforeAndAfterEach
 import org.scalatest.Inside.inside
 import org.scalatest.flatspec.AnyFlatSpecLike
-import rr64.developer.domain.Task
+import rr64.developer.domain.{Factor, Task}
 import rr64.developer.infrastructure.TaskTestUtils.TaskWithIdFactory
 import rr64.developer.infrastructure.task.TaskWithId
 

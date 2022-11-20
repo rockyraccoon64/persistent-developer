@@ -3,7 +3,8 @@ package rr64.developer.infrastructure.dev.behavior
 import org.scalatest.Assertion
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
-import rr64.developer.infrastructure.dev.behavior.Factor.FactorException
+import rr64.developer.domain.Factor
+import rr64.developer.domain.Factor.FactorException
 
 class FactorTestSuite extends AnyWordSpec with Matchers {
 

@@ -1,6 +1,7 @@
 package rr64.developer.infrastructure.dev.behavior
 
 import akka.actor.typed.scaladsl.TimerScheduler
+import rr64.developer.domain.Factor
 import rr64.developer.infrastructure.task.TaskWithId
 
 import scala.concurrent.duration.{DurationInt, FiniteDuration}
