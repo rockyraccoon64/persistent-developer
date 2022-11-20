@@ -37,6 +37,8 @@ class TaskSlickRepositoryTestSuite
     status = TaskStatus.InProgress
   )
 
+  private val taskList = Seq(queuedTask, finishedTask, taskInProgress)
+
   override protected def beforeEach(): Unit = {
     super.beforeEach()
     Await.result(
@@ -121,16 +123,9 @@ class TaskSlickRepositoryTestSuite
     } yield taskOpt shouldEqual None
   }
 
-  /** Репозиторий должен ограничить количество возвращаемых задач переданным в limit числом */
-  "The repository" should "limit the number of returned tasks" in {
-    val tasks = Seq(queuedTask, finishedTask, taskInProgress)
-    val expected = tasks.take(2)
-    val query = LimitOffsetQuery(
-      limit = 2,
-      offset = 0
-    )
+  def listTest(query: LimitOffsetQuery, expected: Seq[TaskInfo]): Future[Assertion] = {
     for {
-      _ <- tasks.foldLeft[Future[Any]](Future.unit) { (acc, task) =>
+      _ <- taskList.foldLeft[Future[Any]](Future.unit) { (acc, task) =>
         acc.flatMap(_ => repository.save(task))
       }
       list <- repository.list(query)
@@ -139,21 +134,16 @@ class TaskSlickRepositoryTestSuite
     }
   }
 
+  /** Репозиторий должен ограничить количество возвращаемых задач переданным в limit числом */
+  "The repository" should "limit the number of returned tasks" in listTest(
+    query = LimitOffsetQuery(limit = 2, offset = 0),
+    expected = taskList.take(2)
+  )
+
   /** Если задач меньше, чем limit, возвращаются все задачи */
-  "The repository" should "return all tasks if the limit exceeds their amount" in {
-    val tasks = Seq(queuedTask, finishedTask, taskInProgress)
-    val query = LimitOffsetQuery(
-      limit = 4,
-      offset = 0
-    )
-    for {
-      _ <- tasks.foldLeft[Future[Any]](Future.unit) { (acc, task) =>
-        acc.flatMap(_ => repository.save(task))
-      }
-      list <- repository.list(query)
-    } yield {
-      list should contain theSameElementsInOrderAs tasks
-    }
-  }
+  "The repository" should "return all tasks if the limit exceeds their amount" in listTest(
+    query = LimitOffsetQuery(limit = 4, offset = 0),
+    expected = taskList
+  )
 
 }
