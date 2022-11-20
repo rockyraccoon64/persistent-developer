@@ -164,6 +164,15 @@ class TaskSlickRepositoryTestSuite
     expected = taskList.tail
   )
 
+  /** Репозиторий должен учитывать как limit, так и offset */
+  "The repository" should "return tasks starting with the given offset and limit their amount" in
+    listTest(
+      limit = 1,
+      offset = 1,
+      initial = taskList,
+      expected = taskList.slice(1, 2)
+    )
+
   /** Если задач нет, возвращается пустой список */
   "The repository" should "return an empty list when there are no tasks" in listTest(
     limit = 10,
