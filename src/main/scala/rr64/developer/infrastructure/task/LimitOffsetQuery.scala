@@ -13,7 +13,7 @@ object LimitOffsetQuery {
     limit: Int = defaultLimit,
     offset: Int = defaultOffset
   ): LimitOffsetQuery =
-    if (limit > 0)
+    if (limit > 0 && offset >= 0)
       new LimitOffsetQuery(limit, offset)
     else
       throw new LimitOffsetException
