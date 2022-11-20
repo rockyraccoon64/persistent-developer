@@ -40,8 +40,21 @@ class LimitOffsetQueryTestSuite
       assertThrows[IllegalArgumentException] {
         new QueryFactory(defaultLimit = 10, maxLimit = -1)
       }
-
     }
+
+    /** Должна limit по умолчанию меньше или равный, чем максимальный */
+    "have a default limit less than or equal to the max limit" in {
+      assertThrows[IllegalArgumentException] {
+        new QueryFactory(defaultLimit = 10, maxLimit = 9)
+      }
+      noException should be thrownBy {
+        new QueryFactory(defaultLimit = 9, maxLimit = 9)
+      }
+      noException should be thrownBy {
+        new QueryFactory(defaultLimit = 5, maxLimit = 10)
+      }
+    }
+
   }
 
   /** Количество запрашиваемых элементов */
