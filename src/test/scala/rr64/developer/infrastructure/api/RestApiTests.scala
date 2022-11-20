@@ -260,7 +260,7 @@ class RestApiTests
 
     def mockService = (service.tasks(_: Any)(_: ExecutionContext)).expects(*, *)
 
-    /** Возвращать список всех имеющихся задач */
+    /** Возвращать список задач */
     "return the task list" in {
       val domainTasks = TaskInfo(UUID.randomUUID(), Difficulty(99), TaskStatus.Finished) ::
         TaskInfo(UUID.randomUUID(), Difficulty(51), TaskStatus.InProgress) ::
