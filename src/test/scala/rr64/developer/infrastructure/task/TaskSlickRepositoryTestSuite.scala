@@ -173,6 +173,15 @@ class TaskSlickRepositoryTestSuite
       expected = taskList.slice(1, 2)
     )
 
+  /** Если offset выходит за пределы количества имеющихся задач, возвращается пустой список */
+  "The repository" should "return an empty list when the offset exceeds the amount of tasks" in
+    listTest(
+      limit = 5,
+      offset = 3,
+      initial = taskList,
+      expected = Nil
+    )
+
   /** Если задач нет, возвращается пустой список */
   "The repository" should "return an empty list when there are no tasks" in listTest(
     limit = 10,
