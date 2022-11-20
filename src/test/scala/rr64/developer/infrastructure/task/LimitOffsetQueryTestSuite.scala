@@ -8,7 +8,7 @@ class LimitOffsetQueryTestSuite
   extends AnyWordSpec
     with Matchers {
 
-  /** Количество возвращаемых элементов */
+  /** Количество запрашиваемых элементов */
   "The limit" should {
 
     /** Не должно быть меньше одного */
