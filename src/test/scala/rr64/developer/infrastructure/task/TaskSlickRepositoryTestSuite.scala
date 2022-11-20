@@ -148,4 +148,11 @@ class TaskSlickRepositoryTestSuite
     expected = taskList
   )
 
+  /** Если задач нет, возвращается пустой список */
+  "The repository" should "return an empty list when there are no tasks" in listTest(
+    query = LimitOffsetQuery(limit = 10, offset = 0),
+    initial = Nil,
+    expected = Nil
+  )
+
 }
