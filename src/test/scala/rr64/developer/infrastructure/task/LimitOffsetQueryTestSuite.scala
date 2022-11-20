@@ -43,6 +43,13 @@ class LimitOffsetQueryTestSuite
       assertException(offset = -5)
     }
 
+    /** Может быть больше или равен нулю */
+    "be allowed to be greater than or equal to zero" in {
+      assertNoException(offset = 0)
+      assertNoException(offset = 1)
+      assertNoException(offset = 99)
+    }
+
   }
 
 }
