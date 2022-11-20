@@ -277,6 +277,8 @@ class RestApiTests
       }
     }
 
+    // TODO Параметр query
+
     /** Возвращать пустой массив, если задач нет */
     "return an empty list when there are no tasks" in {
       mockService.returning(Future.successful(Nil))
