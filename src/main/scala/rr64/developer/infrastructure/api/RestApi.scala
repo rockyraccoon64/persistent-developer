@@ -3,7 +3,8 @@ package rr64.developer.infrastructure.api
 import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport._
 import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.server.Directives._
-import akka.http.scaladsl.server.Route
+import akka.http.scaladsl.server.{ExceptionHandler, Route}
+import rr64.developer.domain.Task.TaskDifficultyException
 import rr64.developer.domain._
 import rr64.developer.infrastructure.api.ApiDeveloperState._
 import spray.json.DefaultJsonProtocol._
@@ -49,6 +50,15 @@ class RestApi(service: DeveloperService) {
       onSuccess(service.tasks) { taskList =>
         complete(taskList.map(taskInfoAdapter.convert))
       }
+    }
+
+  private implicit def exceptionHandler: ExceptionHandler =
+    ExceptionHandler {
+      case _: TaskDifficultyException =>
+        extractUri { _ =>
+          val error = ApiError("Tasks should have difficulty [1-100]")
+          complete(StatusCodes.BadRequest, error)
+        }
     }
 
   val route: Route = Route.seal(
