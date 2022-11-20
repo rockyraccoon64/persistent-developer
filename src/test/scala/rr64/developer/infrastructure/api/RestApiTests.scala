@@ -35,14 +35,14 @@ class RestApiTests
       (service.taskInfo(_: UUID)(_: ExecutionContext))
         .expects(id, *)
 
-    def checkTask(id: UUID, difficulty: Int, status: TaskStatus, apiStatus: String) = {
+    def checkTask(id: UUID, difficulty: Difficulty, status: TaskStatus, apiStatus: String) = {
       val taskInfo = TaskInfo(id, difficulty, status)
 
       val taskInfoFound = Future.successful(Some(taskInfo))
       mockExpects(id).returning(taskInfoFound)
 
       Get(s"$baseUrl/$id") ~> route ~> check {
-        responseAs[ApiTaskInfo] shouldEqual ApiTaskInfo(id, difficulty, apiStatus)
+        responseAs[ApiTaskInfo] shouldEqual ApiTaskInfo(id, difficulty.value, apiStatus)
         response.status shouldEqual StatusCodes.OK
       }
     }
@@ -51,19 +51,19 @@ class RestApiTests
     "return the existing task info for a given id" in {
       checkTask(
         id = UUID.fromString("6f9ed143-70f4-4406-9c6b-2d9ddd297304"),
-        difficulty = 35,
+        difficulty = Difficulty(35),
         status = TaskStatus.InProgress,
         apiStatus = "InProgress"
       )
       checkTask(
         id = UUID.fromString("5f4e32f8-fc81-49c4-a05c-efbf5aa0d47d"),
-        difficulty = 99,
+        difficulty = Difficulty(99),
         status = TaskStatus.Queued,
         apiStatus = "Queued"
       )
       checkTask(
         id = UUID.fromString("374b7d13-8174-4476-b1d6-1d8759d2a6ed"),
-        difficulty = 1,
+        difficulty = Difficulty(1),
         status = TaskStatus.Finished,
         apiStatus = "Finished"
       )
@@ -262,9 +262,9 @@ class RestApiTests
 
     /** Возвращать список всех имеющихся задач */
     "return the task list" in {
-      val domainTasks = TaskInfo(UUID.randomUUID(), 99, TaskStatus.Finished) ::
-        TaskInfo(UUID.randomUUID(), 51, TaskStatus.InProgress) ::
-        TaskInfo(UUID.randomUUID(), 65, TaskStatus.Queued) ::
+      val domainTasks = TaskInfo(UUID.randomUUID(), Difficulty(99), TaskStatus.Finished) ::
+        TaskInfo(UUID.randomUUID(), Difficulty(51), TaskStatus.InProgress) ::
+        TaskInfo(UUID.randomUUID(), Difficulty(65), TaskStatus.Queued) ::
         Nil
 
       val apiTasks = domainTasks.map(ApiTaskInfo.adapter.convert)

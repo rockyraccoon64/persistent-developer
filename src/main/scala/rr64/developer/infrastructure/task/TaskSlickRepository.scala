@@ -1,5 +1,5 @@
 package rr64.developer.infrastructure.task
-import rr64.developer.domain.{TaskInfo, TaskStatus}
+import rr64.developer.domain.{Difficulty, TaskInfo, TaskStatus}
 import rr64.developer.infrastructure.task.TaskSlickRepository.TaskStatusAdapter
 import slick.jdbc.PostgresProfile.api._
 
@@ -11,7 +11,7 @@ class TaskSlickRepository(db: Database) extends TaskRepository {
   override def save(taskInfo: TaskInfo): Future[_] = db.run {
     val status = TaskStatusAdapter.toStringValue(taskInfo.status)
     sqlu"""INSERT INTO task(id, difficulty, status)
-          VALUES (${taskInfo.id.toString}::uuid, ${taskInfo.difficulty}, $status)
+          VALUES (${taskInfo.id.toString}::uuid, ${taskInfo.difficulty.value}, $status)
           ON CONFLICT (id)
           DO UPDATE SET status = $status
         """
@@ -25,7 +25,7 @@ class TaskSlickRepository(db: Database) extends TaskRepository {
         .headOption
         .map(_.map { case (difficulty, statusStr) =>
           val status = TaskStatusAdapter.fromString(statusStr)
-          TaskInfo(id, difficulty, status)
+          TaskInfo(id, Difficulty(difficulty), status)
         })
     }
   }
@@ -37,7 +37,7 @@ class TaskSlickRepository(db: Database) extends TaskRepository {
         .map(_.map { case (idStr, difficulty, statusStr) =>
           val id = UUID.fromString(idStr)
           val status = TaskStatusAdapter.fromString(statusStr)
-          TaskInfo(id, difficulty, status)
+          TaskInfo(id, Difficulty(difficulty), status)
         })
     }
   }
