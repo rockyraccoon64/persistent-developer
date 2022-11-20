@@ -7,7 +7,7 @@ import akka.persistence.typed.PersistenceId
 import org.scalatest.BeforeAndAfterEach
 import org.scalatest.Inside.inside
 import org.scalatest.flatspec.AnyFlatSpecLike
-import rr64.developer.domain.{Factor, Task}
+import rr64.developer.domain.{Difficulty, Factor, Task}
 import rr64.developer.infrastructure.TaskTestUtils.TaskWithIdFactory
 import rr64.developer.infrastructure.task.TaskWithId
 
@@ -51,10 +51,10 @@ class DeveloperBehaviorTestSuite
     TaskWithId(task, id)
   }
 
-  private def calculateWorkTime(difficulty: Int): FiniteDuration =
+  private def calculateWorkTime(difficulty: Difficulty): FiniteDuration =
     Timing.calculateTime(difficulty, workFactor)
 
-  private def calculateRestTime(difficulty: Int): FiniteDuration =
+  private def calculateRestTime(difficulty: Difficulty): FiniteDuration =
     Timing.calculateTime(difficulty, restFactor)
 
   override protected def beforeEach(): Unit = {
