@@ -22,6 +22,18 @@ class LimitOffsetQueryTestSuite
       assertException(limit = 0)
       assertException(limit = -1)
     }
+
+  }
+
+  /** Номер первого запрашиваемого элемента */
+  "The offset" should {
+
+    /** Не должен быть меньше нуля */
+    "not be allowed to be less than zero" in {
+      assertException(offset = -1)
+      assertException(offset = -5)
+    }
+
   }
 
 }
