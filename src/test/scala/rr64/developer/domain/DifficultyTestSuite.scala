@@ -3,7 +3,7 @@ package rr64.developer.domain
 import org.scalatest.Assertion
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
-import rr64.developer.domain.Difficulty.TaskDifficultyException
+import rr64.developer.domain.Difficulty.DifficultyException
 
 /**
  * Тесты сложности задач
@@ -13,7 +13,7 @@ class DifficultyTestSuite extends AnyWordSpec with Matchers {
   "Tasks" should {
 
     def assertException(difficulty: Int): Assertion =
-      assertThrows[TaskDifficultyException](Task(difficulty))
+      assertThrows[DifficultyException](Task(difficulty))
 
     def assertNoException(difficulty: Int): Assertion =
       noException should be thrownBy Task(difficulty)

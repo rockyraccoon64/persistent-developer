@@ -10,5 +10,5 @@ object ApiError {
     jsonFormat2(ApiError.apply)
 
   val TaskDifficulty: ApiError =
-    ApiError("TaskDifficulty", "Tasks should have difficulty [1-100]")
+    ApiError("DifficultyRange", "Difficulty should be in the range [1-100]")
 }

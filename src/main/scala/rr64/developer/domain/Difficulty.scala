@@ -8,10 +8,10 @@ object Difficulty {
     if (value > 0 && value <= 100)
       new Difficulty(value)
     else
-      throw new TaskDifficultyException
+      throw new DifficultyException
   }
 
-  class TaskDifficultyException
-    extends RuntimeException("Tasks should have difficulty [1-100]")
+  class DifficultyException
+    extends RuntimeException("Difficulty should be in the range [1-100]")
 
 }
