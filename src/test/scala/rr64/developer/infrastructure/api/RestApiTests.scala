@@ -284,10 +284,8 @@ class RestApiTests
 
     /** Передавать содержимое запроса сервису */
     "extract the query" in {
-      val query = "505"
-      val expected = 505
-      mockService(expected)
-      sendRequest(Some(query)) ~> route
+      mockService(query = 505)
+      sendRequest(query = Some("505")) ~> route
     }
 
     /** Возвращать пустой массив, если задач нет */
