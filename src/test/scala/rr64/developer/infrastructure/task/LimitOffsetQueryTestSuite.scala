@@ -11,13 +11,13 @@ class LimitOffsetQueryTestSuite
 
   trait FactoryTest {
 
-    def assertIllegal(defaultLimit: Int, maxLimit: Int): Assertion = {
+    def assertException(defaultLimit: Int, maxLimit: Int): Assertion = {
       assertThrows[IllegalArgumentException] {
         new QueryFactory(defaultLimit = defaultLimit, maxLimit = maxLimit)
       }
     }
 
-    def assertLegal(defaultLimit: Int, maxLimit: Int): Assertion =
+    def assertNoException(defaultLimit: Int, maxLimit: Int): Assertion =
       noException should be thrownBy {
         new QueryFactory(defaultLimit = defaultLimit, maxLimit = maxLimit)
       }
@@ -43,24 +43,24 @@ class LimitOffsetQueryTestSuite
 
     /** Должна иметь limit по умолчанию больше, чем 0 */
     "have a default limit greater than zero" in new FactoryTest {
-      assertIllegal(defaultLimit = -1, maxLimit = 30)
-      assertIllegal(defaultLimit = 0, maxLimit = 30)
-      assertLegal(defaultLimit = 1, maxLimit = 30)
+      assertException(defaultLimit = -1, maxLimit = 30)
+      assertException(defaultLimit = 0, maxLimit = 30)
+      assertNoException(defaultLimit = 1, maxLimit = 30)
     }
 
     /** Должна иметь максимальный limit больше, чем 0 */
     "have a max limit greater than zero" in new FactoryTest {
-      assertIllegal(defaultLimit = 1, maxLimit = -1)
-      assertIllegal(defaultLimit = 1, maxLimit = 0)
-      assertLegal(defaultLimit = 1, maxLimit = 1)
-      assertLegal(defaultLimit = 1, maxLimit = 10)
+      assertException(defaultLimit = 1, maxLimit = -1)
+      assertException(defaultLimit = 1, maxLimit = 0)
+      assertNoException(defaultLimit = 1, maxLimit = 1)
+      assertNoException(defaultLimit = 1, maxLimit = 10)
     }
 
     /** Должна limit по умолчанию меньше или равный, чем максимальный */
     "have a default limit less than or equal to the max limit" in new FactoryTest {
-      assertLegal(defaultLimit = 5, maxLimit = 10)
-      assertLegal(defaultLimit = 10, maxLimit = 10)
-      assertIllegal(defaultLimit = 11, maxLimit = 10)
+      assertNoException(defaultLimit = 5, maxLimit = 10)
+      assertNoException(defaultLimit = 10, maxLimit = 10)
+      assertException(defaultLimit = 11, maxLimit = 10)
     }
 
   }
