@@ -11,17 +11,3 @@ private[behavior] case class Setup(
   restFactor: Factor,
   timer: TimerScheduler[Command]
 )
-
-object Setup {
-
-  def apply(
-    workFactor: Int,
-    restFactor: Int,
-    timer: TimerScheduler[Command]
-  ): Setup = Setup(
-    workFactor = Factor(workFactor),
-    restFactor = Factor(restFactor),
-    timer = timer
-  )
-
-}
