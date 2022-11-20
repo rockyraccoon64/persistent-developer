@@ -35,6 +35,7 @@ class TaskSlickRepository(db: Database) extends TaskRepository[LimitOffsetQuery]
       sql"""SELECT uuid, difficulty, status
            FROM task
            ORDER BY serial_id
+           OFFSET ${query.offset}
            LIMIT ${query.limit}"""
         .as[(String, Int, String)]
         .map(_.map { case (idStr, difficulty, statusStr) =>
