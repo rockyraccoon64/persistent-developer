@@ -131,4 +131,20 @@ class TaskSlickRepositoryTestSuite
     }
   }
 
+  /** Репозиторий должен ограничить количество возвращаемых задач переданным в limit числом */
+  "The repository" should "limit the number of returned tasks" in {
+    val tasks = Seq(queuedTask, finishedTask, taskInProgress)
+    val expected = Seq(queuedTask, finishedTask)
+    val query = LimitOffsetQuery(
+      limit = 2,
+      offset = 0
+    )
+    for {
+      _ <- Future.traverse(tasks)(repository.save)
+      list <- repository.list(query)
+    } yield {
+      list should contain theSameElementsInOrderAs expected
+    }
+  }
+
 }
