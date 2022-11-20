@@ -12,7 +12,7 @@ import spray.json.DefaultJsonProtocol._
 /**
  * REST API сервиса разработки
  */
-class RestApi(service: DeveloperService) {
+class RestApi[Query](service: DeveloperService[Query], extractQuery: Option[String] => Query) {
 
   private val developerStateAdapter = implicitly[Adapter[DeveloperState, ApiDeveloperState]]
   private val taskInfoAdapter = implicitly[Adapter[TaskInfo, ApiTaskInfo]]
@@ -46,9 +46,12 @@ class RestApi(service: DeveloperService) {
     }
 
   private val taskListRoute =
-    (path("task-list") & extractExecutionContext) { implicit exec =>
-      onSuccess(service.tasks) { taskList =>
-        complete(taskList.map(taskInfoAdapter.convert))
+    (path("task-list") & parameter("query".as[String].optional)) { query =>
+      extractExecutionContext { implicit exec =>
+        val parsedQuery = extractQuery(query)
+        onSuccess(service.tasks(parsedQuery)) { taskList =>
+          complete(taskList.map(taskInfoAdapter.convert))
+        }
       }
     }
 

@@ -23,8 +23,8 @@ class RestApiTests
     with ScalatestRouteTest
     with MockFactory {
 
-  private val service = mock[DeveloperService]
-  private val route = new RestApi(service).route
+  private val service = mock[DeveloperService[Any]]
+  private val route = new RestApi[Any](service, identity).route
 
   /** Запрос информации о задаче */
   "The service processing a single task info request" should {
@@ -258,7 +258,7 @@ class RestApiTests
 
     val SendRequest = Get("/api/query/task-list")
 
-    def mockService = (service.tasks(_: ExecutionContext)).expects(*)
+    def mockService = (service.tasks(_: Any)(_: ExecutionContext)).expects(*, *)
 
     /** Возвращать список всех имеющихся задач */
     "return the task list" in {

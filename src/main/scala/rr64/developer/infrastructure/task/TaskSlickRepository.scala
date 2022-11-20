@@ -6,7 +6,7 @@ import slick.jdbc.PostgresProfile.api._
 import java.util.UUID
 import scala.concurrent.{ExecutionContext, Future}
 
-class TaskSlickRepository(db: Database) extends TaskRepository {
+class TaskSlickRepository(db: Database) extends TaskRepository[LimitOffsetQuery] {
 
   override def save(taskInfo: TaskInfo): Future[_] = db.run {
     val status = TaskStatusAdapter.toStringValue(taskInfo.status)
@@ -30,7 +30,7 @@ class TaskSlickRepository(db: Database) extends TaskRepository {
     }
   }
 
-  override def list(implicit ec: ExecutionContext): Future[Seq[TaskInfo]] = {
+  override def list(query: LimitOffsetQuery )(implicit ec: ExecutionContext): Future[Seq[TaskInfo]] = {
     db.run {
       sql"""SELECT id, difficulty, status FROM task"""
         .as[(String, Int, String)]

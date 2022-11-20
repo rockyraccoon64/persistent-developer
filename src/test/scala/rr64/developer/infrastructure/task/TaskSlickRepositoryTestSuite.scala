@@ -125,7 +125,7 @@ class TaskSlickRepositoryTestSuite
     val tasks = Seq(queuedTask, finishedTask, taskInProgress)
     for {
       _ <- Future.traverse(tasks)(repository.save)
-      list <- repository.list
+      list <- repository.list(LimitOffsetQuery.Default)
     } yield {
       list should contain theSameElementsAs tasks
     }

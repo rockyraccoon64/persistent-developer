@@ -24,7 +24,7 @@ class TasksFromRepositoryTestSuite
   /** Запрос информации о задаче должен делегироваться репозиторию */
   "Single task queries" should "be redirected to the repository" in {
     val task = task1
-    val mockRepository = mock[TaskRepository]
+    val mockRepository = mock[TaskRepository[Any]]
     (mockRepository.findById(_: UUID)(_: ExecutionContext))
       .expects(task.id, *)
       .once()
@@ -38,15 +38,15 @@ class TasksFromRepositoryTestSuite
   /** Запрос списка задач должен делегироваться репозиторию */
   "Task list queries" should "be delegated to the repository" in {
     val taskSeq = Seq(task1, task2)
-    val mockRepository = mock[TaskRepository]
-    (mockRepository.list(_: ExecutionContext))
-      .expects(*)
+    val mockRepository = mock[TaskRepository[Any]]
+    (mockRepository.list(_: Any)(_: ExecutionContext))
+      .expects(*, *)
       .once()
       .returning {
         Future.successful(taskSeq)
       }
     val tasks = new TasksFromRepository(mockRepository)
-    tasks.list.map(_ should contain theSameElementsInOrderAs taskSeq)
+    tasks.list().map(_ should contain theSameElementsInOrderAs taskSeq)
   }
 
 }
