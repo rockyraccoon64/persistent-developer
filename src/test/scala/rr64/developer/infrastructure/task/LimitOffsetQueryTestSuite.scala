@@ -33,6 +33,11 @@ class LimitOffsetQueryTestSuite
       assertException(limit = 31)
     }
 
+    /** Может быть максимальным */
+    "be allowed to be equal to the max limit" in {
+      assertNoException(limit = 30)
+    }
+
     /** Может быть больше нуля */
     "be allowed to be greater than zero" in {
       assertNoException(limit = 1)
