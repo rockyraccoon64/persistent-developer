@@ -56,8 +56,7 @@ class RestApi(service: DeveloperService) {
     ExceptionHandler {
       case _: TaskDifficultyException =>
         extractUri { _ =>
-          val error = ApiError("Tasks should have difficulty [1-100]")
-          complete(StatusCodes.BadRequest, error)
+          complete(StatusCodes.BadRequest, ApiError.TaskDifficulty)
         }
     }
 
