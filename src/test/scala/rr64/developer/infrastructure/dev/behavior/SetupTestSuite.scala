@@ -9,14 +9,14 @@ import rr64.developer.infrastructure.dev.behavior.Setup.FactorException
 
 class SetupTestSuite extends AnyWordSpec with Matchers with MockFactory {
 
-  private def setupFromWorkFactor(workFactor: Int) = Setup(
-    workFactor = workFactor,
-    restFactor = 10,
-    timer = mock[TimerScheduler[Command]]
-  )
-
   /** Рабочий множитель */
   "The work factor" should {
+
+    def setupFromWorkFactor(workFactor: Int) = Setup(
+      workFactor = workFactor,
+      restFactor = 10,
+      timer = mock[TimerScheduler[Command]]
+    )
 
     def assertFactorException(workFactor: Int): Assertion =
       assertThrows[FactorException] {
