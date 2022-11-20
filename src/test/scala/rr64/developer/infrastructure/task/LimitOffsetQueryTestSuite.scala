@@ -2,6 +2,7 @@ package rr64.developer.infrastructure.task
 
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
+import rr64.developer.infrastructure.task.LimitOffsetQuery.LimitOffsetException
 
 class LimitOffsetQueryTestSuite
   extends AnyWordSpec
