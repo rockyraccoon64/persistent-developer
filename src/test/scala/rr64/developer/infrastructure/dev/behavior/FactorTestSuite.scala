@@ -1,72 +1,41 @@
 package rr64.developer.infrastructure.dev.behavior
 
-import akka.actor.typed.scaladsl.TimerScheduler
-import org.scalamock.scalatest.MockFactory
 import org.scalatest.Assertion
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import rr64.developer.infrastructure.dev.behavior.Factor.FactorException
 
-class FactorTestSuite extends AnyWordSpec with Matchers with MockFactory {
+class FactorTestSuite extends AnyWordSpec with Matchers {
 
-  /** Рабочий множитель */
-  "The work factor" should {
+  /** Множители */
+  "Factors" should {
 
-    def setupFromWorkFactor(workFactor: Int) = Setup(
-      workFactor = workFactor,
-      restFactor = 10,
-      timer = mock[TimerScheduler[Command]]
-    )
-
-    def assertFactorException(workFactor: Int): Assertion =
+    def assertFactorException(factor: Int): Assertion =
       assertThrows[FactorException] {
-        setupFromWorkFactor(workFactor)
+        Factor(factor)
       }
 
-    def assertNoException(workFactor: Int): Assertion =
-      noException should be thrownBy setupFromWorkFactor(workFactor)
+    def assertNoException(factor: Int): Assertion =
+      noException should be thrownBy Factor(factor)
 
-    /** Не должен быть меньше единицы */
+    /** Не должны быть меньше единицы */
     "not be allowed to be less than 1" in {
       assertFactorException(0)
       assertFactorException(-1)
       assertFactorException(-15)
     }
 
-    /** Не должен быть больше 1000 */
+    /** Не должны быть больше 1000 */
     "not be allowed to be greater than 1000" in {
       assertFactorException(1001)
       assertFactorException(987654)
     }
 
-    /** Должен быть в пределах 1-1000 */
+    /** Должны быть в пределах 1-1000 */
     "be allowed to be between 1 and 1000" in {
       assertNoException(1)
       assertNoException(445)
       assertNoException(1000)
-    }
-
-  }
-
-  /** Множитель отдыха */
-  "The rest factor" should {
-
-    def setupFromRestFactor(restFactor: Int) = Setup(
-      workFactor = 55,
-      restFactor = restFactor,
-      timer = mock[TimerScheduler[Command]]
-    )
-
-    def assertFactorException(restFactor: Int): Assertion =
-      assertThrows[FactorException] {
-        setupFromRestFactor(restFactor)
-      }
-
-    /** Не должен быть меньше единицы */
-    "not be allowed to be less than 1" in {
-      assertFactorException(0)
-      assertFactorException(-1)
-      assertFactorException(-15)
     }
 
   }
