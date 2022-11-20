@@ -207,6 +207,17 @@ class RestApiTests
       }
     }
 
+    /** Если у задачи сложность больше 100, возвращается 400 Bad Request и сообщение об ошибке */
+    "return 400 Bad Request when the task has difficulty greater than 100" in {
+      val postEntity = ApiTaskToAdd(101)
+      val apiError = ApiError.TaskDifficulty
+
+      Post(url, postEntity) ~> route ~> check {
+        responseAs[ApiError] shouldEqual apiError
+        status shouldEqual StatusCodes.BadRequest
+      }
+    }
+
     /** В случае некорректного формата сущности возвращается 400 Bad Request */
     "return 400 Bad Request when encountering an invalid entity" in {
       val postEntity = JsObject()
