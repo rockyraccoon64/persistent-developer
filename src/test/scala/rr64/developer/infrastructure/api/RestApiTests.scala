@@ -23,9 +23,11 @@ class RestApiTests
     with ScalatestRouteTest
     with MockFactory {
 
-  private val service = mock[DeveloperService[Any]]
-  private val extractQuery: Option[String] => Any = _.map(Integer.parseInt).orNull
-  private val route = new RestApi[Any](service, extractQuery).route
+  private type Query = Any
+
+  private val service = mock[DeveloperService[Query]]
+  private val extractQuery: Option[String] => Query = _.map(Integer.parseInt).orNull
+  private val route = new RestApi[Query](service, extractQuery).route
 
   /** Запрос информации о задаче */
   "The service processing a single task info request" should {
@@ -262,8 +264,8 @@ class RestApiTests
       Get(s"/api/query/task-list$queryString")
     }
 
-    def mockService(expectedQuery: MockParameter[Any]) =
-      (service.tasks(_: Any)(_: ExecutionContext)).expects(expectedQuery, *)
+    def mockService(expectedQuery: MockParameter[Query]) =
+      (service.tasks(_: Query)(_: ExecutionContext)).expects(expectedQuery, *)
 
     /** Возвращать список задач */
     "return the task list" in {
