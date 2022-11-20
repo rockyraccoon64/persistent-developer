@@ -5,12 +5,25 @@ import akka.actor.typed.scaladsl.TimerScheduler
 /**
  * Данные инициализации актора
  * */
-private[behavior] case class Setup(
+private[behavior] case class Setup private(
   workFactor: Int,
   restFactor: Int,
   timer: TimerScheduler[Command]
 )
 
 object Setup {
+
+  def apply(
+    workFactor: Int,
+    restFactor: Int,
+    timer: TimerScheduler[Command]
+  ): Setup = {
+    if (workFactor > 0)
+      new Setup(workFactor, restFactor, timer)
+    else
+      throw new FactorException
+  }
+
   class FactorException extends RuntimeException
+
 }
