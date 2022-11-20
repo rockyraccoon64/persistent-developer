@@ -9,12 +9,12 @@ class LimitOffsetQueryTestSuite
   extends AnyWordSpec
     with Matchers {
 
-  def assertException(limit: Int = 10, offset: Int = 0): Assertion =
+  private def assertException(limit: Int = 10, offset: Int = 0): Assertion =
     assertThrows[LimitOffsetException] {
       LimitOffsetQuery(limit = limit, offset = offset)
     }
 
-  def assertNoException(limit: Int = 10, offset: Int = 0): Assertion =
+  private def assertNoException(limit: Int = 10, offset: Int = 0): Assertion =
     noException should be thrownBy LimitOffsetQuery(limit = limit, offset = offset)
 
   /** Количество запрашиваемых элементов */
