@@ -7,7 +7,7 @@ class TaskTestSuite extends AnyWordSpec with Matchers {
 
   "Tasks" should {
 
-    /** У задач должна быть сложность больше нуля */
+    /** Сложность задач должна быть больше нуля */
     "only be allowed to have positive difficulty" in {
       assertThrows[IllegalArgumentException](Task(0))
       assertThrows[IllegalArgumentException](Task(-1))
