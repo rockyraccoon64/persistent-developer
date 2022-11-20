@@ -7,7 +7,7 @@ import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import rr64.developer.infrastructure.dev.behavior.Factor.FactorException
 
-class SetupTestSuite extends AnyWordSpec with Matchers with MockFactory {
+class FactorTestSuite extends AnyWordSpec with Matchers with MockFactory {
 
   /** Рабочий множитель */
   "The work factor" should {
