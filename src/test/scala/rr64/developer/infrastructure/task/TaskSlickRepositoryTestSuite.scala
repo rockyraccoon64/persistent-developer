@@ -123,13 +123,15 @@ class TaskSlickRepositoryTestSuite
     } yield taskOpt shouldEqual None
   }
 
+  val queryFactory = new QueryFactory
+
   def listTest(
     limit: Int,
     offset: Int,
     initial: Seq[TaskInfo],
     expected: Seq[TaskInfo]
   ): Future[Assertion] = {
-    val query = LimitOffsetQuery(limit, offset)
+    val query = queryFactory.create(limit, offset)
     for {
       _ <- initial.foldLeft[Future[Any]](Future.unit) { (acc, task) =>
         acc.flatMap(_ => repository.save(task))

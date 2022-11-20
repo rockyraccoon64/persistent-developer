@@ -9,13 +9,15 @@ class LimitOffsetQueryTestSuite
   extends AnyWordSpec
     with Matchers {
 
+  val factory = new QueryFactory
+
   private def assertException(limit: Int = 10, offset: Int = 0): Assertion =
     assertThrows[LimitOffsetException] {
-      LimitOffsetQuery(limit = limit, offset = offset)
+      factory.create(limit = limit, offset = offset)
     }
 
   private def assertNoException(limit: Int = 10, offset: Int = 0): Assertion =
-    noException should be thrownBy LimitOffsetQuery(limit = limit, offset = offset)
+    noException should be thrownBy factory.create(limit = limit, offset = offset)
 
   /** Количество запрашиваемых элементов */
   "The limit" should {

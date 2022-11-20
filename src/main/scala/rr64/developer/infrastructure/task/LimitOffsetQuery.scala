@@ -1,18 +1,24 @@
 package rr64.developer.infrastructure.task
 
+import rr64.developer.infrastructure.task.LimitOffsetQuery.LimitOffsetException
+
 trait LimitOffsetQuery {
   def limit: Int
   def offset: Int
 }
 
 object LimitOffsetQuery {
+  class LimitOffsetException extends RuntimeException
+}
+
+class QueryFactory {
 
   private val defaultLimit = 20 // TODO app.conf
   private val defaultOffset = 0
 
-  val Default: LimitOffsetQuery = LimitOffsetQuery()
+  val Default: LimitOffsetQuery = create()
 
-  def apply(
+  def create(
     limit: Int = defaultLimit,
     offset: Int = defaultOffset
   ): LimitOffsetQuery = {
@@ -26,7 +32,5 @@ object LimitOffsetQuery {
     else
       throw new LimitOffsetException
   }
-
-  class LimitOffsetException extends RuntimeException
 
 }
