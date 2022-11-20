@@ -42,7 +42,8 @@ class TaskSlickRepositoryTestSuite
     Await.result(
       database.run {
         sqlu"""CREATE TABLE task(
-             id UUID PRIMARY KEY,
+             serial_id SERIAL PRIMARY KEY,
+             uuid UUID NOT NULL UNIQUE,
              difficulty INT NOT NULL,
              status VARCHAR(10) NOT NULL
            )"""
@@ -134,13 +135,15 @@ class TaskSlickRepositoryTestSuite
   /** Репозиторий должен ограничить количество возвращаемых задач переданным в limit числом */
   "The repository" should "limit the number of returned tasks" in {
     val tasks = Seq(queuedTask, finishedTask, taskInProgress)
-    val expected = Seq(queuedTask, finishedTask)
+    val expected = tasks.take(2)
     val query = LimitOffsetQuery(
       limit = 2,
       offset = 0
     )
     for {
-      _ <- Future.traverse(tasks)(repository.save)
+      _ <- tasks.foldLeft[Future[Any]](Future.unit) { (acc, task) =>
+        acc.flatMap(_ => repository.save(task))
+      }
       list <- repository.list(query)
     } yield {
       list should contain theSameElementsInOrderAs expected
