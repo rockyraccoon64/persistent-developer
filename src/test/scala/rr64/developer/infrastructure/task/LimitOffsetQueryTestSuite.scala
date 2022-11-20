@@ -9,7 +9,7 @@ class LimitOffsetQueryTestSuite
   extends AnyWordSpec
     with Matchers {
 
-  val factory = new QueryFactory
+  val factory = new QueryFactory(defaultLimit = 10)
 
   private def assertException(limit: Int = 10, offset: Int = 0): Assertion =
     assertThrows[LimitOffsetException] {
