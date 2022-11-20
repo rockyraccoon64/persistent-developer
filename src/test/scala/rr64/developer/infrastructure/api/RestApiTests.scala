@@ -1,7 +1,7 @@
 package rr64.developer.infrastructure.api
 
 import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport._
-import akka.http.scaladsl.model.StatusCodes
+import akka.http.scaladsl.model.{HttpRequest, StatusCodes}
 import akka.http.scaladsl.testkit.ScalatestRouteTest
 import org.scalamock.matchers.MockParameter
 import org.scalamock.scalatest.MockFactory
@@ -24,7 +24,8 @@ class RestApiTests
     with MockFactory {
 
   private val service = mock[DeveloperService[Any]]
-  private val route = new RestApi[Any](service, identity).route
+  private val extractQuery: Option[String] => Any = _.map(Integer.parseInt).orNull
+  private val route = new RestApi[Any](service, extractQuery).route
 
   /** Запрос информации о задаче */
   "The service processing a single task info request" should {
@@ -256,9 +257,13 @@ class RestApiTests
   /** Во время обработки запроса списка задач API должен */
   "The service processing the task list request" should {
 
-    val SendRequest = Get("/api/query/task-list")
+    def sendRequest(query: Option[String] = None): HttpRequest = {
+      val queryString = query.map("?query=" + _).getOrElse("")
+      Get(s"/api/query/task-list$queryString")
+    }
 
-    def mockService = (service.tasks(_: Any)(_: ExecutionContext)).expects(*, *)
+    def mockService(query: MockParameter[Any]) =
+      (service.tasks(_: Any)(_: ExecutionContext)).expects(query, *)
 
     /** Возвращать список задач */
     "return the task list" in {
@@ -269,39 +274,50 @@ class RestApiTests
 
       val apiTasks = domainTasks.map(ApiTaskInfo.adapter.convert)
 
-      mockService.returning(Future.successful(domainTasks))
+      mockService().returning(Future.successful(domainTasks))
 
-      SendRequest ~> route ~> check {
+      sendRequest() ~> route ~> check {
         responseAs[Seq[ApiTaskInfo]] should contain theSameElementsInOrderAs apiTasks
         status shouldEqual StatusCodes.OK
       }
     }
 
-    // TODO Параметр query
+    /** Передавать содержимое запроса сервису */
+    "extract the query" in {
+      val query = "505"
+      val expected = 505
+
+      mockService(expected).returning(Future.successful(Nil))
+
+      sendRequest(Some(query)) ~> route ~> check {
+        responseAs[Seq[ApiTaskInfo]] shouldEqual Nil
+        status shouldEqual StatusCodes.OK
+      }
+    }
 
     /** Возвращать пустой массив, если задач нет */
     "return an empty list when there are no tasks" in {
-      mockService.returning(Future.successful(Nil))
+      mockService().returning(Future.successful(Nil))
 
-      SendRequest ~> route ~> check {
+      sendRequest() ~> route ~> check {
         responseAs[Seq[ApiTaskInfo]] should have size 0
       }
     }
 
     /** Возвращать 500 Internal Server Error в случае асинхронной ошибки */
     "return 500 Internal Server Error when encountering an asynchronous error" in {
-      mockService.returning(Future.failed(new RuntimeException))
+      mockService().returning(Future.failed(new RuntimeException))
 
-      SendRequest ~> route ~> check {
+      sendRequest() ~> route ~> check {
         status shouldEqual StatusCodes.InternalServerError
       }
     }
 
     /** Возвращать 500 Internal Server Error в случае синхронной ошибки */
     "return 500 Internal Server Error when encountering a synchronous error" in {
-      mockService.throwing(new RuntimeException)
+      mockService().throwing(new RuntimeException)
 
-      SendRequest ~> route ~> check {
+      sendRequest() ~> route ~> check {
         status shouldEqual StatusCodes.InternalServerError
       }
     }
