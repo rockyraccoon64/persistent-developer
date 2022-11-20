@@ -22,31 +22,27 @@ class LimitOffsetQueryTestSuite
   /** Фабрика параметров запроса */
   "The factory" should {
 
+    def assertIllegal(defaultLimit: Int, maxLimit: Int): Assertion = {
+      assertThrows[IllegalArgumentException] {
+        new QueryFactory(defaultLimit = defaultLimit, maxLimit = maxLimit)
+      }
+    }
+
     /** Должна иметь limit по умолчанию больше, чем 0 */
     "have a default limit greater than zero" in {
-      assertThrows[IllegalArgumentException] {
-        new QueryFactory(defaultLimit = 0, maxLimit = 30)
-      }
-      assertThrows[IllegalArgumentException] {
-        new QueryFactory(defaultLimit = -1, maxLimit = 30)
-      }
+      assertIllegal(defaultLimit = 0, maxLimit = 30)
+      assertIllegal(defaultLimit = -1, maxLimit = 30)
     }
 
     /** Должна иметь максимальный limit больше, чем 0 */
     "have a max limit greater than zero" in {
-      assertThrows[IllegalArgumentException] {
-        new QueryFactory(defaultLimit = 10, maxLimit = 0)
-      }
-      assertThrows[IllegalArgumentException] {
-        new QueryFactory(defaultLimit = 10, maxLimit = -1)
-      }
+      assertIllegal(defaultLimit = 10, maxLimit = 0)
+      assertIllegal(defaultLimit = 10, maxLimit = -1)
     }
 
     /** Должна limit по умолчанию меньше или равный, чем максимальный */
     "have a default limit less than or equal to the max limit" in {
-      assertThrows[IllegalArgumentException] {
-        new QueryFactory(defaultLimit = 10, maxLimit = 9)
-      }
+      assertIllegal(defaultLimit = 10, maxLimit = 9)
       noException should be thrownBy {
         new QueryFactory(defaultLimit = 9, maxLimit = 9)
       }
