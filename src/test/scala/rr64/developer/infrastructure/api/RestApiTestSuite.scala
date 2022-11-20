@@ -17,7 +17,7 @@ import scala.concurrent.{ExecutionContext, Future}
 /**
  * Тесты REST API сервиса разработки
  * */
-class RestApiTests
+class RestApiTestSuite
   extends AnyWordSpec
     with Matchers
     with ScalatestRouteTest
