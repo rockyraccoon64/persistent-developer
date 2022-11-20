@@ -19,6 +19,21 @@ class LimitOffsetQueryTestSuite
   private def assertNoException(limit: Int = 10, offset: Int = 0): Assertion =
     noException should be thrownBy factory.create(limit = limit, offset = offset)
 
+  /** Фабрика параметров запроса */
+  "The factory" should {
+
+    /** Должна иметь limit по умолчанию больше, чем 0 */
+    "have a default limit greater than zero" in {
+      assertThrows[IllegalArgumentException] {
+        new QueryFactory(defaultLimit = 0, maxLimit = 30)
+      }
+      assertThrows[IllegalArgumentException] {
+        new QueryFactory(defaultLimit = -1, maxLimit = 30)
+      }
+
+    }
+  }
+
   /** Количество запрашиваемых элементов */
   "The limit" should {
 
