@@ -30,6 +30,16 @@ class LimitOffsetQueryTestSuite
       assertThrows[IllegalArgumentException] {
         new QueryFactory(defaultLimit = -1, maxLimit = 30)
       }
+    }
+
+    /** Должна иметь максимальный limit больше, чем 0 */
+    "have a default limit greater than zero" in {
+      assertThrows[IllegalArgumentException] {
+        new QueryFactory(defaultLimit = 10, maxLimit = 0)
+      }
+      assertThrows[IllegalArgumentException] {
+        new QueryFactory(defaultLimit = 10, maxLimit = -1)
+      }
 
     }
   }
