@@ -9,7 +9,7 @@ class LimitOffsetQueryTestSuite
   extends AnyWordSpec
     with Matchers {
 
-  private val factory = new QueryFactory(defaultLimit = 10)
+  private val factory = new QueryFactory(defaultLimit = 10, maxLimit = 30)
 
   private def assertException(limit: Int = 10, offset: Int = 0): Assertion =
     assertThrows[LimitOffsetException] {
@@ -26,6 +26,11 @@ class LimitOffsetQueryTestSuite
     "not be allowed to be less than 1" in {
       assertException(limit = 0)
       assertException(limit = -1)
+    }
+
+    /** Не должно быть больше максимального */
+    "not be allowed to be greater than the max limit" in {
+      assertException(limit = 31)
     }
 
     /** Может быть больше нуля */
