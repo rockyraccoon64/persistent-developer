@@ -28,6 +28,11 @@ class LimitOffsetQueryTestSuite
       }
     }
 
+    def assertLegal(defaultLimit: Int, maxLimit: Int): Assertion =
+      noException should be thrownBy {
+        new QueryFactory(defaultLimit = defaultLimit, maxLimit = maxLimit)
+      }
+
     /** Должна иметь limit по умолчанию больше, чем 0 */
     "have a default limit greater than zero" in {
       assertIllegal(defaultLimit = 0, maxLimit = 30)
@@ -42,13 +47,9 @@ class LimitOffsetQueryTestSuite
 
     /** Должна limit по умолчанию меньше или равный, чем максимальный */
     "have a default limit less than or equal to the max limit" in {
-      assertIllegal(defaultLimit = 10, maxLimit = 9)
-      noException should be thrownBy {
-        new QueryFactory(defaultLimit = 9, maxLimit = 9)
-      }
-      noException should be thrownBy {
-        new QueryFactory(defaultLimit = 5, maxLimit = 10)
-      }
+      assertLegal(defaultLimit = 5, maxLimit = 10)
+      assertLegal(defaultLimit = 10, maxLimit = 10)
+      assertIllegal(defaultLimit = 11, maxLimit = 10)
     }
 
   }
