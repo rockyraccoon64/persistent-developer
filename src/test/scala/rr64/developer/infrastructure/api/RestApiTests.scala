@@ -196,6 +196,18 @@ class RestApiTests
       checkReply(difficulty, domainReply, apiReply)
     }
 
+    /** Если у задачи отрицательная сложность, возвращается 400 Bad Request и сообщение об ошибке */
+    "return the Task Queued reply" in {
+      val difficulty = -1
+      val apiError = ApiError("Tasks should have difficulty [1-100]")
+      val postEntity = ApiTaskToAdd(difficulty)
+
+      Post(url, postEntity) ~> route ~> check {
+        responseAs[ApiError] shouldEqual apiError
+        status shouldEqual StatusCodes.BadRequest
+      }
+    }
+
     /** В случае некорректного формата сущности возвращается 400 Bad Request */
     "return 400 Bad Request when encountering an invalid entity" in {
       val postEntity = JsObject()
