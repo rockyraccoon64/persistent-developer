@@ -12,6 +12,7 @@ object LimitOffsetQuery {
 }
 
 class QueryFactory(defaultLimit: Int, maxLimit: Int) { // TODO app.conf
+  // TODO defaultLimit > 0, maxLimit > 0, defaultLimit <= maxLimit
 
   val Default: LimitOffsetQuery = create()
 
@@ -21,7 +22,7 @@ class QueryFactory(defaultLimit: Int, maxLimit: Int) { // TODO app.conf
   ): LimitOffsetQuery = {
     val lim = limit
     val off = offset
-    if (limit > 0 && offset >= 0)
+    if (limit > 0 && limit <= maxLimit && offset >= 0)
       new LimitOffsetQuery {
         override def limit: Int = lim
         override def offset: Int = off
