@@ -4,6 +4,9 @@ import org.scalatest.Assertion
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 
+/**
+ * Тесты создания задач
+ */
 class TaskTestSuite extends AnyWordSpec with Matchers {
 
   "Tasks" should {
