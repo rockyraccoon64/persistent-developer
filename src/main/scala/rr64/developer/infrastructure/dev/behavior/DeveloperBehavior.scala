@@ -5,7 +5,7 @@ import akka.actor.typed.scaladsl.Behaviors
 import akka.persistence.typed.scaladsl.EventSourcedBehavior
 import akka.persistence.typed.{PersistenceId, RecoveryCompleted}
 import rr64.developer.domain.Factor
-import rr64.developer.infrastructure.dev.behavior.Timing._
+import rr64.developer.infrastructure.dev.behavior.Timers._
 
 object DeveloperBehavior {
 

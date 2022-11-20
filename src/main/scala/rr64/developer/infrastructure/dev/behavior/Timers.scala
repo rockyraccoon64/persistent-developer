@@ -8,7 +8,7 @@ import rr64.developer.infrastructure.task.TaskWithId
  * Вспомогательные методы для таймеров
  * актора разработчика
  * */
-object Timing {
+object Timers {
 
   /** Запустить таймер до завершения задачи */
   private[behavior] def startWorkTimer(taskWithId: TaskWithId)
