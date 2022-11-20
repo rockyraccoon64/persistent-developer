@@ -207,10 +207,16 @@ class RestApiTests
     }
 
     /** Если у задачи отрицательная сложность, возвращается 400 Bad Request и сообщение об ошибке */
-    "return 400 Bad Request when the task has negative difficulty" in new DifficultyErrorTest(-1)
+    "return 400 Bad Request when the task has negative difficulty" in
+      new DifficultyErrorTest(-1)
+
+    /** Если у задачи сложность равна нулю, возвращается 400 Bad Request и сообщение об ошибке */
+    "return 400 Bad Request when the task has zero difficulty" in
+      new DifficultyErrorTest(0)
 
     /** Если у задачи сложность больше 100, возвращается 400 Bad Request и сообщение об ошибке */
-    "return 400 Bad Request when the task has difficulty greater than 100" in new DifficultyErrorTest(101)
+    "return 400 Bad Request when the task has difficulty greater than 100" in
+      new DifficultyErrorTest(101)
 
     /** В случае некорректного формата сущности возвращается 400 Bad Request */
     "return 400 Bad Request when encountering an invalid entity" in {
