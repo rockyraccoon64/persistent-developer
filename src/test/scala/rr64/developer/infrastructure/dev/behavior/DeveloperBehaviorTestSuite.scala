@@ -29,8 +29,8 @@ class DeveloperBehaviorTestSuite
 
   private val manualTime = ManualTime()
 
-  private val workFactor = 10
-  private val restFactor = 5
+  private val workFactor = Factor(10)
+  private val restFactor = Factor(5)
   private val developerTestKit: Kit =
     EventSourcedBehaviorTestKit(
       system = system,

@@ -12,8 +12,8 @@ import scala.concurrent.duration.{DurationInt, FiniteDuration}
 object Timing {
 
   /** Расчитать время таймера, исходя из сложности задачи и множителя */
-  def calculateTime(difficulty: Int, factor: Int): FiniteDuration =
-    (difficulty * factor).millis
+  def calculateTime(difficulty: Int, factor: Factor): FiniteDuration =
+    (difficulty * factor.value).millis
 
   /** Запустить таймер до завершения задачи */
   private[behavior] def startWorkTimer(taskWithId: TaskWithId)
@@ -40,7 +40,7 @@ object Timing {
     timer: TimerScheduler[Command],
     message: Command,
     difficulty: Int,
-    factor: Int
+    factor: Factor
   ): Unit = {
     val delay = calculateTime(difficulty, factor)
     timer.startSingleTimer(message, delay)

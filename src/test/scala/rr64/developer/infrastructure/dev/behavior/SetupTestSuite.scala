@@ -5,7 +5,7 @@ import org.scalamock.scalatest.MockFactory
 import org.scalatest.Assertion
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
-import rr64.developer.infrastructure.dev.behavior.Setup.FactorException
+import rr64.developer.infrastructure.dev.behavior.Factor.FactorException
 
 class SetupTestSuite extends AnyWordSpec with Matchers with MockFactory {
 

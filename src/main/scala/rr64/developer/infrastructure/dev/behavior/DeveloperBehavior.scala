@@ -8,7 +8,7 @@ import rr64.developer.infrastructure.dev.behavior.Timing._
 
 object DeveloperBehavior {
 
-  def apply(persistenceId: PersistenceId, workFactor: Int, restFactor: Int): Behavior[Command] =
+  def apply(persistenceId: PersistenceId, workFactor: Factor, restFactor: Factor): Behavior[Command] =
     Behaviors.withTimers { timer =>
       implicit val setup: Setup = Setup(workFactor, restFactor, timer)
       EventSourcedBehavior[Command, Event, State](
