@@ -1,20 +1,14 @@
 package rr64.developer.infrastructure.dev.behavior
 
 import akka.actor.typed.scaladsl.TimerScheduler
-import rr64.developer.domain.{Difficulty, Factor}
+import rr64.developer.domain.{Difficulty, Factor, TaskTiming}
 import rr64.developer.infrastructure.task.TaskWithId
-
-import scala.concurrent.duration.{DurationInt, FiniteDuration}
 
 /**
  * Вспомогательные методы для таймеров
  * актора разработчика
  * */
 object Timing {
-
-  /** Расчитать время таймера, исходя из сложности задачи и множителя */
-  def calculateTime(difficulty: Difficulty, factor: Factor): FiniteDuration = // TODO Domain
-    (difficulty.value * factor.value).millis
 
   /** Запустить таймер до завершения задачи */
   private[behavior] def startWorkTimer(taskWithId: TaskWithId)
@@ -43,7 +37,7 @@ object Timing {
     difficulty: Difficulty,
     factor: Factor
   ): Unit = {
-    val delay = calculateTime(difficulty, factor)
+    val delay = TaskTiming.calculateTime(difficulty, factor)
     timer.startSingleTimer(message, delay)
   }
 
