@@ -15,6 +15,14 @@ class TaskTestSuite extends AnyWordSpec with Matchers {
       noException should be thrownBy Task(1)
       noException should be thrownBy Task(5)
     }
+
+    /** Сложность задач должна быть меньше или равна 100 */
+    "only be allowed to have difficulty less than or equal to 100" in {
+      assertThrows[IllegalArgumentException](Task(12345))
+      assertThrows[IllegalArgumentException](Task(101))
+      noException should be thrownBy Task(100)
+      noException should be thrownBy Task(55)
+    }
   }
 
 }
