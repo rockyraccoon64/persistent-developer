@@ -264,7 +264,7 @@ class RestApiTests
       Get(s"/api/query/task-list$queryString")
     }
 
-    def mockService(expectedQuery: MockParameter[Query]) =
+    def mockService(expectedQuery: MockParameter[Query] = *) =
       (service.tasks(_: Query)(_: ExecutionContext)).expects(expectedQuery, *)
 
     /** Возвращать список задач */
