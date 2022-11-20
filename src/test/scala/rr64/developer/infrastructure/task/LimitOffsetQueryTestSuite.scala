@@ -9,6 +9,21 @@ class LimitOffsetQueryTestSuite
   extends AnyWordSpec
     with Matchers {
 
+  trait FactoryTest {
+
+    def assertIllegal(defaultLimit: Int, maxLimit: Int): Assertion = {
+      assertThrows[IllegalArgumentException] {
+        new QueryFactory(defaultLimit = defaultLimit, maxLimit = maxLimit)
+      }
+    }
+
+    def assertLegal(defaultLimit: Int, maxLimit: Int): Assertion =
+      noException should be thrownBy {
+        new QueryFactory(defaultLimit = defaultLimit, maxLimit = maxLimit)
+      }
+
+  }
+
   private val factory = new QueryFactory(defaultLimit = 10, maxLimit = 30)
 
   private def assertException(limit: Int = 10, offset: Int = 0): Assertion =
@@ -22,26 +37,15 @@ class LimitOffsetQueryTestSuite
   /** Фабрика параметров запроса */
   "The factory" should {
 
-    def assertIllegal(defaultLimit: Int, maxLimit: Int): Assertion = {
-      assertThrows[IllegalArgumentException] {
-        new QueryFactory(defaultLimit = defaultLimit, maxLimit = maxLimit)
-      }
-    }
-
-    def assertLegal(defaultLimit: Int, maxLimit: Int): Assertion =
-      noException should be thrownBy {
-        new QueryFactory(defaultLimit = defaultLimit, maxLimit = maxLimit)
-      }
-
     /** Должна иметь limit по умолчанию больше, чем 0 */
-    "have a default limit greater than zero" in {
+    "have a default limit greater than zero" in new FactoryTest {
       assertIllegal(defaultLimit = -1, maxLimit = 30)
       assertIllegal(defaultLimit = 0, maxLimit = 30)
       assertLegal(defaultLimit = 1, maxLimit = 30)
     }
 
     /** Должна иметь максимальный limit больше, чем 0 */
-    "have a max limit greater than zero" in {
+    "have a max limit greater than zero" in new FactoryTest {
       assertIllegal(defaultLimit = 1, maxLimit = -1)
       assertIllegal(defaultLimit = 1, maxLimit = 0)
       assertLegal(defaultLimit = 1, maxLimit = 1)
@@ -49,7 +53,7 @@ class LimitOffsetQueryTestSuite
     }
 
     /** Должна limit по умолчанию меньше или равный, чем максимальный */
-    "have a default limit less than or equal to the max limit" in {
+    "have a default limit less than or equal to the max limit" in new FactoryTest {
       assertLegal(defaultLimit = 5, maxLimit = 10)
       assertLegal(defaultLimit = 10, maxLimit = 10)
       assertIllegal(defaultLimit = 11, maxLimit = 10)
