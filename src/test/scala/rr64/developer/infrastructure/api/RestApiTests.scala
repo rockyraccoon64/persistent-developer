@@ -23,10 +23,10 @@ class RestApiTests
     with ScalatestRouteTest
     with MockFactory {
 
-  private type Query = Any
+  private type Query = Option[Int]
 
   private val service = mock[DeveloperService[Query]]
-  private val extractQuery: Option[String] => Query = _.map(Integer.parseInt).orNull
+  private val extractQuery: Option[String] => Query = _.map(Integer.parseInt)
   private val route = new RestApi[Query](service, extractQuery).route
 
   /** Запрос информации о задаче */
@@ -267,6 +267,12 @@ class RestApiTests
     def mockService(expectedQuery: MockParameter[Query] = *) =
       (service.tasks(_: Query)(_: ExecutionContext)).expects(expectedQuery, *)
 
+    /** Передавать содержимое запроса сервису */
+    "extract the query" in {
+      mockService(expectedQuery = Some(505))
+      sendRequest(query = Some("505")) ~> route
+    }
+
     /** Возвращать список задач */
     "return the task list" in {
       val domainTasks = TaskInfo(UUID.randomUUID(), Difficulty(99), TaskStatus.Finished) ::
@@ -282,12 +288,6 @@ class RestApiTests
         responseAs[Seq[ApiTaskInfo]] should contain theSameElementsInOrderAs apiTasks
         status shouldEqual StatusCodes.OK
       }
-    }
-
-    /** Передавать содержимое запроса сервису */
-    "extract the query" in {
-      mockService(expectedQuery = 505)
-      sendRequest(query = Some("505")) ~> route
     }
 
     /** Возвращать пустой массив, если задач нет */
