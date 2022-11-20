@@ -12,8 +12,7 @@ object LimitOffsetQuery {
 }
 
 class QueryFactory(defaultLimit: Int, maxLimit: Int) { // TODO app.conf
-  // TODO defaultLimit > 0, maxLimit > 0, defaultLimit <= maxLimit
-  require(defaultLimit > 0 && maxLimit > 0)
+  require(defaultLimit > 0 && maxLimit > 0 && defaultLimit <= maxLimit)
 
   val Default: LimitOffsetQuery = create()
 
