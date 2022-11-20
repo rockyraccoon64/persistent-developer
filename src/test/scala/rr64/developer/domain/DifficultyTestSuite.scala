@@ -10,29 +10,34 @@ import rr64.developer.domain.Difficulty.DifficultyException
  */
 class DifficultyTestSuite extends AnyWordSpec with Matchers {
 
-  "Tasks" should {
+  /** Сложность задач должна быть */
+  "Difficulty" should {
 
     def assertException(difficulty: Int): Assertion =
-      assertThrows[DifficultyException](Task(difficulty))
+      assertThrows[DifficultyException](Difficulty(difficulty))
 
     def assertNoException(difficulty: Int): Assertion =
-      noException should be thrownBy Task(difficulty)
+      noException should be thrownBy Difficulty(difficulty)
 
-    /** Сложность задач должна быть больше нуля */
-    "only be allowed to have positive difficulty" in {
-      assertException(-55)
-      assertException(-1)
+    /** Не меньше единицы */
+    "not be allowed to be less than 1" in {
       assertException(0)
-      assertNoException(1)
-      assertNoException(5)
+      assertException(-1)
+      assertException(-55)
     }
 
-    /** Сложность задач должна быть меньше или равна 100 */
-    "only be allowed to have difficulty less than or equal to 100" in {
-      assertException(12345)
+    /** Не больше 100 */
+    "not be allowed to be greater than 100" in {
       assertException(101)
-      assertNoException(100)
+      assertException(12345)
+    }
+
+    /** В пределах 1-100 */
+    "be allowed to be in the range [1-100]" in {
+      assertNoException(1)
+      assertNoException(5)
       assertNoException(55)
+      assertNoException(100)
     }
   }
 
