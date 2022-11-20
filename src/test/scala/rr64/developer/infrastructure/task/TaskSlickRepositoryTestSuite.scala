@@ -159,9 +159,9 @@ class TaskSlickRepositoryTestSuite
   /** Репозиторий должен возвращать задачи, начиная с переданного offset */
   "The repository" should "return tasks starting with the given offset" in listTest(
     limit = 3,
-    offset = 2,
+    offset = 1,
     initial = taskList,
-    expected = taskList.drop(2)
+    expected = taskList.tail
   )
 
   /** Если задач нет, возвращается пустой список */
