@@ -197,7 +197,7 @@ class RestApiTests
     }
 
     /** Если у задачи отрицательная сложность, возвращается 400 Bad Request и сообщение об ошибке */
-    "return the Task Queued reply" in {
+    "return 400 Bad Request when the task has negative difficulty" in {
       val difficulty = -1
       val apiError = ApiError("Tasks should have difficulty [1-100]")
       val postEntity = ApiTaskToAdd(difficulty)
