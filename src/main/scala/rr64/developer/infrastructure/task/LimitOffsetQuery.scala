@@ -1,15 +1,11 @@
 package rr64.developer.infrastructure.task
 
-import rr64.developer.infrastructure.task.LimitOffsetQuery.LimitOffsetException
-
 trait LimitOffsetQuery {
   def limit: Int
   def offset: Int
 }
 
-object LimitOffsetQuery {
-  class LimitOffsetException extends RuntimeException
-}
+class LimitOffsetException extends RuntimeException
 
 class LimitOffsetQueryFactory(defaultLimit: Int, maxLimit: Int) {
   require(defaultLimit > 0 && maxLimit > 0 && defaultLimit <= maxLimit)
