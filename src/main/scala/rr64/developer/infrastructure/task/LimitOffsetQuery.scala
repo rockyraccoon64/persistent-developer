@@ -1,6 +1,9 @@
 package rr64.developer.infrastructure.task
 
-case class LimitOffsetQuery private(limit: Int, offset: Int)
+trait LimitOffsetQuery {
+  def limit: Int
+  def offset: Int
+}
 
 object LimitOffsetQuery {
 
@@ -12,11 +15,17 @@ object LimitOffsetQuery {
   def apply(
     limit: Int = defaultLimit,
     offset: Int = defaultOffset
-  ): LimitOffsetQuery =
+  ): LimitOffsetQuery = {
+    val lim = limit
+    val off = offset
     if (limit > 0 && offset >= 0)
-      new LimitOffsetQuery(limit, offset)
+      new LimitOffsetQuery {
+        override def limit: Int = lim
+        override def offset: Int = off
+      }
     else
       throw new LimitOffsetException
+  }
 
   class LimitOffsetException extends RuntimeException
 
