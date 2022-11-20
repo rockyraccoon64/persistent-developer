@@ -13,13 +13,11 @@ object LimitOffsetQuery {
 
 class QueryFactory(defaultLimit: Int) { // TODO app.conf
 
-  private val defaultOffset = 0
-
   val Default: LimitOffsetQuery = create()
 
   def create(
     limit: Int = defaultLimit,
-    offset: Int = defaultOffset
+    offset: Int = 0
   ): LimitOffsetQuery = {
     val lim = limit
     val off = offset
