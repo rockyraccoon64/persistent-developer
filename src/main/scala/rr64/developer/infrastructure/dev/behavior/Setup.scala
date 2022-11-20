@@ -18,7 +18,7 @@ object Setup {
     restFactor: Int,
     timer: TimerScheduler[Command]
   ): Setup = {
-    if (workFactor > 0)
+    if (workFactor > 0 && workFactor <= 1000)
       new Setup(workFactor, restFactor, timer)
     else
       throw new FactorException

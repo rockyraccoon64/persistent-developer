@@ -32,9 +32,8 @@ class SetupTestSuite extends AnyWordSpec with Matchers with MockFactory {
 
     /** Не должен быть больше 1000 */
     "not be allowed to be greater than 1000" in {
-      assertFactorException(1000)
       assertFactorException(1001)
-      assertFactorException(9876543)
+      assertFactorException(987654)
     }
 
   }
