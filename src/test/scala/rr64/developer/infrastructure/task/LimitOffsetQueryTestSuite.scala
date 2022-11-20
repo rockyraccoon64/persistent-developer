@@ -14,6 +14,9 @@ class LimitOffsetQueryTestSuite
       LimitOffsetQuery(limit = limit, offset = offset)
     }
 
+  def assertNoException(limit: Int = 10, offset: Int = 0): Assertion =
+    noException should be thrownBy LimitOffsetQuery(limit = limit, offset = offset)
+
   /** Количество запрашиваемых элементов */
   "The limit" should {
 
@@ -21,6 +24,12 @@ class LimitOffsetQueryTestSuite
     "not be allowed to be less than 1" in {
       assertException(limit = 0)
       assertException(limit = -1)
+    }
+
+    /** Может быть больше нуля */
+    "be allowed to be greater than zero" in {
+      assertNoException(limit = 1)
+      assertNoException(limit = 25)
     }
 
   }
