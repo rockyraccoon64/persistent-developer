@@ -48,4 +48,27 @@ class SetupTestSuite extends AnyWordSpec with Matchers with MockFactory {
 
   }
 
+  /** Множитель отдыха */
+  "The rest factor" should {
+
+    def setupFromRestFactor(restFactor: Int) = Setup(
+      workFactor = 55,
+      restFactor = restFactor,
+      timer = mock[TimerScheduler[Command]]
+    )
+
+    def assertFactorException(restFactor: Int): Assertion =
+      assertThrows[FactorException] {
+        setupFromRestFactor(restFactor)
+      }
+
+    /** Не должен быть меньше единицы */
+    "not be allowed to be less than 1" in {
+      assertFactorException(0)
+      assertFactorException(-1)
+      assertFactorException(-15)
+    }
+
+  }
+
 }
