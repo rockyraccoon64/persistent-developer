@@ -11,28 +11,6 @@ trait LimitOffsetQuery {
   def offset: Int
 }
 
-object LimitOffsetQuery {
-
-  private val regex: Regex = """^limit:(\d),offset:(\d+)$""".r
-
-  private val errorMessage = "Invalid limit + offset"
-
-  def stringExtractor(factory: LimitOffsetQueryFactory): QueryExtractor[Option[String], LimitOffsetQuery] = {
-    case Some(regex(limitStr, offsetStr)) =>
-      Try {
-        factory.create(
-          limit = limitStr.toInt,
-          offset = offsetStr.toInt
-        )
-      }.toOption.toRight(errorMessage)
-    case Some(_) =>
-      Left(errorMessage)
-    case None =>
-      Right(factory.Default)
-  }
-
-}
-
 class LimitOffsetException extends RuntimeException
 
 class LimitOffsetQueryFactory(defaultLimit: Int, maxLimit: Int) {
@@ -54,4 +32,31 @@ class LimitOffsetQueryFactory(defaultLimit: Int, maxLimit: Int) {
 
 object LimitOffsetQueryFactory {
   private case class QueryImpl(limit: Int, offset: Int) extends LimitOffsetQuery
+}
+
+class LimitOffsetQueryStringExtractor(factory: LimitOffsetQueryFactory)
+  extends QueryExtractor[Option[String], LimitOffsetQuery] {
+
+  import LimitOffsetQueryStringExtractor._
+
+  override def extract(input: Option[String]): Either[String, LimitOffsetQuery] =
+    input match {
+      case Some(regex(limitStr, offsetStr)) =>
+        Try {
+          factory.create(
+            limit = limitStr.toInt,
+            offset = offsetStr.toInt
+          )
+        }.toOption.toRight(errorMessage)
+      case Some(_) =>
+        Left(errorMessage)
+      case None =>
+        Right(factory.Default)
+    }
+
+}
+
+object LimitOffsetQueryStringExtractor {
+  private val regex: Regex = """^limit:(\d),offset:(\d+)$""".r
+  private val errorMessage = "Invalid limit + offset"
 }

@@ -111,7 +111,7 @@ class LimitOffsetQueryTestSuite
 
   class ExtractorTest {
     private val factory = new LimitOffsetQueryFactory(defaultLimit = 10, maxLimit = 30)
-    protected val extractor = LimitOffsetQuery.stringExtractor(factory)
+    protected val extractor = new LimitOffsetQueryStringExtractor(factory)
   }
 
   /** Парсер запроса */
