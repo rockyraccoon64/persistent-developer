@@ -1,6 +1,7 @@
 package rr64.developer.infrastructure.task
 
 import rr64.developer.infrastructure.api.QueryExtractor
+import rr64.developer.infrastructure.task.LimitOffsetQueryFactory.QueryImpl
 
 import scala.util.Try
 import scala.util.matching.Regex
@@ -43,15 +44,14 @@ class LimitOffsetQueryFactory(defaultLimit: Int, maxLimit: Int) {
     limit: Int = defaultLimit,
     offset: Int = 0
   ): LimitOffsetQuery = {
-    val lim = limit
-    val off = offset
     if (limit > 0 && limit <= maxLimit && offset >= 0)
-      new LimitOffsetQuery {
-        override def limit: Int = lim
-        override def offset: Int = off
-      }
+      QueryImpl(limit, offset)
     else
       throw new LimitOffsetException
   }
 
+}
+
+object LimitOffsetQueryFactory {
+  private case class QueryImpl(limit: Int, offset: Int) extends LimitOffsetQuery
 }
