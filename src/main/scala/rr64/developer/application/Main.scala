@@ -18,7 +18,7 @@ object Main extends App {
   val appConfig = config.getConfig(ConfigKeys.AppConfig)
 
   val rootGuardianName = appConfig.getString(ConfigKeys.RootGuardianName)
-  val timeoutDuration = appConfig.getDuration(ConfigKeys.AskTimeout).toScala
+  val askTimeoutDuration = appConfig.getDuration(ConfigKeys.AskTimeout).toScala
   val developerName = appConfig.getString(ConfigKeys.DeveloperActorName)
   val workFactor = appConfig.getInt(ConfigKeys.WorkFactor)
   val restFactor = appConfig.getInt(ConfigKeys.RestFactor)
@@ -28,7 +28,7 @@ object Main extends App {
   implicit val ec: ExecutionContext = system.executionContext
   implicit val scheduler: Scheduler = system.scheduler
 
-  implicit val timeout: Timeout = Timeout(timeoutDuration)
+  implicit val askTimeout: Timeout = Timeout(askTimeoutDuration)
 
   val developerBehavior = DeveloperBehavior(
     persistenceId = PersistenceId.ofUniqueId(ConfigKeys.DeveloperPersistenceId),
