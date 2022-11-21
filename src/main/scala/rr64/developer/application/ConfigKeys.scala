@@ -5,4 +5,6 @@ object ConfigKeys {
   val AskTimeout = "ask-timeout"
   val DeveloperActorName = "developer.name"
   val DeveloperPersistenceId = "developer.persistence-id"
+  val WorkFactor = "developer.work-factor"
+  val RestFactor = "developer.rest-factor"
 }

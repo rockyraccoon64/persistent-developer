@@ -23,14 +23,17 @@ object Main extends App {
   val appConfig = config.getConfig(ConfigKeys.AppConfig)
 
   val timeoutDuration = appConfig.getDuration(ConfigKeys.AskTimeout).toScala
+  val developerName = appConfig.getString(ConfigKeys.DeveloperActorName)
+  val workFactor = appConfig.getInt(ConfigKeys.WorkFactor)
+  val restFactor = appConfig.getInt(ConfigKeys.RestFactor)
 
   implicit val timeout: Timeout = Timeout(timeoutDuration)
 
-  val developerName = appConfig.getString(ConfigKeys.DeveloperActorName)
+
   val developerBehavior = DeveloperBehavior(
     persistenceId = PersistenceId.ofUniqueId(ConfigKeys.DeveloperPersistenceId),
-    workFactor = Factor(10), // TODO config
-    restFactor = Factor(5)
+    workFactor = Factor(workFactor),
+    restFactor = Factor(restFactor)
   )
   val developerRef = system.ask { replyTo =>
     RootGuardian.SpawnDeveloper(developerName, developerBehavior, replyTo)
