@@ -10,6 +10,7 @@ import rr64.developer.infrastructure.dev.behavior.Timers._
 object DeveloperBehavior {
 
   type DeveloperCommand = Command
+  type DeveloperEvent = Event
   type DeveloperRef = ActorRef[Command]
 
   def apply(persistenceId: PersistenceId, workFactor: Factor, restFactor: Factor): Behavior[Command] =
