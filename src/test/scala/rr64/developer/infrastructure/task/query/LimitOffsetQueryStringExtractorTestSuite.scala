@@ -40,6 +40,13 @@ class LimitOffsetQueryStringExtractorTestSuite
       result.left.value shouldEqual errorMessage
     }
 
+    /** Должен возвращать сообщение об ошибке, когда offset больше, чем Integer.MAX_VALUE */
+    "return an error message when the offset is greater than Integer.MAX_VALUE" in new ExtractorTest {
+      val input = Some("limit:15,offset:987654321098")
+      val result = extractor.extract(input)
+      result.left.value shouldEqual errorMessage
+    }
+
   }
 
 }
