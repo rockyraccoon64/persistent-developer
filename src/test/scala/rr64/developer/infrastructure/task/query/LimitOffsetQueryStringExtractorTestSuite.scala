@@ -9,7 +9,8 @@ class LimitOffsetQueryStringExtractorTestSuite
 
   trait ExtractorTest {
     private val factory = new LimitOffsetQueryFactory(defaultLimit = 10, maxLimit = 30)
-    protected val extractor = new LimitOffsetQueryStringExtractor(factory)
+    protected val errorMessage = "Invalid limit + offset"
+    protected val extractor = new LimitOffsetQueryStringExtractor(factory, errorMessage)
   }
 
   /** Парсер запроса */
@@ -29,7 +30,7 @@ class LimitOffsetQueryStringExtractorTestSuite
     "return an error message when the query format is incorrect" in new ExtractorTest {
       val input = Some("What's this query")
       val result = extractor.extract(input)
-      result.isLeft shouldEqual true
+      result shouldEqual Left(errorMessage)
     }
 
   }

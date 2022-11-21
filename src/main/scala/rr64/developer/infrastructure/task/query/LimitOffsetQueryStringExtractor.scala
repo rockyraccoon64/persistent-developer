@@ -6,8 +6,10 @@ import rr64.developer.infrastructure.task.query.LimitOffsetQueryStringExtractor.
 import scala.util.Try
 import scala.util.matching.Regex
 
-class LimitOffsetQueryStringExtractor(factory: LimitOffsetQueryFactory)
-  extends QueryExtractor[Option[String], LimitOffsetQuery] {
+class LimitOffsetQueryStringExtractor(
+  factory: LimitOffsetQueryFactory,
+  errorMessage: String
+) extends QueryExtractor[Option[String], LimitOffsetQuery] {
 
   override def extract(input: Option[String]): Either[String, LimitOffsetQuery] =
     input match {
@@ -28,5 +30,4 @@ class LimitOffsetQueryStringExtractor(factory: LimitOffsetQueryFactory)
 
 object LimitOffsetQueryStringExtractor {
   private val regex: Regex = """^limit:(\d),offset:(\d+)$""".r
-  private val errorMessage = "Invalid limit + offset"
 }
