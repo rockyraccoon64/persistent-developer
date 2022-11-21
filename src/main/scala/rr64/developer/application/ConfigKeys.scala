@@ -10,4 +10,6 @@ object ConfigKeys {
   val RestFactor = "developer.rest-factor"
   val DefaultLimit = "tasks.query.default-limit"
   val MaxLimit = "tasks.query.max-limit"
+  val ApiInterface = "api.interface"
+  val ApiPort = "api.port"
 }

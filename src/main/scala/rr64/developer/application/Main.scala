@@ -2,6 +2,7 @@ package rr64.developer.application
 
 import akka.actor.typed.scaladsl.AskPattern.Askable
 import akka.actor.typed.{ActorSystem, Scheduler}
+import akka.http.scaladsl.Http
 import akka.persistence.typed.PersistenceId
 import akka.util.Timeout
 import com.typesafe.config.ConfigFactory
@@ -31,6 +32,8 @@ object Main extends App {
   val restFactor = appConfig.getInt(ConfigKeys.RestFactor)
   val defaultLimit = appConfig.getInt(ConfigKeys.DefaultLimit)
   val maxLimit = appConfig.getInt(ConfigKeys.MaxLimit)
+  val apiInterface = appConfig.getString(ConfigKeys.ApiInterface)
+  val apiPort = appConfig.getInt(ConfigKeys.ApiPort)
 
   implicit val system: ActorSystem[RootGuardian.Message] =
     ActorSystem(RootGuardian(), rootGuardianName)
@@ -79,5 +82,6 @@ object Main extends App {
     new LimitOffsetQueryStringExtractor(queryFactory, queryExtractorErrorMessage)
 
   val restApi = new RestApi[Query](service, queryExtractor)
+  val server = Http().newServerAt(apiInterface, apiPort).bind(restApi.route)
 
 }
