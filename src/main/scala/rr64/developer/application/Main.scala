@@ -8,7 +8,7 @@ import com.typesafe.config.ConfigFactory
 import rr64.developer.domain.{Developer, DeveloperService, DeveloperServiceFacade, Factor, Tasks}
 import rr64.developer.infrastructure.RootGuardian
 import rr64.developer.infrastructure.api.{QueryExtractor, RestApi}
-import rr64.developer.infrastructure.dev.{DeveloperStateFromRepository, PersistentDeveloper}
+import rr64.developer.infrastructure.dev.{DeveloperStateFromRepository, DeveloperStateSlickRepository, PersistentDeveloper}
 import rr64.developer.infrastructure.dev.behavior.DeveloperBehavior
 import rr64.developer.infrastructure.task.{TaskRepository, TaskSlickRepository, TasksFromRepository}
 import rr64.developer.infrastructure.task.query.{LimitOffsetQuery, LimitOffsetQueryFactory, LimitOffsetQueryFactoryImpl, LimitOffsetQueryStringExtractor}
@@ -53,9 +53,10 @@ object Main extends App {
   val dbConfig = DatabaseConfig.forConfig("slick")
   val database = dbConfig.db
 
-  val developerRepository = ???
+  val developerStateRepository =
+    new DeveloperStateSlickRepository(database)
   val developerStateProvider =
-    new DeveloperStateFromRepository(developerPersistenceId, developerRepository)
+    new DeveloperStateFromRepository(developerPersistenceId, developerStateRepository)
   val developer: Developer =
     PersistentDeveloper(developerRef, developerStateProvider)
 
