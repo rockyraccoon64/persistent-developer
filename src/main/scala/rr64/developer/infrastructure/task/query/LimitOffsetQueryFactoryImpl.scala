@@ -1,12 +1,12 @@
 package rr64.developer.infrastructure.task.query
 
-trait AbstractLimitOffsetQueryFactory {
+trait LimitOffsetQueryFactory {
   def default: LimitOffsetQuery
   def create(limit: Int, offset: Int): LimitOffsetQuery
 }
 
 class LimitOffsetQueryFactoryImpl(defaultLimit: Int, maxLimit: Int)
-    extends AbstractLimitOffsetQueryFactory {
+    extends LimitOffsetQueryFactory {
   require(defaultLimit > 0 && maxLimit > 0 && defaultLimit <= maxLimit)
 
   import rr64.developer.infrastructure.task.query.LimitOffsetQueryFactoryImpl.QueryImpl

@@ -12,7 +12,7 @@ class LimitOffsetQueryStringExtractorTestSuite
     with MockFactory {
 
   trait ExtractorTest {
-    protected val factory = mock[AbstractLimitOffsetQueryFactory]
+    protected val factory = mock[LimitOffsetQueryFactory]
     protected val errorMessage = "Invalid limit + offset"
     protected val extractor = new LimitOffsetQueryStringExtractor(factory, errorMessage)
     protected def assertError(query: String): Assertion =
