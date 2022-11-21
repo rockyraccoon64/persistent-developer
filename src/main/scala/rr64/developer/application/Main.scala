@@ -26,7 +26,7 @@ object Main extends App {
 
   implicit val timeout: Timeout = Timeout(timeoutDuration)
 
-  val developerName = "dev-actor"
+  val developerName = appConfig.getString(ConfigKeys.DeveloperActorName)
   val developerBehavior = DeveloperBehavior(
     persistenceId = PersistenceId.of("dev", "00"),
     workFactor = Factor(10), // TODO config
