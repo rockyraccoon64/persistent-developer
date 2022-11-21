@@ -20,9 +20,9 @@ object Main extends App {
   implicit val scheduler: Scheduler = system.scheduler
 
   val config = ConfigFactory.load()
-  val appConfig = config.getConfig("persistent-dev")
+  val appConfig = config.getConfig(ConfigKeys.AppConfig)
 
-  val timeoutDuration = appConfig.getDuration("ask-timeout").toScala
+  val timeoutDuration = appConfig.getDuration(ConfigKeys.AskTimeout).toScala
 
   implicit val timeout: Timeout = Timeout(timeoutDuration)
 
