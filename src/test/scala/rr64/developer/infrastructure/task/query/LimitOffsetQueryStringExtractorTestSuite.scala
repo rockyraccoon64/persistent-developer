@@ -25,6 +25,13 @@ class LimitOffsetQueryStringExtractorTestSuite
       }
     }
 
+    /** Должен возвращать сообщение об ошибке, когда запрос сформирован некорректно */
+    "return an error message when the query format is incorrect" in new ExtractorTest {
+      val input = Some("What's this query")
+      val result = extractor.extract(input)
+      result.isLeft shouldEqual true
+    }
+
   }
 
 }
