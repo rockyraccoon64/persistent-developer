@@ -54,17 +54,23 @@ object Main extends App {
   val database = dbConfig.db
 
   val developerRepository = ???
-  val developerStateProvider = new DeveloperStateFromRepository(developerPersistenceId, developerRepository)
-  val developer: Developer = PersistentDeveloper(developerRef, developerStateProvider)
-  val taskRepository: TaskRepository[Query] = new TaskSlickRepository(database)
-  val tasks: Tasks[Query] = new TasksFromRepository[Query](taskRepository)
+  val developerStateProvider =
+    new DeveloperStateFromRepository(developerPersistenceId, developerRepository)
+  val developer: Developer =
+    PersistentDeveloper(developerRef, developerStateProvider)
+
+  val taskRepository: TaskRepository[Query] =
+    new TaskSlickRepository(database)
+  val tasks: Tasks[Query] =
+    new TasksFromRepository[Query](taskRepository)
   val service: DeveloperService[Query] =
     new DeveloperServiceFacade[Query](developer, tasks)
 
-  val queryFactory: LimitOffsetQueryFactory = new LimitOffsetQueryFactoryImpl(
-    defaultLimit = defaultLimit,
-    maxLimit = maxLimit
-  )
+  val queryFactory: LimitOffsetQueryFactory =
+    new LimitOffsetQueryFactoryImpl(
+      defaultLimit = defaultLimit,
+      maxLimit = maxLimit
+    )
   val queryExtractorErrorMessage: String =
     "Invalid list query parameters"
   val queryExtractor: QueryExtractor[Option[String], Query] =
