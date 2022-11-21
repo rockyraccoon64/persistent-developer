@@ -265,21 +265,38 @@ class RestApiTestSuite
       Get(s"/api/query/task-list$queryString")
     }
 
-    def mockService(expectedQuery: MockParameter[Query] = *) =
+    def mockExtractor(
+      expects: MockParameter[Option[String]] = *,
+      returns: Either[String, Query] = Right(None)
+    ) =
+      (extractQuery.extract _)
+        .expects(expects)
+        .returning(returns)
+
+    def mockService(
+      expectedQuery: MockParameter[Query] = *,
+      extractorExpects: MockParameter[Option[String]] = *,
+      extractorReturns: Either[String, Query] = Right(None)
+    ) = {
+      mockExtractor(extractorExpects, extractorReturns)
       (service.tasks(_: Query)(_: ExecutionContext)).expects(expectedQuery, *)
+    }
 
     /** Передавать содержимое запроса сервису после парсинга */
     "extract the query" in {
       val input = Some("505")
       val extracted = Some(505)
-      (extractQuery.extract _).expects(input).returning(Right(extracted))
-      mockService(expectedQuery = extracted)
+      mockService(
+        expectedQuery = extracted,
+        extractorExpects = input,
+        extractorReturns = Right(extracted)
+      )
       sendRequest(query = input) ~> route
     }
 
     /** Сообщать об ошибке в запросе */
     "notify when there's an error in the query" in {
-      (extractQuery.extract _).expects(*).returning(Left(errorMessage))
+      mockExtractor(returns = Left(errorMessage))
       sendRequest(query = Some("ABC")) ~> route ~> check {
         status shouldEqual StatusCodes.BadRequest
         responseAs[ApiError] shouldEqual ApiError.inQuery(errorMessage)
@@ -288,7 +305,6 @@ class RestApiTestSuite
 
     /** Возвращать список задач */
     "return the task list" in {
-      (extractQuery.extract _).expects(*).returning(Right(None))
       val domainTasks = TaskInfo(UUID.randomUUID(), Difficulty(99), TaskStatus.Finished) ::
         TaskInfo(UUID.randomUUID(), Difficulty(51), TaskStatus.InProgress) ::
         TaskInfo(UUID.randomUUID(), Difficulty(65), TaskStatus.Queued) ::
@@ -306,7 +322,6 @@ class RestApiTestSuite
 
     /** Возвращать пустой массив, если задач нет */
     "return an empty list when there are no tasks" in {
-      (extractQuery.extract _).expects(*).returning(Right(None))
       mockService().returning(Future.successful(Nil))
 
       sendRequest() ~> route ~> check {
@@ -316,7 +331,6 @@ class RestApiTestSuite
 
     /** Возвращать 500 Internal Server Error в случае асинхронной ошибки */
     "return 500 Internal Server Error when encountering an asynchronous error" in {
-      (extractQuery.extract _).expects(*).returning(Right(None))
       mockService().returning(Future.failed(new RuntimeException))
 
       sendRequest() ~> route ~> check {
@@ -326,7 +340,6 @@ class RestApiTestSuite
 
     /** Возвращать 500 Internal Server Error в случае синхронной ошибки */
     "return 500 Internal Server Error when encountering a synchronous error" in {
-      (extractQuery.extract _).expects(*).returning(Right(None))
       mockService().throwing(new RuntimeException)
 
       sendRequest() ~> route ~> check {
