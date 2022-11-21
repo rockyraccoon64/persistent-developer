@@ -1,16 +1,18 @@
 package rr64.developer.infrastructure.task.query
 
-import org.scalatest.{Assertion, EitherValues}
+import org.scalamock.scalatest.MockFactory
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
+import org.scalatest.{Assertion, EitherValues}
 
 class LimitOffsetQueryStringExtractorTestSuite
   extends AnyWordSpec
     with Matchers
-    with EitherValues {
+    with EitherValues
+    with MockFactory {
 
   trait ExtractorTest {
-    protected val factory = new LimitOffsetQueryFactory(defaultLimit = 10, maxLimit = 30)
+    protected val factory = mock[AbstractLimitOffsetQueryFactory]
     protected val errorMessage = "Invalid limit + offset"
     protected val extractor = new LimitOffsetQueryStringExtractor(factory, errorMessage)
     protected def assertError(query: String): Assertion =
@@ -20,12 +22,18 @@ class LimitOffsetQueryStringExtractorTestSuite
   /** Парсер запроса */
   "The query extractor" should {
 
-    /** Должен парсить корректно сформированный запрос */
+    /** Должен перенаправлять корректно сформированный запрос фабрике */
     "extract correct queries" in new ExtractorTest {
+      val expected: LimitOffsetQuery = new LimitOffsetQuery {
+        override def limit: Int = 15
+        override def offset: Int = 55
+      }
+      (factory.create _)
+        .expects(15, 55)
+        .returning(expected)
+
       val input = Some("limit:15,offset:55")
-      val result = extractor.extract(input).value
-      result.limit shouldEqual 15
-      result.offset shouldEqual 55
+      extractor.extract(input).value shouldEqual expected
     }
 
     /** Должен возвращать сообщение об ошибке, когда запрос сформирован некорректно */
@@ -55,7 +63,12 @@ class LimitOffsetQueryStringExtractorTestSuite
 
     /** Должен возвращать значение по умолчанию, когда запрос не передаётся */
     "return the default query when there is no input" in new ExtractorTest {
-      extractor.extract(None).value shouldEqual factory.Default
+      val default = new LimitOffsetQuery {
+        override def limit: Int = 5
+        override def offset: Int = 4
+      }
+      (factory.Default _).expects().returning(default)
+      extractor.extract(None).value shouldEqual default
     }
 
   }

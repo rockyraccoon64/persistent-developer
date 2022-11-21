@@ -7,7 +7,7 @@ import scala.util.Try
 import scala.util.matching.Regex
 
 class LimitOffsetQueryStringExtractor(
-  factory: LimitOffsetQueryFactory,
+  factory: AbstractLimitOffsetQueryFactory,
   errorMessage: String
 ) extends QueryExtractor[Option[String], LimitOffsetQuery] {
 
