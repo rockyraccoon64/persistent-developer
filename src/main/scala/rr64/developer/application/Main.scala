@@ -13,6 +13,7 @@ import rr64.developer.infrastructure.dev.behavior.DeveloperBehavior
 import rr64.developer.infrastructure.task.{TaskRepository, TaskSlickRepository, TasksFromRepository}
 import rr64.developer.infrastructure.task.query.{LimitOffsetQuery, LimitOffsetQueryFactory, LimitOffsetQueryFactoryImpl, LimitOffsetQueryStringExtractor}
 import slick.basic.DatabaseConfig
+import slick.jdbc.PostgresProfile
 
 import scala.concurrent.{Await, ExecutionContext}
 import scala.jdk.DurationConverters.JavaDurationOps
@@ -50,7 +51,7 @@ object Main extends App {
 
   type Query = LimitOffsetQuery
 
-  val dbConfig = DatabaseConfig.forConfig("slick")
+  val dbConfig = DatabaseConfig.forConfig[PostgresProfile]("slick")
   val database = dbConfig.db
 
   val developerStateRepository =
