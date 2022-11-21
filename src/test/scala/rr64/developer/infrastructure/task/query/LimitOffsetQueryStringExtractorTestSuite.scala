@@ -67,7 +67,7 @@ class LimitOffsetQueryStringExtractorTestSuite
         override def limit: Int = 5
         override def offset: Int = 4
       }
-      (factory.Default _).expects().returning(default)
+      (factory.default _).expects().returning(default)
       extractor.extract(None).value shouldEqual default
     }
 

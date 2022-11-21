@@ -2,7 +2,7 @@ package rr64.developer.infrastructure.task.query
 
 
 trait AbstractLimitOffsetQueryFactory {
-  def Default: LimitOffsetQuery
+  def default: LimitOffsetQuery
   def create(limit: Int, offset: Int): LimitOffsetQuery
 }
 
@@ -14,7 +14,7 @@ class LimitOffsetQueryFactory(defaultLimit: Int, maxLimit: Int)
 
   private lazy val _default = create(limit = defaultLimit, offset = 0)
 
-  override def Default: LimitOffsetQuery = _default
+  override def default: LimitOffsetQuery = _default
 
   override def create(limit: Int, offset: Int): LimitOffsetQuery =
     if (limit > 0 && limit <= maxLimit && offset >= 0)

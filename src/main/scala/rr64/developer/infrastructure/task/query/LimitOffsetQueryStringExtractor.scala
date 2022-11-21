@@ -23,7 +23,7 @@ class LimitOffsetQueryStringExtractor(
       case Some(_) =>
         Left(errorMessage)
       case None =>
-        Right(factory.Default)
+        Right(factory.default)
     }
 
 }
