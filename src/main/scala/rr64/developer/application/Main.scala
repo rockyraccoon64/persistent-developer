@@ -5,7 +5,7 @@ import akka.actor.typed.{ActorSystem, Scheduler}
 import akka.persistence.typed.PersistenceId
 import akka.util.Timeout
 import com.typesafe.config.ConfigFactory
-import rr64.developer.domain.{DeveloperService, Factor}
+import rr64.developer.domain.{Developer, DeveloperService, DeveloperServiceFacade, Factor, Tasks}
 import rr64.developer.infrastructure.RootGuardian
 import rr64.developer.infrastructure.api.{QueryExtractor, RestApi}
 import rr64.developer.infrastructure.dev.behavior.DeveloperBehavior
@@ -43,7 +43,10 @@ object Main extends App {
     askTimeoutDuration
   )
 
-  val service: DeveloperService[LimitOffsetQuery] = ???
+  val developer: Developer = ???
+  val tasks: Tasks[LimitOffsetQuery] = ???
+  val service: DeveloperService[LimitOffsetQuery] =
+    new DeveloperServiceFacade[LimitOffsetQuery](developer, tasks)
   val queryExtractor: QueryExtractor[Option[String], LimitOffsetQuery] = ???
   val restApi = new RestApi[LimitOffsetQuery](service, queryExtractor)
 
