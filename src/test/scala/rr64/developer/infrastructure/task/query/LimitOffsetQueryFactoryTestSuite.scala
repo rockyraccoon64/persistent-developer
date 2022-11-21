@@ -11,7 +11,8 @@ class LimitOffsetQueryFactoryTestSuite
   extends AnyWordSpec
     with Matchers {
 
-  trait FactoryTest {
+  /** Фикстура для тестирования создания фабрики */
+  trait FactoryConstructionTest {
 
     def assertException(defaultLimit: Int, maxLimit: Int): Assertion = {
       assertThrows[IllegalArgumentException] {
@@ -44,14 +45,14 @@ class LimitOffsetQueryFactoryTestSuite
   "The factory" should {
 
     /** Должна иметь limit по умолчанию больше, чем 0 */
-    "have a default limit greater than zero" in new FactoryTest {
+    "have a default limit greater than zero" in new FactoryConstructionTest {
       assertException(defaultLimit = -1, maxLimit = 30)
       assertException(defaultLimit = 0, maxLimit = 30)
       assertNoException(defaultLimit = 1, maxLimit = 30)
     }
 
     /** Должна иметь максимальный limit больше, чем 0 */
-    "have a max limit greater than zero" in new FactoryTest {
+    "have a max limit greater than zero" in new FactoryConstructionTest {
       assertException(defaultLimit = 1, maxLimit = -1)
       assertException(defaultLimit = 1, maxLimit = 0)
       assertNoException(defaultLimit = 1, maxLimit = 1)
@@ -59,7 +60,7 @@ class LimitOffsetQueryFactoryTestSuite
     }
 
     /** Должна limit по умолчанию меньше или равный, чем максимальный */
-    "have a default limit less than or equal to the max limit" in new FactoryTest {
+    "have a default limit less than or equal to the max limit" in new FactoryConstructionTest {
       assertNoException(defaultLimit = 5, maxLimit = 10)
       assertNoException(defaultLimit = 10, maxLimit = 10)
       assertException(defaultLimit = 11, maxLimit = 10)
