@@ -29,5 +29,5 @@ class LimitOffsetQueryStringExtractor(
 }
 
 object LimitOffsetQueryStringExtractor {
-  private val regex: Regex = """^limit:(\d),offset:(\d+)$""".r
+  private val regex: Regex = """^limit:(\d+),offset:(\d+)$""".r
 }
