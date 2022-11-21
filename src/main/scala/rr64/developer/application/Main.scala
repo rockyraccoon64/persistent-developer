@@ -102,17 +102,17 @@ object Main extends App {
     )
 
   val postgresDriverClass = "org.postgresql.Driver"
-
   val dbUrl = dbConfig.config.getString("db.url")
   val dbUser = dbConfig.config.getString("db.user")
   val dbPassword = dbConfig.config.getString("db.password")
 
-  val developerStateProjectionSessionFactory = () => new PlainJdbcSession(
-    driverClass = postgresDriverClass,
-    url = dbUrl,
-    user = dbUser,
-    password = dbPassword
-  )
+  val developerStateProjectionSessionFactory =
+    () => new PlainJdbcSession(
+      driverClass = postgresDriverClass,
+      url = dbUrl,
+      user = dbUser,
+      password = dbPassword
+    )
 
   val developerStateProjectionHandler =
     new DeveloperStateToRepository(developerStateRepository)
