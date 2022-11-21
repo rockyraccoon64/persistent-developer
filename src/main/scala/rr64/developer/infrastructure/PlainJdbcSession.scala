@@ -12,7 +12,7 @@ class PlainJdbcSession(
   password: String
 ) extends JdbcSession {
 
-  lazy val conn: Connection = {
+  private lazy val conn: Connection = {
     Class.forName(driverClass)
     val c = DriverManager.getConnection(url, user, password)
     c.setAutoCommit(false)

@@ -104,14 +104,13 @@ object Main extends App {
       tag = DeveloperBehavior.EventTag
     )
 
-  val postgresDriverClass = "org.postgresql.Driver"
   val dbUrl = dbConfig.config.getString("db.url")
   val dbUser = dbConfig.config.getString("db.user")
   val dbPassword = dbConfig.config.getString("db.password")
 
   val jdbcSessionFactory =
     () => new PlainJdbcSession(
-      driverClass = postgresDriverClass,
+      driverClass = "org.postgresql.Driver",
       url = dbUrl,
       user = dbUser,
       password = dbPassword
