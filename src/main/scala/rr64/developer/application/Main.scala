@@ -43,11 +43,13 @@ object Main extends App {
     askTimeoutDuration
   )
 
+  type Query = LimitOffsetQuery
+
   val developer: Developer = ???
-  val tasks: Tasks[LimitOffsetQuery] = ???
-  val service: DeveloperService[LimitOffsetQuery] =
-    new DeveloperServiceFacade[LimitOffsetQuery](developer, tasks)
-  val queryExtractor: QueryExtractor[Option[String], LimitOffsetQuery] = ???
-  val restApi = new RestApi[LimitOffsetQuery](service, queryExtractor)
+  val tasks: Tasks[Query] = ???
+  val service: DeveloperService[Query] =
+    new DeveloperServiceFacade[Query](developer, tasks)
+  val queryExtractor: QueryExtractor[Option[String], Query] = ???
+  val restApi = new RestApi[Query](service, queryExtractor)
 
 }
