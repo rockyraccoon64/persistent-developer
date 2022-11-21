@@ -14,7 +14,10 @@ import scala.util.{Failure, Success, Try}
 /**
  * REST API сервиса разработки
  */
-class RestApi[Query](service: DeveloperService[Query], extractQuery: Option[String] => Query) {
+class RestApi[Query](
+  service: DeveloperService[Query],
+  extractQuery: Option[String] => Either[String, Query] // TODO QueryExtractor
+) {
 
   private val developerStateAdapter = implicitly[Adapter[DeveloperState, ApiDeveloperState]]
   private val taskInfoAdapter = implicitly[Adapter[TaskInfo, ApiTaskInfo]]
@@ -54,9 +57,13 @@ class RestApi[Query](service: DeveloperService[Query], extractQuery: Option[Stri
   private val taskListRoute =
     (path("task-list") & parameter("query".as[String].optional)) { query =>
       extractExecutionContext { implicit exec =>
-        val parsedQuery = extractQuery(query)
-        onSuccess(service.tasks(parsedQuery)) { taskList =>
-          complete(taskList.map(taskInfoAdapter.convert))
+        extractQuery(query) match {
+          case Right(parsedQuery) =>
+            onSuccess(service.tasks(parsedQuery)) { taskList =>
+              complete(taskList.map(taskInfoAdapter.convert))
+            }
+          case Left(message) =>
+            complete(StatusCodes.BadRequest, ApiError("Query", message))
         }
       }
     }
