@@ -13,7 +13,6 @@ import spray.json.JsObject
 
 import java.util.UUID
 import scala.concurrent.{ExecutionContext, Future}
-import scala.util.{Failure, Success, Try}
 
 /**
  * Тесты REST API сервиса разработки
@@ -28,15 +27,7 @@ class RestApiTestSuite
 
   private val service = mock[DeveloperService[Query]]
   private val errorMessage = "The query content should be an integer"
-  private val extractQuery: QueryExtractor[Option[String], Query] = {
-    case Some(value) =>
-      Try(Integer.parseInt(value)) match {
-        case Success(value) => Right(Some(value))
-        case Failure(_) => Left(errorMessage)
-      }
-    case None =>
-      Right(None)
-  }
+  private val extractQuery = mock[QueryExtractor[Option[String], Option[Int]]]
   private val route = new RestApi[Query](service, extractQuery).route
 
   /** Запрос информации о задаче */
@@ -277,14 +268,18 @@ class RestApiTestSuite
     def mockService(expectedQuery: MockParameter[Query] = *) =
       (service.tasks(_: Query)(_: ExecutionContext)).expects(expectedQuery, *)
 
-    /** Передавать содержимое запроса сервису */
+    /** Передавать содержимое запроса сервису после парсинга */
     "extract the query" in {
-      mockService(expectedQuery = Some(505))
-      sendRequest(query = Some("505")) ~> route
+      val input = Some("505")
+      val extracted = Some(505)
+      (extractQuery.extract _).expects(input).returning(Right(extracted))
+      mockService(expectedQuery = extracted)
+      sendRequest(query = input) ~> route
     }
 
     /** Сообщать об ошибке в запросе */
     "notify when there's an error in the query" in {
+      (extractQuery.extract _).expects(*).returning(Left(errorMessage))
       sendRequest(query = Some("ABC")) ~> route ~> check {
         status shouldEqual StatusCodes.BadRequest
         responseAs[ApiError] shouldEqual ApiError.inQuery(errorMessage)
@@ -293,6 +288,7 @@ class RestApiTestSuite
 
     /** Возвращать список задач */
     "return the task list" in {
+      (extractQuery.extract _).expects(*).returning(Right(None))
       val domainTasks = TaskInfo(UUID.randomUUID(), Difficulty(99), TaskStatus.Finished) ::
         TaskInfo(UUID.randomUUID(), Difficulty(51), TaskStatus.InProgress) ::
         TaskInfo(UUID.randomUUID(), Difficulty(65), TaskStatus.Queued) ::
@@ -310,6 +306,7 @@ class RestApiTestSuite
 
     /** Возвращать пустой массив, если задач нет */
     "return an empty list when there are no tasks" in {
+      (extractQuery.extract _).expects(*).returning(Right(None))
       mockService().returning(Future.successful(Nil))
 
       sendRequest() ~> route ~> check {
@@ -319,6 +316,7 @@ class RestApiTestSuite
 
     /** Возвращать 500 Internal Server Error в случае асинхронной ошибки */
     "return 500 Internal Server Error when encountering an asynchronous error" in {
+      (extractQuery.extract _).expects(*).returning(Right(None))
       mockService().returning(Future.failed(new RuntimeException))
 
       sendRequest() ~> route ~> check {
@@ -328,6 +326,7 @@ class RestApiTestSuite
 
     /** Возвращать 500 Internal Server Error в случае синхронной ошибки */
     "return 500 Internal Server Error when encountering a synchronous error" in {
+      (extractQuery.extract _).expects(*).returning(Right(None))
       mockService().throwing(new RuntimeException)
 
       sendRequest() ~> route ~> check {
