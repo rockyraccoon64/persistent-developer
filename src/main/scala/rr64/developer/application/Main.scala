@@ -1,23 +1,30 @@
 package rr64.developer.application
 
-import akka.actor.typed.{ActorSystem, Scheduler}
 import akka.actor.typed.scaladsl.AskPattern.Askable
+import akka.actor.typed.{ActorSystem, Scheduler}
 import akka.persistence.typed.PersistenceId
 import akka.util.Timeout
+import com.typesafe.config.ConfigFactory
 import rr64.developer.domain.Factor
 import rr64.developer.infrastructure.RootGuardian
 import rr64.developer.infrastructure.dev.behavior.DeveloperBehavior
 
 import scala.concurrent.ExecutionContext
-import scala.concurrent.duration.DurationInt
+import scala.jdk.DurationConverters.JavaDurationOps
 
 object Main extends App {
+
   implicit val system: ActorSystem[RootGuardian.Message] =
     ActorSystem(RootGuardian(), "root-guardian")
   implicit val ec: ExecutionContext = system.executionContext
   implicit val scheduler: Scheduler = system.scheduler
 
-  implicit val timeout: Timeout = Timeout(5.seconds) // TODO config
+  val config = ConfigFactory.load()
+  val appConfig = config.getConfig("persistent-dev")
+
+  val timeoutDuration = appConfig.getDuration("ask-timeout").toScala
+
+  implicit val timeout: Timeout = Timeout(timeoutDuration)
 
   val developerName = "dev-actor"
   val developerBehavior = DeveloperBehavior(
