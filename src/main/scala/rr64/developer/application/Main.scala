@@ -78,8 +78,6 @@ object Main extends App {
 
   val developerRef = spawn(supervisedBehavior, developerName)
 
-  type Query = LimitOffsetQuery
-
   val dbConfig = DatabaseConfig.forConfig[PostgresProfile]("slick")
   val database = dbConfig.db
 
@@ -89,6 +87,8 @@ object Main extends App {
     new DeveloperStateFromRepository(developerPersistenceId, developerStateRepository)
   val developer: Developer =
     PersistentDeveloper(developerRef, developerStateProvider)
+
+  type Query = LimitOffsetQuery
 
   val taskRepository: TaskRepository[Query] =
     new TaskSlickRepository(database)
