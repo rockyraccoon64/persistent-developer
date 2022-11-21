@@ -21,7 +21,7 @@ import rr64.developer.infrastructure.dev.behavior.DeveloperBehavior
 import rr64.developer.infrastructure.dev.behavior.DeveloperBehavior.{DeveloperEvent, DeveloperRef}
 import rr64.developer.infrastructure.dev.{DeveloperStateFromRepository, DeveloperStateSlickRepository, DeveloperStateToRepository, PersistentDeveloper}
 import rr64.developer.infrastructure.task.query.{LimitOffsetQuery, LimitOffsetQueryFactory, LimitOffsetQueryFactoryImpl, LimitOffsetQueryStringExtractor}
-import rr64.developer.infrastructure.task.{TaskRepository, TaskSlickRepository, TasksFromRepository}
+import rr64.developer.infrastructure.task.{TaskRepository, TaskSlickRepository, TaskToRepository, TasksFromRepository}
 import slick.basic.DatabaseConfig
 import slick.jdbc.PostgresProfile
 
@@ -132,6 +132,31 @@ object Main extends App {
       SpawnProtocol.Spawn(
         behavior = developerStateProjectionBehavior,
         name = "dev-projection",
+        props = Props.empty,
+        replyTo = replyTo
+      )
+    },
+    askTimeoutDuration
+  )
+
+  val taskProjectionHandler =
+    new TaskToRepository(taskRepository)
+
+  val taskProjection = JdbcProjection.atLeastOnceAsync(
+    ProjectionId("task-projection", "0"),
+    sourceProvider = sourceProvider,
+    sessionFactory = developerStateProjectionSessionFactory,
+    handler = () => taskProjectionHandler
+  )
+
+  val taskProjectionBehavior: Behavior[ProjectionBehavior.Command] =
+    ProjectionBehavior(taskProjection)
+
+  val taskProjectionRef = Await.result(
+    system.ask { (replyTo: ActorRef[ActorRef[ProjectionBehavior.Command]]) =>
+      SpawnProtocol.Spawn(
+        behavior = taskProjectionBehavior,
+        name = "task-projection",
         props = Props.empty,
         replyTo = replyTo
       )
