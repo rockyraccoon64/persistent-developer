@@ -6,15 +6,15 @@ import akka.projection.jdbc.JdbcSession
 import java.sql.{Connection, DriverManager}
 
 class PlainJdbcSession(
-  driverClass: String,
-  databaseUrl: String,
-  user: String,
-  password: String
+                        driverClass: String,
+                        url: String,
+                        user: String,
+                        password: String
 ) extends JdbcSession {
 
   lazy val conn: Connection = {
     Class.forName(driverClass)
-    val c = DriverManager.getConnection(databaseUrl, user, password)
+    val c = DriverManager.getConnection(url, user, password)
     c.setAutoCommit(false)
     c
   }
