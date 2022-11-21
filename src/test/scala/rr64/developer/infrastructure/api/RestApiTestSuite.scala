@@ -26,7 +26,6 @@ class RestApiTestSuite
   private type Query = Option[Int]
 
   private val service = mock[DeveloperService[Query]]
-  private val errorMessage = "The query content should be an integer"
   private val extractQuery = mock[QueryExtractor[Option[String], Option[Int]]]
   private val route = new RestApi[Query](service, extractQuery).route
 
@@ -296,6 +295,7 @@ class RestApiTestSuite
 
     /** Сообщать об ошибке в запросе */
     "notify when there's an error in the query" in {
+      val errorMessage = "The query content should be an integer"
       mockExtractor(returns = Left(errorMessage))
       sendRequest(query = Some("ABC")) ~> route ~> check {
         status shouldEqual StatusCodes.BadRequest
