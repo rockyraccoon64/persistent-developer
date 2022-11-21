@@ -9,7 +9,7 @@ import rr64.developer.domain.Factor
 import rr64.developer.infrastructure.RootGuardian
 import rr64.developer.infrastructure.dev.behavior.DeveloperBehavior
 
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{Await, ExecutionContext}
 import scala.jdk.DurationConverters.JavaDurationOps
 
 object Main extends App {
@@ -35,8 +35,10 @@ object Main extends App {
     workFactor = Factor(workFactor),
     restFactor = Factor(restFactor)
   )
-  val developerRef = system.ask { replyTo =>
-    RootGuardian.SpawnDeveloper(developerName, developerBehavior, replyTo)
-  }
+
+  val developerRef = Await.result(
+    system.ask(RootGuardian.SpawnDeveloper(developerName, developerBehavior, _)),
+    askTimeoutDuration
+  )
 
 }
