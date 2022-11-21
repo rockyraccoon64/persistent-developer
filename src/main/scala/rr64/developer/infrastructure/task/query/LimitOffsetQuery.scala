@@ -11,8 +11,6 @@ trait LimitOffsetQuery {
   def offset: Int
 }
 
-class LimitOffsetException extends RuntimeException
-
 class LimitOffsetQueryFactory(defaultLimit: Int, maxLimit: Int) {
   require(defaultLimit > 0 && maxLimit > 0 && defaultLimit <= maxLimit)
 
