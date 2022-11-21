@@ -18,7 +18,7 @@ import rr64.developer.domain._
 import rr64.developer.infrastructure.PlainJdbcSession
 import rr64.developer.infrastructure.api.{QueryExtractor, RestApi}
 import rr64.developer.infrastructure.dev.behavior.DeveloperBehavior
-import rr64.developer.infrastructure.dev.behavior.DeveloperBehavior.{DeveloperEvent, DeveloperRef}
+import rr64.developer.infrastructure.dev.behavior.DeveloperBehavior.DeveloperEvent
 import rr64.developer.infrastructure.dev.{DeveloperStateFromRepository, DeveloperStateSlickRepository, DeveloperStateToRepository, PersistentDeveloper}
 import rr64.developer.infrastructure.task.query.{LimitOffsetQuery, LimitOffsetQueryFactory, LimitOffsetQueryFactoryImpl, LimitOffsetQueryStringExtractor}
 import rr64.developer.infrastructure.task.{TaskRepository, TaskSlickRepository, TaskToRepository, TasksFromRepository}
@@ -51,6 +51,14 @@ object Main extends App {
   implicit val scheduler: Scheduler = system.scheduler
   implicit val askTimeout: Timeout = Timeout(askTimeoutDuration)
 
+  def spawn[T](behavior: Behavior[T], name: String): ActorRef[T] =
+    Await.result(
+      system.ask { (replyTo: ActorRef[ActorRef[T]]) =>
+        SpawnProtocol.Spawn(behavior, name, Props.empty, replyTo)
+      },
+      askTimeoutDuration
+    )
+
   val developerBehavior = DeveloperBehavior(
     persistenceId = PersistenceId.ofUniqueId(developerPersistenceId),
     workFactor = Factor(workFactor),
@@ -68,12 +76,7 @@ object Main extends App {
     Behaviors.supervise(developerBehavior)
       .onFailure(supervisorStrategy)
 
-  val developerRef = Await.result(
-    system.ask { (replyTo: ActorRef[DeveloperRef]) =>
-      SpawnProtocol.Spawn(supervisedBehavior, developerName, Props.empty, replyTo)
-    },
-    askTimeoutDuration
-  )
+  val developerRef = spawn(supervisedBehavior, developerName)
 
   type Query = LimitOffsetQuery
 
@@ -118,7 +121,7 @@ object Main extends App {
     new DeveloperStateToRepository(developerStateRepository)
 
   val developerStateProjection = JdbcProjection.atLeastOnceAsync(
-    ProjectionId("dev-projection", "0"), // TODO config
+    ProjectionId("dev-projection", "0"),
     sourceProvider = sourceProvider,
     sessionFactory = jdbcSessionFactory,
     handler = () => developerStateProjectionHandler
@@ -127,17 +130,8 @@ object Main extends App {
   val developerStateProjectionBehavior: Behavior[ProjectionBehavior.Command] =
     ProjectionBehavior(developerStateProjection)
 
-  val developerStateProjectionRef = Await.result(
-    system.ask { (replyTo: ActorRef[ActorRef[ProjectionBehavior.Command]]) =>
-      SpawnProtocol.Spawn(
-        behavior = developerStateProjectionBehavior,
-        name = "dev-projection",
-        props = Props.empty,
-        replyTo = replyTo
-      )
-    },
-    askTimeoutDuration
-  )
+  val developerStateProjectionRef =
+    spawn(developerStateProjectionBehavior, "dev-projection")
 
   val taskProjectionHandler =
     new TaskToRepository(taskRepository)
@@ -152,17 +146,8 @@ object Main extends App {
   val taskProjectionBehavior: Behavior[ProjectionBehavior.Command] =
     ProjectionBehavior(taskProjection)
 
-  val taskProjectionRef = Await.result(
-    system.ask { (replyTo: ActorRef[ActorRef[ProjectionBehavior.Command]]) =>
-      SpawnProtocol.Spawn(
-        behavior = taskProjectionBehavior,
-        name = "task-projection",
-        props = Props.empty,
-        replyTo = replyTo
-      )
-    },
-    askTimeoutDuration
-  )
+  val taskProjectionRef =
+    spawn(taskProjectionBehavior, "task-projection")
 
   val queryFactory: LimitOffsetQueryFactory =
     new LimitOffsetQueryFactoryImpl(
