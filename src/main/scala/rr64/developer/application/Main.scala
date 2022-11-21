@@ -25,6 +25,8 @@ object Main extends App {
   val developerPersistenceId = appConfig.getString(ConfigKeys.DeveloperPersistenceId)
   val workFactor = appConfig.getInt(ConfigKeys.WorkFactor)
   val restFactor = appConfig.getInt(ConfigKeys.RestFactor)
+  val defaultLimit = appConfig.getInt(ConfigKeys.DefaultLimit)
+  val maxLimit = appConfig.getInt(ConfigKeys.MaxLimit)
 
   implicit val system: ActorSystem[RootGuardian.Message] =
     ActorSystem(RootGuardian(), rootGuardianName)
@@ -51,8 +53,8 @@ object Main extends App {
     new DeveloperServiceFacade[Query](developer, tasks)
 
   val queryFactory: LimitOffsetQueryFactory = new LimitOffsetQueryFactoryImpl(
-    defaultLimit = ???,
-    maxLimit = ???
+    defaultLimit = defaultLimit,
+    maxLimit = maxLimit
   )
   val queryExtractorErrorMessage: String =
     "Invalid list query parameters"
