@@ -106,7 +106,7 @@ object Main extends App {
   val dbUser = dbConfig.config.getString("db.user")
   val dbPassword = dbConfig.config.getString("db.password")
 
-  val developerStateProjectionSessionFactory =
+  val jdbcSessionFactory =
     () => new PlainJdbcSession(
       driverClass = postgresDriverClass,
       url = dbUrl,
@@ -120,7 +120,7 @@ object Main extends App {
   val developerStateProjection = JdbcProjection.atLeastOnceAsync(
     ProjectionId("dev-projection", "0"), // TODO config
     sourceProvider = sourceProvider,
-    sessionFactory = developerStateProjectionSessionFactory,
+    sessionFactory = jdbcSessionFactory,
     handler = () => developerStateProjectionHandler
   )
 
@@ -145,7 +145,7 @@ object Main extends App {
   val taskProjection = JdbcProjection.atLeastOnceAsync(
     ProjectionId("task-projection", "0"),
     sourceProvider = sourceProvider,
-    sessionFactory = developerStateProjectionSessionFactory,
+    sessionFactory = jdbcSessionFactory,
     handler = () => taskProjectionHandler
   )
 
