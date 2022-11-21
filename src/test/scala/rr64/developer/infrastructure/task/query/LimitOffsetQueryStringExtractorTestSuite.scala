@@ -48,6 +48,11 @@ class LimitOffsetQueryStringExtractorTestSuite
       assertError("limit:15,offset:")
     }
 
+    /** Должен возвращать сообщение об ошибке, когда запрос пустой */
+    "return an error message when the query is empty" in new ExtractorTest {
+      assertError("")
+    }
+
   }
 
 }
