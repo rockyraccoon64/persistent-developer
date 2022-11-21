@@ -10,7 +10,7 @@ class LimitOffsetQueryStringExtractorTestSuite
     with EitherValues {
 
   trait ExtractorTest {
-    private val factory = new LimitOffsetQueryFactory(defaultLimit = 10, maxLimit = 30)
+    protected val factory = new LimitOffsetQueryFactory(defaultLimit = 10, maxLimit = 30)
     protected val errorMessage = "Invalid limit + offset"
     protected val extractor = new LimitOffsetQueryStringExtractor(factory, errorMessage)
     protected def assertError(query: String): Assertion =
@@ -51,6 +51,11 @@ class LimitOffsetQueryStringExtractorTestSuite
     /** Должен возвращать сообщение об ошибке, когда запрос пустой */
     "return an error message when the query is empty" in new ExtractorTest {
       assertError("")
+    }
+
+    /** Должен возвращать значение по умолчанию, когда запрос не передаётся */
+    "return the default query when there is no input" in new ExtractorTest {
+      extractor.extract(None).right.value shouldEqual factory.Default
     }
 
   }
