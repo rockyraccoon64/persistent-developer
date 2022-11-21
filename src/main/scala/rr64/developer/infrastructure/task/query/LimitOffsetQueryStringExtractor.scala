@@ -13,7 +13,7 @@ class LimitOffsetQueryStringExtractor(
 
   override def extract(input: Option[String]): Either[String, LimitOffsetQuery] =
     input match {
-      case Some(regex(limitStr, offsetStr)) =>
+      case Some(queryRegex(limitStr, offsetStr)) =>
         Try {
           factory.create(
             limit = limitStr.toInt,
@@ -29,5 +29,5 @@ class LimitOffsetQueryStringExtractor(
 }
 
 object LimitOffsetQueryStringExtractor {
-  private val regex: Regex = """^limit:(\d+),offset:(\d+)$""".r
+  private val queryRegex: Regex = """^limit:(\d+),offset:(\d+)$""".r
 }
