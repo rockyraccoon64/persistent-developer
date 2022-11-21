@@ -1,18 +1,19 @@
 package rr64.developer.application
 
+import akka.actor.typed._
 import akka.actor.typed.scaladsl.AskPattern.Askable
-import akka.actor.typed.{ActorSystem, Scheduler}
+import akka.actor.typed.scaladsl.Behaviors
 import akka.http.scaladsl.Http
 import akka.persistence.typed.PersistenceId
 import akka.util.Timeout
 import com.typesafe.config.ConfigFactory
-import rr64.developer.domain.{Developer, DeveloperService, DeveloperServiceFacade, Factor, Tasks}
-import rr64.developer.infrastructure.RootGuardian
+import rr64.developer.domain._
 import rr64.developer.infrastructure.api.{QueryExtractor, RestApi}
-import rr64.developer.infrastructure.dev.{DeveloperStateFromRepository, DeveloperStateSlickRepository, PersistentDeveloper}
 import rr64.developer.infrastructure.dev.behavior.DeveloperBehavior
-import rr64.developer.infrastructure.task.{TaskRepository, TaskSlickRepository, TasksFromRepository}
+import rr64.developer.infrastructure.dev.behavior.DeveloperBehavior.DeveloperRef
+import rr64.developer.infrastructure.dev.{DeveloperStateFromRepository, DeveloperStateSlickRepository, PersistentDeveloper}
 import rr64.developer.infrastructure.task.query.{LimitOffsetQuery, LimitOffsetQueryFactory, LimitOffsetQueryFactoryImpl, LimitOffsetQueryStringExtractor}
+import rr64.developer.infrastructure.task.{TaskRepository, TaskSlickRepository, TasksFromRepository}
 import slick.basic.DatabaseConfig
 import slick.jdbc.PostgresProfile
 
@@ -36,8 +37,8 @@ object Main extends App {
   val apiInterface = appConfig.getString(ConfigKeys.ApiInterface)
   val apiPort = appConfig.getInt(ConfigKeys.ApiPort)
 
-  implicit val system: ActorSystem[RootGuardian.Message] =
-    ActorSystem(RootGuardian(), rootGuardianName)
+  implicit val system: ActorSystem[SpawnProtocol.Command] =
+    ActorSystem(SpawnProtocol(), rootGuardianName)
   implicit val ec: ExecutionContext = system.executionContext
   implicit val scheduler: Scheduler = system.scheduler
   implicit val askTimeout: Timeout = Timeout(askTimeoutDuration)
@@ -48,8 +49,21 @@ object Main extends App {
     restFactor = Factor(restFactor)
   )
 
+  val supervisorStrategy =
+    SupervisorStrategy.restartWithBackoff(
+      minBackoff = 1.second,
+      maxBackoff = 30.seconds,
+      randomFactor = 0.2
+    )
+
+  val supervisedBehavior =
+    Behaviors.supervise(developerBehavior)
+      .onFailure(supervisorStrategy)
+
   val developerRef = Await.result(
-    system.ask(RootGuardian.SpawnDeveloper(developerName, developerBehavior, _)),
+    system.ask { (replyTo: ActorRef[DeveloperRef]) =>
+      SpawnProtocol.Spawn(supervisedBehavior, developerName, Props.empty, replyTo)
+    },
     askTimeoutDuration
   )
 
