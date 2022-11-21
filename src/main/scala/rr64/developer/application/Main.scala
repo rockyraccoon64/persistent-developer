@@ -16,6 +16,7 @@ import rr64.developer.infrastructure.task.query.{LimitOffsetQuery, LimitOffsetQu
 import slick.basic.DatabaseConfig
 import slick.jdbc.PostgresProfile
 
+import scala.concurrent.duration.DurationInt
 import scala.concurrent.{Await, ExecutionContext}
 import scala.jdk.DurationConverters.JavaDurationOps
 
@@ -83,5 +84,6 @@ object Main extends App {
 
   val restApi = new RestApi[Query](service, queryExtractor)
   val server = Http().newServerAt(apiInterface, apiPort).bind(restApi.route)
+  server.map(_.addToCoordinatedShutdown(hardTerminationDeadline = 10.seconds))
 
 }
