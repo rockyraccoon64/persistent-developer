@@ -5,7 +5,7 @@ import org.scalatest.matchers.should.Matchers
 import org.scalatest.{Assertion, BeforeAndAfterEach}
 import rr64.developer.domain.{Difficulty, TaskInfo, TaskStatus}
 import rr64.developer.infrastructure.PostgresSpec
-import rr64.developer.infrastructure.task.query.LimitOffsetQueryFactory
+import rr64.developer.infrastructure.task.query.LimitOffsetQueryFactoryImpl
 import slick.jdbc.PostgresProfile.api._
 
 import java.util.UUID
@@ -124,7 +124,7 @@ class TaskSlickRepositoryTestSuite
     } yield taskOpt shouldEqual None
   }
 
-  private val queryFactory = new LimitOffsetQueryFactory(defaultLimit = 20, maxLimit = 100)
+  private val queryFactory = new LimitOffsetQueryFactoryImpl(defaultLimit = 20, maxLimit = 100)
 
   def listTest(
     limit: Int,
