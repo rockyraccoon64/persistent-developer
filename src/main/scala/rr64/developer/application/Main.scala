@@ -9,6 +9,7 @@ import rr64.developer.domain.{Developer, DeveloperService, DeveloperServiceFacad
 import rr64.developer.infrastructure.RootGuardian
 import rr64.developer.infrastructure.api.{QueryExtractor, RestApi}
 import rr64.developer.infrastructure.dev.behavior.DeveloperBehavior
+import rr64.developer.infrastructure.task.{TaskRepository, TaskSlickRepository, TasksFromRepository}
 import rr64.developer.infrastructure.task.query.{LimitOffsetQuery, LimitOffsetQueryFactory, LimitOffsetQueryFactoryImpl, LimitOffsetQueryStringExtractor}
 
 import scala.concurrent.{Await, ExecutionContext}
@@ -47,8 +48,11 @@ object Main extends App {
 
   type Query = LimitOffsetQuery
 
+  val database = ???
+
   val developer: Developer = ???
-  val tasks: Tasks[Query] = ???
+  val taskRepository: TaskRepository[Query] = new TaskSlickRepository(database)
+  val tasks: Tasks[Query] = new TasksFromRepository[Query](taskRepository)
   val service: DeveloperService[Query] =
     new DeveloperServiceFacade[Query](developer, tasks)
 
