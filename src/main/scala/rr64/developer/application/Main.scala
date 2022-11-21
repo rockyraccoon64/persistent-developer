@@ -51,7 +51,7 @@ object Main extends App {
     new DeveloperServiceFacade[Query](developer, tasks)
 
   val queryFactory: LimitOffsetQueryFactory = ???
-  val queryExtractorErrorMessage: String = ???
+  val queryExtractorErrorMessage: String = "Invalid list query parameters"
   val queryExtractor: QueryExtractor[Option[String], Query] =
     new LimitOffsetQueryStringExtractor(queryFactory, queryExtractorErrorMessage)
 
