@@ -13,6 +13,7 @@ import spray.json.JsObject
 
 import java.util.UUID
 import scala.concurrent.{ExecutionContext, Future}
+import scala.util.{Failure, Success, Try}
 
 /**
  * Тесты REST API сервиса разработки
@@ -26,7 +27,19 @@ class RestApiTestSuite
   private type Query = Option[Int]
 
   private val service = mock[DeveloperService[Query]]
-  private val extractQuery: Option[String] => Query = _.map(Integer.parseInt)
+  private val errorMessage = "The query content should be an integer"
+  private val extractQuery: Option[String] => Either[String, Query] = stringOpt => {
+    stringOpt.map(x => Try(Integer.parseInt(x)).toOption).toRight(errorMessage)
+    stringOpt match {
+      case Some(value) =>
+        Try(Integer.parseInt(value)) match {
+          case Success(value) => Right(Some(value))
+          case Failure(_) => Left(errorMessage)
+        }
+      case None =>
+        Right(None)
+    }
+  }
   private val route = new RestApi[Query](service, extractQuery).route
 
   /** Запрос информации о задаче */
@@ -271,6 +284,14 @@ class RestApiTestSuite
     "extract the query" in {
       mockService(expectedQuery = Some(505))
       sendRequest(query = Some("505")) ~> route
+    }
+
+    /** Сообщать об ошибке в запросе */
+    "notify when there's an error in the query" in {
+      sendRequest(query = Some("ABC")) ~> route ~> check {
+        status shouldEqual StatusCodes.BadRequest
+        responseAs[ApiError] shouldEqual ApiError("Query", errorMessage)
+      }
     }
 
     /** Возвращать список задач */
