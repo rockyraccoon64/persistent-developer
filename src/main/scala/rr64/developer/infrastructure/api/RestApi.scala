@@ -16,7 +16,7 @@ import scala.util.{Failure, Success, Try}
  */
 class RestApi[Query](
   service: DeveloperService[Query],
-  extractQuery: Option[String] => Either[String, Query] // TODO QueryExtractor
+  queryExtractor: QueryExtractor[Option[String], Query]
 ) {
 
   private val developerStateAdapter = implicitly[Adapter[DeveloperState, ApiDeveloperState]]
@@ -57,7 +57,7 @@ class RestApi[Query](
   private val taskListRoute =
     (path("task-list") & parameter("query".as[String].optional)) { query =>
       extractExecutionContext { implicit exec =>
-        extractQuery(query) match {
+        queryExtractor.extract(query) match {
           case Right(parsedQuery) =>
             onSuccess(service.tasks(parsedQuery)) { taskList =>
               complete(taskList.map(taskInfoAdapter.convert))

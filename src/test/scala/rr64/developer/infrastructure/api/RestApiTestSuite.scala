@@ -28,17 +28,14 @@ class RestApiTestSuite
 
   private val service = mock[DeveloperService[Query]]
   private val errorMessage = "The query content should be an integer"
-  private val extractQuery: Option[String] => Either[String, Query] = stringOpt => {
-    stringOpt.map(x => Try(Integer.parseInt(x)).toOption).toRight(errorMessage)
-    stringOpt match {
-      case Some(value) =>
-        Try(Integer.parseInt(value)) match {
-          case Success(value) => Right(Some(value))
-          case Failure(_) => Left(errorMessage)
-        }
-      case None =>
-        Right(None)
-    }
+  private val extractQuery: QueryExtractor[Option[String], Query] = {
+    case Some(value) =>
+      Try(Integer.parseInt(value)) match {
+        case Success(value) => Right(Some(value))
+        case Failure(_) => Left(errorMessage)
+      }
+    case None =>
+      Right(None)
   }
   private val route = new RestApi[Query](service, extractQuery).route
 
