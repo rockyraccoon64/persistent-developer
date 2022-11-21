@@ -98,7 +98,7 @@ object Main extends App {
     EventSourcedProvider.eventsByTag[DeveloperEvent](
       system = system,
       readJournalPluginId = JdbcReadJournal.Identifier,
-      tag = "dev"
+      tag = DeveloperBehavior.EventTag
     )
 
   val postgresDriverClass = "org.postgresql.Driver"

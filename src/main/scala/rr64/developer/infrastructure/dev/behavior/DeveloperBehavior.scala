@@ -13,6 +13,8 @@ object DeveloperBehavior {
   type DeveloperEvent = Event
   type DeveloperRef = ActorRef[Command]
 
+  val EventTag = "dev"
+
   def apply(persistenceId: PersistenceId, workFactor: Factor, restFactor: Factor): Behavior[Command] =
     Behaviors.withTimers { timer =>
       implicit val setup: Setup = Setup(workFactor, restFactor, timer)
@@ -27,7 +29,7 @@ object DeveloperBehavior {
 
         case (State.Resting(lastCompleted, _), RecoveryCompleted) =>
           startRestTimer(lastCompleted)
-      }
+      }.withTagger(_ => Set(EventTag))
     }
 
 }
