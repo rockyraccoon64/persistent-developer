@@ -23,7 +23,7 @@ class LimitOffsetQueryStringExtractorTestSuite
     /** Должен парсить корректно сформированный запрос */
     "extract correct queries" in new ExtractorTest {
       val input = Some("limit:15,offset:55")
-      val result = extractor.extract(input).right.value
+      val result = extractor.extract(input).value
       result.limit shouldEqual 15
       result.offset shouldEqual 55
     }
@@ -55,7 +55,7 @@ class LimitOffsetQueryStringExtractorTestSuite
 
     /** Должен возвращать значение по умолчанию, когда запрос не передаётся */
     "return the default query when there is no input" in new ExtractorTest {
-      extractor.extract(None).right.value shouldEqual factory.Default
+      extractor.extract(None).value shouldEqual factory.Default
     }
 
   }
