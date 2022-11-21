@@ -28,7 +28,7 @@ object Main extends App {
 
   val developerName = appConfig.getString(ConfigKeys.DeveloperActorName)
   val developerBehavior = DeveloperBehavior(
-    persistenceId = PersistenceId.of("dev", "00"),
+    persistenceId = PersistenceId.ofUniqueId(ConfigKeys.DeveloperPersistenceId),
     workFactor = Factor(10), // TODO config
     restFactor = Factor(5)
   )
