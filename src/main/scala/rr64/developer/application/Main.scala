@@ -14,21 +14,21 @@ import scala.jdk.DurationConverters.JavaDurationOps
 
 object Main extends App {
 
-  implicit val system: ActorSystem[RootGuardian.Message] =
-    ActorSystem(RootGuardian(), "root-guardian")
-  implicit val ec: ExecutionContext = system.executionContext
-  implicit val scheduler: Scheduler = system.scheduler
-
   val config = ConfigFactory.load()
   val appConfig = config.getConfig(ConfigKeys.AppConfig)
 
+  val rootGuardianName = appConfig.getString(ConfigKeys.RootGuardianName)
   val timeoutDuration = appConfig.getDuration(ConfigKeys.AskTimeout).toScala
   val developerName = appConfig.getString(ConfigKeys.DeveloperActorName)
   val workFactor = appConfig.getInt(ConfigKeys.WorkFactor)
   val restFactor = appConfig.getInt(ConfigKeys.RestFactor)
 
-  implicit val timeout: Timeout = Timeout(timeoutDuration)
+  implicit val system: ActorSystem[RootGuardian.Message] =
+    ActorSystem(RootGuardian(), rootGuardianName)
+  implicit val ec: ExecutionContext = system.executionContext
+  implicit val scheduler: Scheduler = system.scheduler
 
+  implicit val timeout: Timeout = Timeout(timeoutDuration)
 
   val developerBehavior = DeveloperBehavior(
     persistenceId = PersistenceId.ofUniqueId(ConfigKeys.DeveloperPersistenceId),
@@ -38,4 +38,5 @@ object Main extends App {
   val developerRef = system.ask { replyTo =>
     RootGuardian.SpawnDeveloper(developerName, developerBehavior, replyTo)
   }
+
 }
