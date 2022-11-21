@@ -116,11 +116,15 @@ object Main extends App {
       password = dbPassword
     )
 
+  val defaultProjectionKey = "0"
+
   val developerStateProjectionHandler =
     new DeveloperStateToRepository(developerStateRepository)
 
+  val developerProjectionName = "dev-projection"
+
   val developerStateProjection = JdbcProjection.atLeastOnceAsync(
-    ProjectionId("dev-projection", "0"),
+    ProjectionId(developerProjectionName, defaultProjectionKey),
     sourceProvider = sourceProvider,
     sessionFactory = jdbcSessionFactory,
     handler = () => developerStateProjectionHandler
@@ -130,13 +134,15 @@ object Main extends App {
     ProjectionBehavior(developerStateProjection)
 
   val developerStateProjectionRef =
-    spawn(developerStateProjectionBehavior, "dev-projection")
+    spawn(developerStateProjectionBehavior, developerProjectionName)
 
   val taskProjectionHandler =
     new TaskToRepository(taskRepository)
 
+  val taskProjectionName = "task-projection"
+
   val taskProjection = JdbcProjection.atLeastOnceAsync(
-    ProjectionId("task-projection", "0"),
+    ProjectionId(taskProjectionName, defaultProjectionKey),
     sourceProvider = sourceProvider,
     sessionFactory = jdbcSessionFactory,
     handler = () => taskProjectionHandler
@@ -146,7 +152,7 @@ object Main extends App {
     ProjectionBehavior(taskProjection)
 
   val taskProjectionRef =
-    spawn(taskProjectionBehavior, "task-projection")
+    spawn(taskProjectionBehavior, taskProjectionName)
 
   val queryFactory: LimitOffsetQueryFactory =
     new LimitOffsetQueryFactoryImpl(
