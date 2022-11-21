@@ -5,6 +5,7 @@ import org.scalatest.matchers.should.Matchers
 import org.scalatest.{Assertion, BeforeAndAfterEach}
 import rr64.developer.domain.{Difficulty, TaskInfo, TaskStatus}
 import rr64.developer.infrastructure.PostgresSpec
+import rr64.developer.infrastructure.task.query.LimitOffsetQueryFactory
 import slick.jdbc.PostgresProfile.api._
 
 import java.util.UUID

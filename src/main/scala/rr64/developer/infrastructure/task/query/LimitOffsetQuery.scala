@@ -1,7 +1,7 @@
-package rr64.developer.infrastructure.task
+package rr64.developer.infrastructure.task.query
 
 import rr64.developer.infrastructure.api.QueryExtractor
-import rr64.developer.infrastructure.task.LimitOffsetQueryFactory.QueryImpl
+import rr64.developer.infrastructure.task.query.LimitOffsetQueryFactory.QueryImpl
 
 import scala.util.Try
 import scala.util.matching.Regex
