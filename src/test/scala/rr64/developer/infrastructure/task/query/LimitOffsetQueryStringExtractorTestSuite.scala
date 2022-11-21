@@ -20,9 +20,9 @@ class LimitOffsetQueryStringExtractorTestSuite
 
     /** Должен парсить корректно сформированный запрос */
     "extract correct queries" in new ExtractorTest {
-      val input = Some("limit:10,offset:55")
+      val input = Some("limit:15,offset:55")
       val result = extractor.extract(input).right.value
-      result.limit shouldEqual 10
+      result.limit shouldEqual 15
       result.offset shouldEqual 55
     }
 
