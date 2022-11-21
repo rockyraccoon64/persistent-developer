@@ -103,7 +103,7 @@ object Main extends App {
 
   val postgresDriverClass = "org.postgresql.Driver"
 
-  val developerStateProjectionDatabaseUrl = ???
+  val developerStateProjectionDatabaseUrl = dbConfig.config.getString("db.url")
 
   val developerStateProjectionSessionFactory = () => new PlainJdbcSession(
     driverClass = postgresDriverClass,
@@ -114,14 +114,26 @@ object Main extends App {
     new DeveloperStateToRepository(developerStateRepository)
 
   val developerStateProjection = JdbcProjection.atLeastOnceAsync(
-    ProjectionId("dev-projection", "0"),
+    ProjectionId("dev-projection", "0"), // TODO config
     sourceProvider = sourceProvider,
     sessionFactory = developerStateProjectionSessionFactory,
     handler = () => developerStateProjectionHandler
   )
 
-  val developerStateProjectionBehavior =
+  val developerStateProjectionBehavior: Behavior[ProjectionBehavior.Command] =
     ProjectionBehavior(developerStateProjection)
+
+  val developerStateProjectionRef = Await.result(
+    system.ask { (replyTo: ActorRef[ActorRef[ProjectionBehavior.Command]]) =>
+      SpawnProtocol.Spawn(
+        behavior = developerStateProjectionBehavior,
+        name = "dev-projection",
+        props = Props.empty,
+        replyTo = replyTo
+      )
+    },
+    askTimeoutDuration
+  )
 
   val queryFactory: LimitOffsetQueryFactory =
     new LimitOffsetQueryFactoryImpl(
