@@ -63,7 +63,7 @@ class RestApi[Query](
               complete(taskList.map(taskInfoAdapter.convert))
             }
           case Left(message) =>
-            complete(StatusCodes.BadRequest, ApiError("Query", message))
+            complete(StatusCodes.BadRequest, ApiError.inQuery(message))
         }
       }
     }

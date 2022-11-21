@@ -290,7 +290,7 @@ class RestApiTestSuite
     "notify when there's an error in the query" in {
       sendRequest(query = Some("ABC")) ~> route ~> check {
         status shouldEqual StatusCodes.BadRequest
-        responseAs[ApiError] shouldEqual ApiError("Query", errorMessage)
+        responseAs[ApiError] shouldEqual ApiError.inQuery(errorMessage)
       }
     }
 
