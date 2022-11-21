@@ -1,7 +1,7 @@
 package rr64.developer.infrastructure.dev.behavior
 
-import akka.actor.typed.Behavior
 import akka.actor.typed.scaladsl.Behaviors
+import akka.actor.typed.{ActorRef, Behavior}
 import akka.persistence.typed.scaladsl.EventSourcedBehavior
 import akka.persistence.typed.{PersistenceId, RecoveryCompleted}
 import rr64.developer.domain.Factor
@@ -10,6 +10,7 @@ import rr64.developer.infrastructure.dev.behavior.Timers._
 object DeveloperBehavior {
 
   type DeveloperCommand = Command
+  type DeveloperRef = ActorRef[Command]
 
   def apply(persistenceId: PersistenceId, workFactor: Factor, restFactor: Factor): Behavior[Command] =
     Behaviors.withTimers { timer =>

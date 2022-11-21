@@ -1,10 +1,10 @@
 package rr64.developer.infrastructure.dev
 
+import akka.actor.typed.Scheduler
 import akka.actor.typed.scaladsl.AskPattern.Askable
-import akka.actor.typed.{ActorRef, Scheduler}
 import akka.util.Timeout
 import rr64.developer.domain._
-import rr64.developer.infrastructure.dev.PersistentDeveloper.DeveloperRef
+import rr64.developer.infrastructure.dev.behavior.DeveloperBehavior.DeveloperRef
 import rr64.developer.infrastructure.dev.behavior.{Command, Replies}
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -33,8 +33,6 @@ class PersistentDeveloper(
 }
 
 object PersistentDeveloper {
-
-  type DeveloperRef = ActorRef[Command] // TODO move
 
   def apply(developerRef: DeveloperRef, stateProvider: DeveloperStateProvider)
     (implicit timeout: Timeout, scheduler: Scheduler): PersistentDeveloper =

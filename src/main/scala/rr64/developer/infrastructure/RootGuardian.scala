@@ -2,8 +2,7 @@ package rr64.developer.infrastructure
 
 import akka.actor.typed.scaladsl.Behaviors
 import akka.actor.typed.{ActorRef, Behavior}
-import rr64.developer.infrastructure.dev.PersistentDeveloper.DeveloperRef
-import rr64.developer.infrastructure.dev.behavior.DeveloperBehavior.DeveloperCommand
+import rr64.developer.infrastructure.dev.behavior.DeveloperBehavior.{DeveloperCommand, DeveloperRef}
 
 object RootGuardian {
 
