@@ -9,6 +9,8 @@ import rr64.developer.infrastructure.dev.behavior.Timers._
 
 object DeveloperBehavior {
 
+  type DeveloperCommand = Command
+
   def apply(persistenceId: PersistenceId, workFactor: Factor, restFactor: Factor): Behavior[Command] =
     Behaviors.withTimers { timer =>
       implicit val setup: Setup = Setup(workFactor, restFactor, timer)

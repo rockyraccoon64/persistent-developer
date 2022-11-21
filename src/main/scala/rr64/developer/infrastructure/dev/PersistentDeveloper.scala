@@ -34,7 +34,7 @@ class PersistentDeveloper(
 
 object PersistentDeveloper {
 
-  type DeveloperRef = ActorRef[Command]
+  type DeveloperRef = ActorRef[Command] // TODO move
 
   def apply(developerRef: DeveloperRef, stateProvider: DeveloperStateProvider)
     (implicit timeout: Timeout, scheduler: Scheduler): PersistentDeveloper =
