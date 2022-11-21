@@ -47,6 +47,13 @@ class LimitOffsetQueryStringExtractorTestSuite
       result.left.value shouldEqual errorMessage
     }
 
+    /** Должен возвращать сообщение об ошибке, когда одно из значений пустое */
+    "return an error message when one of the values is not provided" in new ExtractorTest {
+      val input = Some("limit:15,offset:")
+      val result = extractor.extract(input)
+      result.left.value shouldEqual errorMessage
+    }
+
   }
 
 }
