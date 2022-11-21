@@ -9,7 +9,7 @@ import rr64.developer.domain.{Developer, DeveloperService, DeveloperServiceFacad
 import rr64.developer.infrastructure.RootGuardian
 import rr64.developer.infrastructure.api.{QueryExtractor, RestApi}
 import rr64.developer.infrastructure.dev.behavior.DeveloperBehavior
-import rr64.developer.infrastructure.task.query.LimitOffsetQuery
+import rr64.developer.infrastructure.task.query.{LimitOffsetQuery, LimitOffsetQueryFactory, LimitOffsetQueryStringExtractor}
 
 import scala.concurrent.{Await, ExecutionContext}
 import scala.jdk.DurationConverters.JavaDurationOps
@@ -49,7 +49,12 @@ object Main extends App {
   val tasks: Tasks[Query] = ???
   val service: DeveloperService[Query] =
     new DeveloperServiceFacade[Query](developer, tasks)
-  val queryExtractor: QueryExtractor[Option[String], Query] = ???
+
+  val queryFactory: LimitOffsetQueryFactory = ???
+  val queryExtractorErrorMessage: String = ???
+  val queryExtractor: QueryExtractor[Option[String], Query] =
+    new LimitOffsetQueryStringExtractor(queryFactory, queryExtractorErrorMessage)
+
   val restApi = new RestApi[Query](service, queryExtractor)
 
 }
