@@ -1,7 +1,7 @@
 package rr64.developer.infrastructure.api
 
 import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport._
-import akka.http.scaladsl.model.StatusCodes
+import akka.http.scaladsl.model.{HttpRequest, StatusCodes}
 import akka.http.scaladsl.testkit.ScalatestRouteTest
 import org.scalamock.matchers.MockParameter
 import org.scalamock.scalatest.MockFactory
@@ -13,18 +13,31 @@ import spray.json.JsObject
 
 import java.util.UUID
 import scala.concurrent.{ExecutionContext, Future}
+import scala.util.{Failure, Success, Try}
 
 /**
  * Тесты REST API сервиса разработки
  * */
-class RestApiTests
+class RestApiTestSuite
   extends AnyWordSpec
     with Matchers
     with ScalatestRouteTest
     with MockFactory {
 
-  private val service = mock[DeveloperService]
-  private val route = new RestApi(service).route
+  private type Query = Option[Int]
+
+  private val service = mock[DeveloperService[Query]]
+  private val errorMessage = "The query content should be an integer"
+  private val extractQuery: QueryExtractor[Option[String], Query] = {
+    case Some(value) =>
+      Try(Integer.parseInt(value)) match {
+        case Success(value) => Right(Some(value))
+        case Failure(_) => Left(errorMessage)
+      }
+    case None =>
+      Right(None)
+  }
+  private val route = new RestApi[Query](service, extractQuery).route
 
   /** Запрос информации о задаче */
   "The service processing a single task info request" should {
@@ -35,14 +48,14 @@ class RestApiTests
       (service.taskInfo(_: UUID)(_: ExecutionContext))
         .expects(id, *)
 
-    def checkTask(id: UUID, difficulty: Int, status: TaskStatus, apiStatus: String) = {
+    def checkTask(id: UUID, difficulty: Difficulty, status: TaskStatus, apiStatus: String) = {
       val taskInfo = TaskInfo(id, difficulty, status)
 
       val taskInfoFound = Future.successful(Some(taskInfo))
       mockExpects(id).returning(taskInfoFound)
 
       Get(s"$baseUrl/$id") ~> route ~> check {
-        responseAs[ApiTaskInfo] shouldEqual ApiTaskInfo(id, difficulty, apiStatus)
+        responseAs[ApiTaskInfo] shouldEqual ApiTaskInfo(id, difficulty.value, apiStatus)
         response.status shouldEqual StatusCodes.OK
       }
     }
@@ -51,19 +64,19 @@ class RestApiTests
     "return the existing task info for a given id" in {
       checkTask(
         id = UUID.fromString("6f9ed143-70f4-4406-9c6b-2d9ddd297304"),
-        difficulty = 35,
+        difficulty = Difficulty(35),
         status = TaskStatus.InProgress,
         apiStatus = "InProgress"
       )
       checkTask(
         id = UUID.fromString("5f4e32f8-fc81-49c4-a05c-efbf5aa0d47d"),
-        difficulty = 99,
+        difficulty = Difficulty(99),
         status = TaskStatus.Queued,
         apiStatus = "Queued"
       )
       checkTask(
         id = UUID.fromString("374b7d13-8174-4476-b1d6-1d8759d2a6ed"),
-        difficulty = 1,
+        difficulty = Difficulty(1),
         status = TaskStatus.Finished,
         apiStatus = "Finished"
       )
@@ -196,6 +209,28 @@ class RestApiTests
       checkReply(difficulty, domainReply, apiReply)
     }
 
+    class DifficultyErrorTest(difficulty: Int) {
+      val postEntity = ApiTaskToAdd(difficulty)
+      val apiError = ApiError.TaskDifficulty
+
+      Post(url, postEntity) ~> route ~> check {
+        responseAs[ApiError] shouldEqual apiError
+        status shouldEqual StatusCodes.BadRequest
+      }
+    }
+
+    /** Если у задачи отрицательная сложность, возвращается 400 Bad Request и сообщение об ошибке */
+    "return 400 Bad Request when the task has negative difficulty" in
+      new DifficultyErrorTest(-1)
+
+    /** Если у задачи сложность равна нулю, возвращается 400 Bad Request и сообщение об ошибке */
+    "return 400 Bad Request when the task has zero difficulty" in
+      new DifficultyErrorTest(0)
+
+    /** Если у задачи сложность больше 100, возвращается 400 Bad Request и сообщение об ошибке */
+    "return 400 Bad Request when the task has difficulty greater than 100" in
+      new DifficultyErrorTest(101)
+
     /** В случае некорректного формата сущности возвращается 400 Bad Request */
     "return 400 Bad Request when encountering an invalid entity" in {
       val postEntity = JsObject()
@@ -234,22 +269,40 @@ class RestApiTests
   /** Во время обработки запроса списка задач API должен */
   "The service processing the task list request" should {
 
-    val SendRequest = Get("/api/query/task-list")
+    def sendRequest(query: Option[String] = None): HttpRequest = {
+      val queryString = query.map("?query=" + _).getOrElse("")
+      Get(s"/api/query/task-list$queryString")
+    }
 
-    def mockService = (service.tasks(_: ExecutionContext)).expects(*)
+    def mockService(expectedQuery: MockParameter[Query] = *) =
+      (service.tasks(_: Query)(_: ExecutionContext)).expects(expectedQuery, *)
 
-    /** Возвращать список всех имеющихся задач */
+    /** Передавать содержимое запроса сервису */
+    "extract the query" in {
+      mockService(expectedQuery = Some(505))
+      sendRequest(query = Some("505")) ~> route
+    }
+
+    /** Сообщать об ошибке в запросе */
+    "notify when there's an error in the query" in {
+      sendRequest(query = Some("ABC")) ~> route ~> check {
+        status shouldEqual StatusCodes.BadRequest
+        responseAs[ApiError] shouldEqual ApiError.inQuery(errorMessage)
+      }
+    }
+
+    /** Возвращать список задач */
     "return the task list" in {
-      val domainTasks = TaskInfo(UUID.randomUUID(), 99, TaskStatus.Finished) ::
-        TaskInfo(UUID.randomUUID(), 51, TaskStatus.InProgress) ::
-        TaskInfo(UUID.randomUUID(), 65, TaskStatus.Queued) ::
+      val domainTasks = TaskInfo(UUID.randomUUID(), Difficulty(99), TaskStatus.Finished) ::
+        TaskInfo(UUID.randomUUID(), Difficulty(51), TaskStatus.InProgress) ::
+        TaskInfo(UUID.randomUUID(), Difficulty(65), TaskStatus.Queued) ::
         Nil
 
       val apiTasks = domainTasks.map(ApiTaskInfo.adapter.convert)
 
-      mockService.returning(Future.successful(domainTasks))
+      mockService().returning(Future.successful(domainTasks))
 
-      SendRequest ~> route ~> check {
+      sendRequest() ~> route ~> check {
         responseAs[Seq[ApiTaskInfo]] should contain theSameElementsInOrderAs apiTasks
         status shouldEqual StatusCodes.OK
       }
@@ -257,27 +310,27 @@ class RestApiTests
 
     /** Возвращать пустой массив, если задач нет */
     "return an empty list when there are no tasks" in {
-      mockService.returning(Future.successful(Nil))
+      mockService().returning(Future.successful(Nil))
 
-      SendRequest ~> route ~> check {
+      sendRequest() ~> route ~> check {
         responseAs[Seq[ApiTaskInfo]] should have size 0
       }
     }
 
     /** Возвращать 500 Internal Server Error в случае асинхронной ошибки */
     "return 500 Internal Server Error when encountering an asynchronous error" in {
-      mockService.returning(Future.failed(new RuntimeException))
+      mockService().returning(Future.failed(new RuntimeException))
 
-      SendRequest ~> route ~> check {
+      sendRequest() ~> route ~> check {
         status shouldEqual StatusCodes.InternalServerError
       }
     }
 
     /** Возвращать 500 Internal Server Error в случае синхронной ошибки */
     "return 500 Internal Server Error when encountering a synchronous error" in {
-      mockService.throwing(new RuntimeException)
+      mockService().throwing(new RuntimeException)
 
-      SendRequest ~> route ~> check {
+      sendRequest() ~> route ~> check {
         status shouldEqual StatusCodes.InternalServerError
       }
     }

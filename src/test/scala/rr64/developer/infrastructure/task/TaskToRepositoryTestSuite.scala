@@ -31,7 +31,7 @@ class TaskToRepositoryTestSuite
 
   trait Fixture {
 
-    protected val mockRepository: TaskRepository = new TaskRepository {
+    protected val mockRepository: TaskRepository[Any] = new TaskRepository[Any] {
       private var tasks: Map[UUID, TaskInfo] = Map.empty
       override def save(taskInfo: TaskInfo): Future[_] = {
         tasks = tasks.updated(taskInfo.id, taskInfo)
@@ -39,7 +39,7 @@ class TaskToRepositoryTestSuite
       }
       override def findById(id: UUID)(implicit ec: ExecutionContext): Future[Option[TaskInfo]] =
         Future.successful(tasks.get(id))
-      override def list(implicit ec: ExecutionContext): Future[Seq[TaskInfo]] =
+      override def list(query: Any)(implicit ec: ExecutionContext): Future[Seq[TaskInfo]] =
         Future.successful(tasks.values.toSeq)
     }
 

@@ -9,7 +9,7 @@ import rr64.developer.infrastructure.task.TaskToRepository.TaskInfoFactory
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class TaskToRepository(repository: TaskRepository)
+class TaskToRepository(repository: TaskRepository[_])
     (implicit ec: ExecutionContext) extends Handler[EventEnvelope[Event]] {
 
   override def process(envelope: EventEnvelope[Event]): Future[Done] =

@@ -4,11 +4,12 @@ import akka.actor.typed.Behavior
 import akka.actor.typed.scaladsl.Behaviors
 import akka.persistence.typed.scaladsl.EventSourcedBehavior
 import akka.persistence.typed.{PersistenceId, RecoveryCompleted}
-import rr64.developer.infrastructure.dev.behavior.Timing._
+import rr64.developer.domain.Factor
+import rr64.developer.infrastructure.dev.behavior.Timers._
 
 object DeveloperBehavior {
 
-  def apply(persistenceId: PersistenceId, workFactor: Int, restFactor: Int): Behavior[Command] =
+  def apply(persistenceId: PersistenceId, workFactor: Factor, restFactor: Factor): Behavior[Command] =
     Behaviors.withTimers { timer =>
       implicit val setup: Setup = Setup(workFactor, restFactor, timer)
       EventSourcedBehavior[Command, Event, State](

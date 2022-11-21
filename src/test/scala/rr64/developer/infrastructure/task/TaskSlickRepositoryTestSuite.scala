@@ -3,7 +3,7 @@ package rr64.developer.infrastructure.task
 import org.scalatest.flatspec.AsyncFlatSpecLike
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.{Assertion, BeforeAndAfterEach}
-import rr64.developer.domain.{TaskInfo, TaskStatus}
+import rr64.developer.domain.{Difficulty, TaskInfo, TaskStatus}
 import rr64.developer.infrastructure.PostgresSpec
 import slick.jdbc.PostgresProfile.api._
 
@@ -21,28 +21,31 @@ class TaskSlickRepositoryTestSuite
 
   private val queuedTask = TaskInfo(
     id = UUID.fromString("30dbff1f-88dc-4972-aa70-a057bf5f1c88"),
-    difficulty = 5,
+    difficulty = Difficulty(5),
     status = TaskStatus.Queued
   )
 
   private val taskInProgress = TaskInfo(
     id = UUID.fromString("959c3bee-9f0b-472e-b45b-1285aa78f215"),
-    difficulty = 38,
+    difficulty = Difficulty(38),
     status = TaskStatus.InProgress
   )
 
   private val finishedTask = TaskInfo(
     id = UUID.fromString("cc972e84-c43a-49dc-8ab2-3a2a36676ac8"),
-    difficulty = 100,
+    difficulty = Difficulty(100),
     status = TaskStatus.InProgress
   )
+
+  private val taskList = Seq(queuedTask, finishedTask, taskInProgress)
 
   override protected def beforeEach(): Unit = {
     super.beforeEach()
     Await.result(
       database.run {
         sqlu"""CREATE TABLE task(
-             id UUID PRIMARY KEY,
+             serial_id SERIAL PRIMARY KEY,
+             uuid UUID NOT NULL UNIQUE,
              difficulty INT NOT NULL,
              status VARCHAR(10) NOT NULL
            )"""
@@ -87,7 +90,7 @@ class TaskSlickRepositoryTestSuite
   "The repository" should "update existing tasks' status" in {
     val initialTask = TaskInfo(
       id = UUID.fromString("a67fb9da-9c25-4bce-ac57-abe4de23f208"),
-      difficulty = 50,
+      difficulty = Difficulty(50),
       status = TaskStatus.InProgress
     )
     val updatedTask = initialTask.copy(status = TaskStatus.Finished)
@@ -101,10 +104,10 @@ class TaskSlickRepositoryTestSuite
   "The repository" should "not update existing tasks' difficulty" in {
     val initialTask = TaskInfo(
       id = UUID.fromString("8d22593a-f477-48a2-be4a-79f2d8e34f91"),
-      difficulty = 15,
+      difficulty = Difficulty(15),
       status = TaskStatus.InProgress
     )
-    val updatedTask = initialTask.copy(difficulty = 1)
+    val updatedTask = initialTask.copy(difficulty = Difficulty(1))
     for {
       _ <- repository.save(initialTask)
       _ <- repository.save(updatedTask)
@@ -120,15 +123,73 @@ class TaskSlickRepositoryTestSuite
     } yield taskOpt shouldEqual None
   }
 
-  /** Репозиторий должен возвращать список всех задач */
-  "The repository" should "list all tasks" in {
-    val tasks = Seq(queuedTask, finishedTask, taskInProgress)
+  private val queryFactory = new LimitOffsetQueryFactory(defaultLimit = 20, maxLimit = 100)
+
+  def listTest(
+    limit: Int,
+    offset: Int,
+    initial: Seq[TaskInfo],
+    expected: Seq[TaskInfo]
+  ): Future[Assertion] = {
+    val query = queryFactory.create(limit, offset)
     for {
-      _ <- Future.traverse(tasks)(repository.save)
-      list <- repository.list
+      _ <- initial.foldLeft[Future[Any]](Future.unit) { (acc, task) =>
+        acc.flatMap(_ => repository.save(task))
+      }
+      list <- repository.list(query)
     } yield {
-      list should contain theSameElementsAs tasks
+      list should contain theSameElementsInOrderAs expected
     }
   }
+
+  /** Репозиторий должен ограничить количество возвращаемых задач переданным в limit числом */
+  "The repository" should "limit the number of returned tasks" in listTest(
+    limit = 2,
+    offset = 0,
+    initial = taskList,
+    expected = taskList.take(2)
+  )
+
+  /** Если задач меньше, чем limit, возвращаются все задачи */
+  "The repository" should "return all tasks if the limit exceeds their amount" in listTest(
+    limit = 4,
+    offset = 0,
+    initial = taskList,
+    expected = taskList
+  )
+
+  /** Репозиторий должен возвращать задачи, начиная с переданного offset */
+  "The repository" should "return tasks starting with the given offset" in listTest(
+    limit = 3,
+    offset = 1,
+    initial = taskList,
+    expected = taskList.tail
+  )
+
+  /** Репозиторий должен учитывать как limit, так и offset */
+  "The repository" should "return tasks starting with the given offset and limit their amount" in
+    listTest(
+      limit = 1,
+      offset = 1,
+      initial = taskList,
+      expected = taskList.slice(1, 2)
+    )
+
+  /** Если offset выходит за пределы количества имеющихся задач, возвращается пустой список */
+  "The repository" should "return an empty list when the offset exceeds the amount of tasks" in
+    listTest(
+      limit = 5,
+      offset = 3,
+      initial = taskList,
+      expected = Nil
+    )
+
+  /** Если задач нет, возвращается пустой список */
+  "The repository" should "return an empty list when there are no tasks" in listTest(
+    limit = 10,
+    offset = 0,
+    initial = Nil,
+    expected = Nil
+  )
 
 }

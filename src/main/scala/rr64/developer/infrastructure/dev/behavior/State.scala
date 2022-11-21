@@ -25,7 +25,7 @@ object State {
           // Начать работу над задачей
           val taskWithId = TaskWithId.fromTask(task)
           Effect.persist(Event.TaskStarted(taskWithId))
-            .thenRun((_: State) => Timing.startWorkTimer(taskWithId))
+            .thenRun((_: State) => Timers.startWorkTimer(taskWithId))
             .thenReply(replyTo)(_ => Replies.TaskStarted(taskWithId.id))
 
         case _ =>
@@ -48,7 +48,7 @@ object State {
         case FinishTask(id) if id == currentTask.id =>
           // Завершить работу над задачей
           Effect.persist(Event.TaskFinished(currentTask))
-            .thenRun((_: State) => Timing.startRestTimer(currentTask))
+            .thenRun((_: State) => Timers.startRestTimer(currentTask))
 
         case AddTask(task, replyTo) =>
           // Поставить задачу в очередь
@@ -77,7 +77,7 @@ object State {
         case StopResting =>
           // Завершить отдых
           Effect.persist(Event.Rested(taskQueue.headOption))
-            .thenRun((_: State) => taskQueue.headOption.foreach(Timing.startWorkTimer))
+            .thenRun((_: State) => taskQueue.headOption.foreach(Timers.startWorkTimer))
 
         case AddTask(task, replyTo) =>
           // Поставить задачу в очередь

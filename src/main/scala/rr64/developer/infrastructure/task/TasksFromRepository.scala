@@ -5,8 +5,9 @@ import rr64.developer.domain.{TaskInfo, Tasks}
 import java.util.UUID
 import scala.concurrent.{ExecutionContext, Future}
 
-class TasksFromRepository(repository: TaskRepository) extends Tasks {
+class TasksFromRepository[Query](repository: TaskRepository[Query]) extends Tasks[Query] {
   override def findById(id: UUID)(implicit ec: ExecutionContext): Future[Option[TaskInfo]] =
     repository.findById(id)
-  override def list(implicit ec: ExecutionContext): Future[Seq[TaskInfo]] = repository.list
+  override def list(query: Query)(implicit ec: ExecutionContext): Future[Seq[TaskInfo]] =
+    repository.list(query)
 }

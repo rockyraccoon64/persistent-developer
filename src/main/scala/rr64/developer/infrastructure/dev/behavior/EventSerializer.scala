@@ -57,7 +57,7 @@ class EventSerializer extends SerializerWithStringManifest {
     ByteBuffer.allocate(20)
       .putLong(id.getMostSignificantBits)
       .putLong(id.getLeastSignificantBits)
-      .putInt(difficulty)
+      .putInt(difficulty.value)
       .array
   }
 

@@ -1,6 +1,6 @@
 package rr64.developer.infrastructure.api
 
-import rr64.developer.domain.{TaskInfo, TaskStatus}
+import rr64.developer.domain.{Difficulty, TaskInfo, TaskStatus}
 import rr64.developer.infrastructure.api.CommonJsonFormats._
 import spray.json.DefaultJsonProtocol._
 import spray.json.RootJsonFormat
@@ -16,7 +16,7 @@ object ApiTaskInfo {
   implicit val adapter: Adapter[TaskInfo, ApiTaskInfo] = value => {
     val TaskInfo(
       id: UUID,
-      difficulty: Int,
+      difficulty: Difficulty,
       status: TaskStatus
     ) = value
 
@@ -26,6 +26,6 @@ object ApiTaskInfo {
       case TaskStatus.Finished => "Finished"
     }
 
-    ApiTaskInfo(id, difficulty, statusString)
+    ApiTaskInfo(id, difficulty.value, statusString)
   }
 }
