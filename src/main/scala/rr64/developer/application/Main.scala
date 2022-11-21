@@ -1,17 +1,25 @@
 package rr64.developer.application
 
-import akka.actor.typed._
 import akka.actor.typed.scaladsl.AskPattern.Askable
 import akka.actor.typed.scaladsl.Behaviors
+import akka.actor.typed.{ActorSystem, Scheduler, _}
 import akka.http.scaladsl.Http
+import akka.persistence.jdbc.query.scaladsl.JdbcReadJournal
+import akka.persistence.query.Offset
 import akka.persistence.typed.PersistenceId
+import akka.projection.eventsourced.EventEnvelope
+import akka.projection.eventsourced.scaladsl.EventSourcedProvider
+import akka.projection.jdbc.scaladsl.JdbcProjection
+import akka.projection.scaladsl.SourceProvider
+import akka.projection.{ProjectionBehavior, ProjectionId}
 import akka.util.Timeout
 import com.typesafe.config.ConfigFactory
 import rr64.developer.domain._
+import rr64.developer.infrastructure.PlainJdbcSession
 import rr64.developer.infrastructure.api.{QueryExtractor, RestApi}
 import rr64.developer.infrastructure.dev.behavior.DeveloperBehavior
-import rr64.developer.infrastructure.dev.behavior.DeveloperBehavior.DeveloperRef
-import rr64.developer.infrastructure.dev.{DeveloperStateFromRepository, DeveloperStateSlickRepository, PersistentDeveloper}
+import rr64.developer.infrastructure.dev.behavior.DeveloperBehavior.{DeveloperEvent, DeveloperRef}
+import rr64.developer.infrastructure.dev.{DeveloperStateFromRepository, DeveloperStateSlickRepository, DeveloperStateToRepository, PersistentDeveloper}
 import rr64.developer.infrastructure.task.query.{LimitOffsetQuery, LimitOffsetQueryFactory, LimitOffsetQueryFactoryImpl, LimitOffsetQueryStringExtractor}
 import rr64.developer.infrastructure.task.{TaskRepository, TaskSlickRepository, TasksFromRepository}
 import slick.basic.DatabaseConfig
@@ -85,6 +93,35 @@ object Main extends App {
     new TasksFromRepository[Query](taskRepository)
   val service: DeveloperService[Query] =
     new DeveloperServiceFacade[Query](developer, tasks)
+
+  val sourceProvider: SourceProvider[Offset, EventEnvelope[DeveloperEvent]] =
+    EventSourcedProvider.eventsByTag[DeveloperEvent](
+      system = system,
+      readJournalPluginId = JdbcReadJournal.Identifier,
+      tag = "dev"
+    )
+
+  val postgresDriverClass = "org.postgresql.Driver"
+
+  val developerStateProjectionDatabaseUrl = ???
+
+  val developerStateProjectionSessionFactory = () => new PlainJdbcSession(
+    driverClass = postgresDriverClass,
+    databaseUrl = developerStateProjectionDatabaseUrl
+  )
+
+  val developerStateProjectionHandler =
+    new DeveloperStateToRepository(developerStateRepository)
+
+  val developerStateProjection = JdbcProjection.atLeastOnceAsync(
+    ProjectionId("dev-projection", "0"),
+    sourceProvider = sourceProvider,
+    sessionFactory = developerStateProjectionSessionFactory,
+    handler = () => developerStateProjectionHandler
+  )
+
+  val developerStateProjectionBehavior =
+    ProjectionBehavior(developerStateProjection)
 
   val queryFactory: LimitOffsetQueryFactory =
     new LimitOffsetQueryFactoryImpl(
