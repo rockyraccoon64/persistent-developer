@@ -5,9 +5,11 @@ import akka.actor.typed.{ActorSystem, Scheduler}
 import akka.persistence.typed.PersistenceId
 import akka.util.Timeout
 import com.typesafe.config.ConfigFactory
-import rr64.developer.domain.Factor
+import rr64.developer.domain.{DeveloperService, Factor}
 import rr64.developer.infrastructure.RootGuardian
+import rr64.developer.infrastructure.api.{QueryExtractor, RestApi}
 import rr64.developer.infrastructure.dev.behavior.DeveloperBehavior
+import rr64.developer.infrastructure.task.query.LimitOffsetQuery
 
 import scala.concurrent.{Await, ExecutionContext}
 import scala.jdk.DurationConverters.JavaDurationOps
@@ -40,5 +42,9 @@ object Main extends App {
     system.ask(RootGuardian.SpawnDeveloper(developerName, developerBehavior, _)),
     askTimeoutDuration
   )
+
+  val service: DeveloperService[LimitOffsetQuery] = ???
+  val queryExtractor: QueryExtractor[Option[String], LimitOffsetQuery] = ???
+  val restApi = new RestApi[LimitOffsetQuery](service, queryExtractor)
 
 }
