@@ -9,7 +9,7 @@ import rr64.developer.domain.{Developer, DeveloperService, DeveloperServiceFacad
 import rr64.developer.infrastructure.RootGuardian
 import rr64.developer.infrastructure.api.{QueryExtractor, RestApi}
 import rr64.developer.infrastructure.dev.behavior.DeveloperBehavior
-import rr64.developer.infrastructure.task.query.{LimitOffsetQuery, LimitOffsetQueryFactory, LimitOffsetQueryStringExtractor}
+import rr64.developer.infrastructure.task.query.{LimitOffsetQuery, LimitOffsetQueryFactory, LimitOffsetQueryFactoryImpl, LimitOffsetQueryStringExtractor}
 
 import scala.concurrent.{Await, ExecutionContext}
 import scala.jdk.DurationConverters.JavaDurationOps
@@ -50,8 +50,12 @@ object Main extends App {
   val service: DeveloperService[Query] =
     new DeveloperServiceFacade[Query](developer, tasks)
 
-  val queryFactory: LimitOffsetQueryFactory = ???
-  val queryExtractorErrorMessage: String = "Invalid list query parameters"
+  val queryFactory: LimitOffsetQueryFactory = new LimitOffsetQueryFactoryImpl(
+    defaultLimit = ???,
+    maxLimit = ???
+  )
+  val queryExtractorErrorMessage: String =
+    "Invalid list query parameters"
   val queryExtractor: QueryExtractor[Option[String], Query] =
     new LimitOffsetQueryStringExtractor(queryFactory, queryExtractorErrorMessage)
 
