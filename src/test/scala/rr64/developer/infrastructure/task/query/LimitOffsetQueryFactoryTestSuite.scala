@@ -27,7 +27,8 @@ class LimitOffsetQueryFactoryTestSuite
 
   }
 
-  trait LimitOffsetTest {
+  /** Фикстура для тестирования создания запросов фабрикой */
+  trait QueryConstructionTest {
 
     private val factory = new LimitOffsetQueryFactory(defaultLimit = 10, maxLimit = 30)
 
@@ -72,23 +73,23 @@ class LimitOffsetQueryFactoryTestSuite
   "The limit" should {
 
     /** Не должно быть меньше одного */
-    "not be allowed to be less than 1" in new LimitOffsetTest {
+    "not be allowed to be less than 1" in new QueryConstructionTest {
       assertException(limit = 0)
       assertException(limit = -1)
     }
 
     /** Не должно быть больше максимального */
-    "not be allowed to be greater than the max limit" in new LimitOffsetTest {
+    "not be allowed to be greater than the max limit" in new QueryConstructionTest {
       assertException(limit = 31)
     }
 
     /** Может быть максимальным */
-    "be allowed to be equal to the max limit" in new LimitOffsetTest {
+    "be allowed to be equal to the max limit" in new QueryConstructionTest {
       assertNoException(limit = 30)
     }
 
     /** Может быть больше нуля */
-    "be allowed to be greater than zero" in new LimitOffsetTest {
+    "be allowed to be greater than zero" in new QueryConstructionTest {
       assertNoException(limit = 1)
       assertNoException(limit = 25)
     }
@@ -99,13 +100,13 @@ class LimitOffsetQueryFactoryTestSuite
   "The offset" should {
 
     /** Не должен быть меньше нуля */
-    "not be allowed to be less than zero" in new LimitOffsetTest {
+    "not be allowed to be less than zero" in new QueryConstructionTest {
       assertException(offset = -1)
       assertException(offset = -5)
     }
 
     /** Может быть больше или равен нулю */
-    "be allowed to be greater than or equal to zero" in new LimitOffsetTest {
+    "be allowed to be greater than or equal to zero" in new QueryConstructionTest {
       assertNoException(offset = 0)
       assertNoException(offset = 1)
       assertNoException(offset = 99)
