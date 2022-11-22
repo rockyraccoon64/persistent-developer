@@ -28,7 +28,7 @@ object TaskInfo {
     status = status
   )
 
-  implicit class TaskInfoFactory(taskWithId: TaskWithId) {
+  implicit class TaskInfoFromTaskWithId(taskWithId: TaskWithId) {
     def withStatus(status: TaskStatus): TaskInfo = fromTaskAndStatus(taskWithId, status)
   }
 
