@@ -24,6 +24,9 @@ class DeveloperStateCodecTestSuite
     /** "Работает" */
     "encode and decode the Working state" in testCodec(DeveloperState.Working)
 
+    /** "Отдыхает" */
+    "encode and decode the Resting state" in testCodec(DeveloperState.Resting)
+
   }
 
 }
