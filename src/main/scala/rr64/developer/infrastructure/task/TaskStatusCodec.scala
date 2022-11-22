@@ -3,7 +3,11 @@ package rr64.developer.infrastructure.task
 import rr64.developer.domain.TaskStatus
 import rr64.developer.infrastructure.Codec
 
+/**
+ * Кодек статусов задач в строку
+ */
 class TaskStatusCodec extends Codec[TaskStatus, String] {
+
   private val InProgressStatus = "InProgress"
   private val QueuedStatus = "Queued"
   private val FinishedStatus = "Finished"
