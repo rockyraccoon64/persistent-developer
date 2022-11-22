@@ -29,7 +29,12 @@ object TaskInfo {
   )
 
   implicit class TaskInfoFromTaskWithId(taskWithId: TaskWithId) {
-    def withStatus(status: TaskStatus): TaskInfo = fromTaskAndStatus(taskWithId, status)
+    /**
+     * Добавить к задаче статус
+     * @param status Статус задачи
+     * */
+    def withStatus(status: TaskStatus): TaskInfo =
+      fromTaskAndStatus(taskWithId, status)
   }
 
 }
