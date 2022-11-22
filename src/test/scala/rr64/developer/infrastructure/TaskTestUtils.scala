@@ -1,6 +1,6 @@
 package rr64.developer.infrastructure
 
-import rr64.developer.domain.Task
+import rr64.developer.domain.task.Task
 import rr64.developer.infrastructure.task.TaskWithId
 
 import java.util.UUID

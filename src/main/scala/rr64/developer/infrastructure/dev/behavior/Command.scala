@@ -1,7 +1,7 @@
 package rr64.developer.infrastructure.dev.behavior
 
 import akka.actor.typed.ActorRef
-import rr64.developer.domain.Task
+import rr64.developer.domain.task.Task
 
 import java.util.UUID
 

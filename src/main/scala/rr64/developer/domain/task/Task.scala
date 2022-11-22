@@ -1,4 +1,6 @@
-package rr64.developer.domain
+package rr64.developer.domain.task
+
+import rr64.developer.domain.Difficulty
 
 /**
  * Задача

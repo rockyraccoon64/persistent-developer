@@ -1,6 +1,6 @@
 package rr64.developer.infrastructure.api
 
-import rr64.developer.domain.Task
+import rr64.developer.domain.task.Task
 import spray.json.DefaultJsonProtocol._
 import spray.json.RootJsonFormat
 
