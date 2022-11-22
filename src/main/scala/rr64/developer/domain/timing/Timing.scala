@@ -1,7 +1,6 @@
-package rr64.developer.domain
+package rr64.developer.domain.timing
 
 import rr64.developer.domain.task.Difficulty
-import rr64.developer.domain.timing.Factor
 
 import scala.concurrent.duration.{DurationInt, FiniteDuration}
 

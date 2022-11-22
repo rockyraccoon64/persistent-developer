@@ -1,9 +1,8 @@
 package rr64.developer.infrastructure.dev.behavior
 
 import akka.actor.typed.scaladsl.TimerScheduler
-import rr64.developer.domain.Timing
 import rr64.developer.domain.task.Difficulty
-import rr64.developer.domain.timing.Factor
+import rr64.developer.domain.timing.{Factor, Timing}
 import rr64.developer.infrastructure.task.TaskWithId
 
 /**
