@@ -1,7 +1,14 @@
 package rr64.developer.domain
+
 import java.util.UUID
 import scala.concurrent.{ExecutionContext, Future}
 
+/**
+ * Фасад сервиса разработки задач на основе разработчика и сервиса задач
+ * @param developer Разработчик
+ * @param taskService Сервис задач
+ * @tparam Query Параметры запроса списка задач
+ */
 class DeveloperServiceFacade[Query](
   developer: Developer,
   taskService: Tasks[Query]
