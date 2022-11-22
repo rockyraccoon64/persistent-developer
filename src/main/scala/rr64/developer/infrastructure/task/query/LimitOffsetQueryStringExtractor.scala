@@ -6,6 +6,12 @@ import rr64.developer.infrastructure.task.query.LimitOffsetQueryStringExtractor.
 import scala.util.Try
 import scala.util.matching.Regex
 
+/**
+ * Парсер параметров запроса с использованием limit/offset из строки
+ * Например: limit:5,offset:15
+ * @param factory Фабрика параметров запроса
+ * @param errorMessage Сообщение об ошибке из-за некорректного формата строки
+ */
 class LimitOffsetQueryStringExtractor(
   factory: LimitOffsetQueryFactory,
   errorMessage: String
@@ -29,5 +35,6 @@ class LimitOffsetQueryStringExtractor(
 }
 
 object LimitOffsetQueryStringExtractor {
+  /** Регулярное выражение параметров запроса */
   private val queryRegex: Regex = """^limit:(\d+),offset:(\d+)$""".r
 }
