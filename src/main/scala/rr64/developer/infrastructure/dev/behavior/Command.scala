@@ -11,10 +11,21 @@ import java.util.UUID
 sealed trait Command
 
 object Command {
-  /** Добавить задачу */
+
+  /**
+   * Поручить задачу
+   * @param task Новая задача
+   * @param replyTo Получатель результата поручения задачи
+   * */
   case class AddTask(task: Task, replyTo: ActorRef[Replies.AddTaskResult]) extends Command
-  /** Завершить задачу */
+
+  /**
+   * Завершить задачу
+   * @param id Идентификатор задачи
+   * */
   private[behavior] case class FinishTask(id: UUID) extends Command
+
   /** Завершить отдых */
   private[behavior] case object StopResting extends Command
+
 }
