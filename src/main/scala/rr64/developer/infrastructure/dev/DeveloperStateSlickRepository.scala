@@ -1,17 +1,23 @@
 package rr64.developer.infrastructure.dev
+
 import rr64.developer.domain.DeveloperState
+import rr64.developer.infrastructure.dev.DeveloperStateSlickRepository._
 import slick.jdbc.PostgresProfile.api._
 
 import scala.concurrent.{ExecutionContext, Future}
 
+/**
+ * Репозиторий состояний разработчиков на основе PostgreSQL + Slick
+ * @param db База данных PostgreSQL
+ * */
 class DeveloperStateSlickRepository(db: Database) extends DeveloperStateRepository {
 
   override def save(id: String, state: DeveloperState)
       (implicit ec: ExecutionContext): Future[_] = {
     val name = state match {
-      case DeveloperState.Free => "Free"
-      case DeveloperState.Working => "Working"
-      case DeveloperState.Resting => "Resting"
+      case DeveloperState.Free => FreeState
+      case DeveloperState.Working => WorkingState
+      case DeveloperState.Resting => RestingState
     }
     db.run {
       sqlu"""INSERT INTO dev_state (id, state)
@@ -28,11 +34,17 @@ class DeveloperStateSlickRepository(db: Database) extends DeveloperStateReposito
         .as[String]
         .headOption
         .map(_.map {
-          case "Free" => DeveloperState.Free
-          case "Working" => DeveloperState.Working
-          case "Resting" => DeveloperState.Resting
+          case FreeState => DeveloperState.Free
+          case WorkingState => DeveloperState.Working
+          case RestingState => DeveloperState.Resting
         })
     }
   }
 
+}
+
+object DeveloperStateSlickRepository {
+  private val FreeState = "Free"
+  private val WorkingState = "Working"
+  private val RestingState = "Resting"
 }
