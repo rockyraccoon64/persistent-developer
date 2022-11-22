@@ -3,7 +3,7 @@ package rr64.developer.infrastructure.dev
 import org.scalatest.Assertion
 import org.scalatest.flatspec.AsyncFlatSpecLike
 import org.scalatest.matchers.should.Matchers
-import rr64.developer.domain.DeveloperState
+import rr64.developer.domain.dev.DeveloperState
 import rr64.developer.infrastructure.PostgresSpec
 import slick.jdbc.PostgresProfile.api._
 

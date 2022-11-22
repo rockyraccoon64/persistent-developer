@@ -3,7 +3,7 @@ package rr64.developer.infrastructure.dev
 import akka.Done
 import akka.projection.eventsourced.EventEnvelope
 import akka.projection.scaladsl.Handler
-import rr64.developer.domain.DeveloperState
+import rr64.developer.domain.dev.DeveloperState
 import rr64.developer.infrastructure.dev.behavior.Event
 
 import scala.concurrent.{ExecutionContext, Future}

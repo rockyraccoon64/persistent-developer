@@ -4,8 +4,8 @@ import akka.actor.testkit.typed.scaladsl.ScalaTestWithActorTestKit
 import akka.actor.typed.scaladsl.Behaviors
 import akka.actor.typed.{Behavior, Scheduler}
 import org.scalatest.flatspec.AsyncFlatSpecLike
-import rr64.developer.domain.dev.DeveloperReply
-import rr64.developer.domain.{DeveloperState, Task}
+import rr64.developer.domain.Task
+import rr64.developer.domain.dev.{DeveloperReply, DeveloperState}
 import rr64.developer.infrastructure.dev.behavior.DeveloperBehavior.DeveloperRef
 import rr64.developer.infrastructure.dev.behavior.{Command, Replies}
 

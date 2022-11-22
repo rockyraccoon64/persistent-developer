@@ -1,6 +1,6 @@
 package rr64.developer.infrastructure.dev
 
-import rr64.developer.domain.DeveloperState
+import rr64.developer.domain.dev.DeveloperState
 
 import scala.concurrent.{ExecutionContext, Future}
 

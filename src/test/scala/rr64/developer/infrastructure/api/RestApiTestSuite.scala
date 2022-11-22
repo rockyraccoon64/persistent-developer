@@ -8,7 +8,7 @@ import org.scalamock.scalatest.MockFactory
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import rr64.developer.domain._
-import rr64.developer.domain.dev.DeveloperReply
+import rr64.developer.domain.dev.{DeveloperReply, DeveloperState}
 import spray.json.DefaultJsonProtocol.immSeqFormat
 import spray.json.JsObject
 

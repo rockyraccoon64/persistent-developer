@@ -3,7 +3,7 @@ package rr64.developer.infrastructure.dev
 import org.scalatest.Assertion
 import org.scalatest.flatspec.AsyncFlatSpec
 import org.scalatest.matchers.should.Matchers
-import rr64.developer.domain.DeveloperState
+import rr64.developer.domain.dev.DeveloperState
 
 import scala.concurrent.{ExecutionContext, Future}
 
