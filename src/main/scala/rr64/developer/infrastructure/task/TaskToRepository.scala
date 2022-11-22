@@ -9,6 +9,10 @@ import rr64.developer.infrastructure.task.TaskToRepository.TaskInfoFactory
 
 import scala.concurrent.{ExecutionContext, Future}
 
+/**
+ * Обработчик проекции информации о задачах
+ * @param repository Репозиторий задач
+ * */
 class TaskToRepository(repository: TaskRepository[_])
     (implicit ec: ExecutionContext) extends Handler[EventEnvelope[Event]] {
 
@@ -34,6 +38,10 @@ class TaskToRepository(repository: TaskRepository[_])
         Future.successful(Done)
     }
 
+  /**
+   * Сохранить задачу в репозитории
+   * @param taskInfo Задача
+   * */
   private def save(taskInfo: TaskInfo): Future[Done] =
     repository.save(taskInfo).map(_ => Done)
 
