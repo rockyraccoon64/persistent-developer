@@ -10,7 +10,10 @@ trait Developer {
   /** Текущее состояние */
   def state(implicit ec: ExecutionContext): Future[DeveloperState]
   
-  /** Поручить задачу */
+  /**
+   * Поручить задачу
+   * @param task Новая задача
+   * */
   def addTask(task: Task)(implicit ec: ExecutionContext): Future[DeveloperReply]
 
 }
