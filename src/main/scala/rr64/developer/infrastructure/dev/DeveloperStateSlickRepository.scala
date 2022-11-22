@@ -1,7 +1,6 @@
 package rr64.developer.infrastructure.dev
 
 import rr64.developer.domain.DeveloperState
-import rr64.developer.infrastructure.dev.DeveloperStateSlickRepository._
 import slick.jdbc.PostgresProfile.api._
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -12,13 +11,11 @@ import scala.concurrent.{ExecutionContext, Future}
  * */
 class DeveloperStateSlickRepository(db: Database) extends DeveloperStateRepository {
 
+  val codec = new DeveloperStateCodec
+
   override def save(id: String, state: DeveloperState)
       (implicit ec: ExecutionContext): Future[_] = {
-    val name = state match {
-      case DeveloperState.Free => FreeState
-      case DeveloperState.Working => WorkingState
-      case DeveloperState.Resting => RestingState
-    }
+    val name = codec.encode(state)
     db.run {
       sqlu"""INSERT INTO dev_state (id, state)
             VALUES ($id, $name)
@@ -33,18 +30,8 @@ class DeveloperStateSlickRepository(db: Database) extends DeveloperStateReposito
       sql"""SELECT state FROM dev_state WHERE id = $id"""
         .as[String]
         .headOption
-        .map(_.map {
-          case FreeState => DeveloperState.Free
-          case WorkingState => DeveloperState.Working
-          case RestingState => DeveloperState.Resting
-        })
+        .map(_.map(codec.decode))
     }
   }
 
-}
-
-object DeveloperStateSlickRepository {
-  private val FreeState = "Free"
-  private val WorkingState = "Working"
-  private val RestingState = "Resting"
 }
