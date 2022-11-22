@@ -1,5 +1,9 @@
 package rr64.developer.domain
 
+/**
+ * Множитель для расчёта времени
+ * @param value Значение в рамках 1-1000
+ * */
 case class Factor private(value: Int)
 
 object Factor {
@@ -10,6 +14,7 @@ object Factor {
     else
       throw new FactorException
 
+  /** Исключение, связанное с некорректным множителем */
   class FactorException extends RuntimeException
 
 }
