@@ -1,4 +1,4 @@
-package rr64.developer.domain
+package rr64.developer.domain.task
 
 /**
  * Статус задачи

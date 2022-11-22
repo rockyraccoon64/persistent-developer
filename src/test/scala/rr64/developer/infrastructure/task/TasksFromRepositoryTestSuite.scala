@@ -4,8 +4,7 @@ import org.scalamock.scalatest.AsyncMockFactory
 import org.scalatest.flatspec.AsyncFlatSpecLike
 import org.scalatest.matchers.should.Matchers
 import rr64.developer.domain.TaskInfo.TaskInfoFromTaskWithId
-import rr64.developer.domain.TaskStatus
-import rr64.developer.domain.task.Task
+import rr64.developer.domain.task.{Task, TaskStatus}
 import rr64.developer.infrastructure.TaskTestUtils.TaskWithIdFactory
 
 import java.util.UUID

@@ -1,6 +1,6 @@
 package rr64.developer.infrastructure.task
 
-import rr64.developer.domain.TaskStatus
+import rr64.developer.domain.task.TaskStatus
 import rr64.developer.infrastructure.Codec
 import rr64.developer.infrastructure.task.TaskStatusCodec._
 

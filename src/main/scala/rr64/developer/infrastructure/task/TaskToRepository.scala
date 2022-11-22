@@ -3,8 +3,9 @@ package rr64.developer.infrastructure.task
 import akka.Done
 import akka.projection.eventsourced.EventEnvelope
 import akka.projection.scaladsl.Handler
+import rr64.developer.domain.TaskInfo
 import rr64.developer.domain.TaskInfo.TaskInfoFromTaskWithId
-import rr64.developer.domain.{TaskInfo, TaskStatus}
+import rr64.developer.domain.task.TaskStatus
 import rr64.developer.infrastructure.dev.behavior.Event
 
 import scala.concurrent.{ExecutionContext, Future}

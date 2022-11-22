@@ -10,9 +10,9 @@ import akka.projection.testkit.scaladsl.{ProjectionTestKit, TestProjection}
 import akka.stream.scaladsl.Source
 import org.scalatest.Assertion
 import org.scalatest.flatspec.AnyFlatSpecLike
+import rr64.developer.domain.TaskInfo
 import rr64.developer.domain.TaskInfo.TaskInfoFromTaskWithId
-import rr64.developer.domain.task.Task
-import rr64.developer.domain.{TaskInfo, TaskStatus}
+import rr64.developer.domain.task.{Task, TaskStatus}
 import rr64.developer.infrastructure.ProjectionTestUtils
 import rr64.developer.infrastructure.TaskTestUtils.TaskWithIdFactory
 import rr64.developer.infrastructure.dev.behavior.Event
