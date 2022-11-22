@@ -10,7 +10,10 @@ import rr64.developer.infrastructure.task.TaskWithId
  * */
 object Timers {
 
-  /** Запустить таймер до завершения задачи */
+  /**
+   * Запустить таймер до завершения задачи
+   * @param taskWithId Задача
+   * */
   private[behavior] def startWorkTimer(taskWithId: TaskWithId)
       (implicit setup: Setup): Unit =
     startTimer(
@@ -20,7 +23,10 @@ object Timers {
       factor = setup.workFactor
     )
 
-  /** Запустить таймер до завершения отдыха */
+  /**
+   * Запустить таймер до завершения отдыха
+   * @param taskWithId Последняя завершённая задача
+   * */
   private[behavior] def startRestTimer(taskWithId: TaskWithId)
       (implicit setup: Setup): Unit =
     startTimer(
@@ -30,7 +36,13 @@ object Timers {
       factor = setup.restFactor
     )
 
-  /** Запустить таймер, исходя из сложности задачи и множителя */
+  /**
+   * Запустить таймер, исходя из сложности задачи и множителя
+   * @param timer Таймер актора
+   * @param message Команда актору
+   * @param difficulty Сложность задачи
+   * @param factor Множитель
+   * */
   private def startTimer(
     timer: TimerScheduler[Command],
     message: Command,
