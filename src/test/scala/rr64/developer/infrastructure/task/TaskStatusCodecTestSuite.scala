@@ -13,7 +13,7 @@ class TaskStatusCodecTestSuite
 
   private val codec = new TaskStatusCodec
 
-  private class CodecTest(status: TaskStatus) {
+  private def codecTest(status: TaskStatus) {
     val encoded = codec.encode(status)
     codec.decode(encoded) shouldEqual status
   }
@@ -22,13 +22,13 @@ class TaskStatusCodecTestSuite
   "The task status codec" should {
 
     /** "В работе" */
-    "encode and decode the In Progress status" in new CodecTest(TaskStatus.InProgress)
+    "encode and decode the In Progress status" in codecTest(TaskStatus.InProgress)
 
     /** "В очереди" */
-    "encode and decode the Queued status" in new CodecTest(TaskStatus.Queued)
+    "encode and decode the Queued status" in codecTest(TaskStatus.Queued)
 
     /** "Завершена" */
-    "encode and decode the Finished status" in new CodecTest(TaskStatus.Finished)
+    "encode and decode the Finished status" in codecTest(TaskStatus.Finished)
 
   }
 
