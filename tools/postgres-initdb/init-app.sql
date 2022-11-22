@@ -1,0 +1,11 @@
+CREATE TABLE dev_state(
+	id VARCHAR(100) PRIMARY KEY,
+	state VARCHAR(10) NOT NULL
+);
+
+CREATE TABLE task(
+	serial_id SERIAL PRIMARY KEY,
+	uuid UUID NOT NULL UNIQUE,
+	difficulty INT NOT NULL,
+	status VARCHAR(10) NOT NULL
+);
