@@ -18,7 +18,7 @@ object Timers {
       (implicit setup: Setup): Unit =
     startTimer(
       timer = setup.timer,
-      message = Command.FinishTask(taskWithId.id),
+      command = Command.FinishTask(taskWithId.id),
       difficulty = taskWithId.difficulty,
       factor = setup.workFactor
     )
@@ -31,7 +31,7 @@ object Timers {
       (implicit setup: Setup): Unit =
     startTimer(
       timer = setup.timer,
-      message = Command.StopResting,
+      command = Command.StopResting,
       difficulty = taskWithId.difficulty,
       factor = setup.restFactor
     )
@@ -39,18 +39,18 @@ object Timers {
   /**
    * Запустить таймер, исходя из сложности задачи и множителя
    * @param timer Таймер актора
-   * @param message Команда актору
+   * @param command Команда актору
    * @param difficulty Сложность задачи
    * @param factor Множитель
    * */
   private def startTimer(
     timer: TimerScheduler[Command],
-    message: Command,
+    command: Command,
     difficulty: Difficulty,
     factor: Factor
   ): Unit = {
     val delay = Timing.calculateTime(difficulty, factor)
-    timer.startSingleTimer(message, delay)
+    timer.startSingleTimer(command, delay)
   }
 
 }
