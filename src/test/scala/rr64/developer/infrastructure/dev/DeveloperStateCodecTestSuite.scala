@@ -10,22 +10,19 @@ class DeveloperStateCodecTestSuite
 
   private val codec = new DeveloperStateCodec
 
+  private def testCodec(state: DeveloperState) = {
+    val encoded = codec.encode(state)
+    state shouldEqual codec.decode(encoded)
+  }
+
   /** Кодек должен кодировать и декодировать состояние разработчика */
   "The developer state codec" should {
 
     /** "Свободен" */
-    "encode and decode the Free state" in {
-      val state = DeveloperState.Free
-      val encoded = codec.encode(state)
-      state shouldEqual codec.decode(encoded)
-    }
+    "encode and decode the Free state" in testCodec(DeveloperState.Free)
 
     /** "Работает" */
-    "encode and decode the Working state" in {
-      val state = DeveloperState.Working
-      val encoded = codec.encode(state)
-      state shouldEqual codec.decode(encoded)
-    }
+    "encode and decode the Working state" in testCodec(DeveloperState.Working)
 
   }
 
