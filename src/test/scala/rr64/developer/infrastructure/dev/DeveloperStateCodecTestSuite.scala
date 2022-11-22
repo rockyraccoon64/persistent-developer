@@ -19,6 +19,14 @@ class DeveloperStateCodecTestSuite
       val encoded = codec.encode(state)
       state shouldEqual codec.decode(encoded)
     }
+
+    /** "Работает" */
+    "encode and decode the Working state" in {
+      val state = DeveloperState.Working
+      val encoded = codec.encode(state)
+      state shouldEqual codec.decode(encoded)
+    }
+
   }
 
 }
