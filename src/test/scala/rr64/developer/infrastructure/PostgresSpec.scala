@@ -1,6 +1,8 @@
 package rr64.developer.infrastructure
 
+import com.typesafe.config.ConfigFactory
 import org.scalatest.{BeforeAndAfterAll, Suite}
+import rr64.developer.infrastructure.PostgresSpec._
 import slick.jdbc.PostgresProfile.api._
 
 import scala.concurrent.Await
@@ -18,10 +20,11 @@ trait PostgresSpec
     "org.postgresql.Driver"
 
   private val postgres = Database.forURL(
-    "jdbc:postgresql:postgres",
-    user = "postgres",
-    password = "postgres",
-    driver = driver)
+    s"$url:postgres",
+    user = user,
+    password = password,
+    driver = driver
+  )
 
   override protected def beforeAll(): Unit = {
     super.beforeAll()
@@ -42,9 +45,17 @@ trait PostgresSpec
   }
 
   val database = Database.forURL(
-    s"jdbc:postgresql:$dbname",
-    user = "postgres",
-    password = "postgres",
-    driver = driver)
+    s"$url:$dbname",
+    user = user,
+    password = password,
+    driver = driver
+  )
 
+}
+
+object PostgresSpec {
+  private[this] val config = ConfigFactory.load().getConfig("postgres-test")
+  private val url = config.getString("url")
+  private val user = config.getString("user")
+  private val password = config.getString("password")
 }
