@@ -7,6 +7,7 @@ services:
   db:
     image: postgres:14.6
     environment:
+      POSTGRES_DB: persistent_developer
       POSTGRES_PASSWORD: postgres
     volumes:
       - "./tools/postgres-initdb:/docker-entrypoint-initdb.d"
