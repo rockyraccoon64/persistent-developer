@@ -3,9 +3,9 @@ package rr64.developer.infrastructure.task
 import org.scalamock.scalatest.AsyncMockFactory
 import org.scalatest.flatspec.AsyncFlatSpecLike
 import org.scalatest.matchers.should.Matchers
+import rr64.developer.domain.TaskInfo.TaskInfoFactory
 import rr64.developer.domain.{Task, TaskStatus}
 import rr64.developer.infrastructure.TaskTestUtils.TaskWithIdFactory
-import rr64.developer.infrastructure.task.TaskToRepository.TaskInfoFactory
 
 import java.util.UUID
 import scala.concurrent.{ExecutionContext, Future}
