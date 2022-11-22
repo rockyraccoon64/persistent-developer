@@ -1,5 +1,6 @@
 package rr64.developer.domain
 
+import rr64.developer.domain.task.Difficulty
 import rr64.developer.infrastructure.task.TaskWithId
 
 import java.util.UUID

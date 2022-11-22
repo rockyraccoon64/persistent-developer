@@ -1,5 +1,7 @@
 package rr64.developer.domain
 
+import rr64.developer.domain.task.Difficulty
+
 import scala.concurrent.duration.{DurationInt, FiniteDuration}
 
 /**
