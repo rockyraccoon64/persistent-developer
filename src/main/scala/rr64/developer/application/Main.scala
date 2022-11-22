@@ -15,6 +15,7 @@ import akka.projection.{ProjectionBehavior, ProjectionId}
 import akka.util.Timeout
 import com.typesafe.config.ConfigFactory
 import rr64.developer.domain._
+import rr64.developer.domain.dev.Developer
 import rr64.developer.infrastructure.PlainJdbcSession
 import rr64.developer.infrastructure.api.{QueryExtractor, RestApi}
 import rr64.developer.infrastructure.dev.behavior.DeveloperBehavior

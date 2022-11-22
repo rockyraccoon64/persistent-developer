@@ -1,4 +1,6 @@
-package rr64.developer.domain
+package rr64.developer.domain.dev
+
+import rr64.developer.domain.{DeveloperReply, DeveloperState, Task}
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -9,7 +11,7 @@ trait Developer {
 
   /** Текущее состояние */
   def state(implicit ec: ExecutionContext): Future[DeveloperState]
-  
+
   /**
    * Поручить задачу
    * @param task Новая задача

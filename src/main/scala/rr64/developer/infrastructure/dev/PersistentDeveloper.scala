@@ -4,6 +4,7 @@ import akka.actor.typed.Scheduler
 import akka.actor.typed.scaladsl.AskPattern.Askable
 import akka.util.Timeout
 import rr64.developer.domain._
+import rr64.developer.domain.dev.Developer
 import rr64.developer.infrastructure.dev.behavior.DeveloperBehavior.DeveloperRef
 import rr64.developer.infrastructure.dev.behavior.{Command, Replies}
 

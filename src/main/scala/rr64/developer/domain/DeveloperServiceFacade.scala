@@ -1,5 +1,7 @@
 package rr64.developer.domain
 
+import rr64.developer.domain.dev.Developer
+
 import java.util.UUID
 import scala.concurrent.{ExecutionContext, Future}
 
