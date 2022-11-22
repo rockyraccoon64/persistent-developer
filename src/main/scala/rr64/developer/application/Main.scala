@@ -29,7 +29,14 @@ import scala.concurrent.duration.DurationInt
 import scala.concurrent.{Await, ExecutionContext}
 import scala.jdk.DurationConverters.JavaDurationOps
 
+/**
+ * Точка входа в приложение
+ * */
 object Main extends App {
+
+  /**
+   * Чтение файла конфигурации
+   * */
 
   val config = ConfigFactory.load()
   val appConfig = config.getConfig(ConfigKeys.AppConfig)
@@ -45,12 +52,17 @@ object Main extends App {
   val apiInterface = appConfig.getString(ConfigKeys.ApiInterface)
   val apiPort = appConfig.getInt(ConfigKeys.ApiPort)
 
+  /**
+   * Инициализация подсистемы акторов
+   */
+
   implicit val system: ActorSystem[SpawnProtocol.Command] =
     ActorSystem(SpawnProtocol(), rootGuardianName)
   implicit val ec: ExecutionContext = system.executionContext
   implicit val scheduler: Scheduler = system.scheduler
   implicit val askTimeout: Timeout = Timeout(askTimeoutDuration)
 
+  /** Создать актора */
   def spawn[T](behavior: Behavior[T], name: String): ActorRef[T] =
     Await.result(
       system.ask { (replyTo: ActorRef[ActorRef[T]]) =>
@@ -58,6 +70,10 @@ object Main extends App {
       },
       askTimeoutDuration
     )
+
+  /**
+   * Инициализация актора разработчика
+   * */
 
   val developerBehavior = DeveloperBehavior(
     persistenceId = PersistenceId.ofUniqueId(developerPersistenceId),
@@ -78,6 +94,10 @@ object Main extends App {
 
   val developerRef = spawn(supervisedBehavior, developerName)
 
+  /**
+   * Инициализация сервиса разработчика
+   * */
+
   val dbConfig = DatabaseConfig.forConfig[PostgresProfile]("slick")
   val database = dbConfig.db
 
@@ -88,14 +108,23 @@ object Main extends App {
   val developer: Developer =
     PersistentDeveloper(developerRef, developerStateProvider)
 
+  /**
+   * Инициализация сервиса задач
+   * */
+
   type Query = LimitOffsetQuery
 
   val taskRepository: TaskRepository[Query] =
     new TaskSlickRepository(database)
   val tasks: Tasks[Query] =
     new TasksFromRepository[Query](taskRepository)
+
   val service: DeveloperService[Query] =
     new DeveloperServiceFacade[Query](developer, tasks)
+
+  /**
+   * Инициализация проекций
+   * */
 
   val sourceProvider: SourceProvider[Offset, EventEnvelope[DeveloperEvent]] =
     EventSourcedProvider.eventsByTag[DeveloperEvent](
@@ -118,6 +147,10 @@ object Main extends App {
 
   val defaultProjectionKey = "0"
 
+  /**
+   * Инициализация проекции состояния разработчика
+   * */
+
   val developerStateProjectionHandler =
     new DeveloperStateToRepository(developerStateRepository)
 
@@ -136,6 +169,10 @@ object Main extends App {
   val developerStateProjectionRef =
     spawn(developerStateProjectionBehavior, developerProjectionName)
 
+  /**
+   * Инициализация проекции хранилища задач
+   * */
+
   val taskProjectionHandler =
     new TaskToRepository(taskRepository)
 
@@ -153,6 +190,10 @@ object Main extends App {
 
   val taskProjectionRef =
     spawn(taskProjectionBehavior, taskProjectionName)
+
+  /**
+   * Инициализация REST API
+   * */
 
   val queryFactory: LimitOffsetQueryFactory =
     new LimitOffsetQueryFactoryImpl(
