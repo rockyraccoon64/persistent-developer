@@ -1,6 +1,7 @@
 package rr64.developer.infrastructure.task
 
-import rr64.developer.domain.{TaskInfo, Tasks}
+import rr64.developer.domain.Tasks
+import rr64.developer.domain.task.TaskInfo
 
 import java.util.UUID
 import scala.concurrent.{ExecutionContext, Future}

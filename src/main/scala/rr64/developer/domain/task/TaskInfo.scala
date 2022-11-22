@@ -1,6 +1,5 @@
-package rr64.developer.domain
+package rr64.developer.domain.task
 
-import rr64.developer.domain.task.{Difficulty, TaskStatus}
 import rr64.developer.infrastructure.task.TaskWithId
 
 import java.util.UUID

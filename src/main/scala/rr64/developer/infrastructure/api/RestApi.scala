@@ -4,10 +4,10 @@ import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport._
 import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
-import rr64.developer.domain.Difficulty.DifficultyException
 import rr64.developer.domain._
 import rr64.developer.domain.dev.{DeveloperReply, DeveloperState}
-import rr64.developer.domain.task.Task
+import rr64.developer.domain.task.Difficulty.DifficultyException
+import rr64.developer.domain.task.{Task, TaskInfo}
 import rr64.developer.infrastructure.api.ApiDeveloperState._
 import spray.json.DefaultJsonProtocol._
 

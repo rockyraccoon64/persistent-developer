@@ -1,7 +1,6 @@
 package rr64.developer.infrastructure.task
 
-import rr64.developer.domain.TaskInfo
-import rr64.developer.domain.task.{Difficulty, TaskStatus}
+import rr64.developer.domain.task.{Difficulty, TaskInfo, TaskStatus}
 import rr64.developer.infrastructure.Codec
 import rr64.developer.infrastructure.task.query.LimitOffsetQuery
 import slick.jdbc.PostgresProfile.api._

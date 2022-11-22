@@ -3,7 +3,8 @@ package rr64.developer.domain
 import org.scalatest.Assertion
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
-import rr64.developer.domain.Difficulty.DifficultyException
+import rr64.developer.domain.task.Difficulty
+import rr64.developer.domain.task.Difficulty.DifficultyException
 
 /**
  * Тесты сложности задач

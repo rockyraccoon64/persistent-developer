@@ -1,7 +1,6 @@
 package rr64.developer.infrastructure.api
 
-import rr64.developer.domain.TaskInfo
-import rr64.developer.domain.task.{Difficulty, TaskStatus}
+import rr64.developer.domain.task.{Difficulty, TaskInfo, TaskStatus}
 import rr64.developer.infrastructure.api.CommonJsonFormats._
 import spray.json.DefaultJsonProtocol._
 import spray.json.RootJsonFormat
