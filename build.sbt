@@ -27,3 +27,5 @@ libraryDependencies ++= Seq(
   scalatest % Test,
   scalamock % Test
 )
+
+assembly / mainClass := Some("rr64.developer.application.Main")
