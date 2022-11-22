@@ -20,7 +20,7 @@ trait PostgresSpec
     "org.postgresql.Driver"
 
   private val postgres = Database.forURL(
-    s"$url:postgres",
+    s"jdbc:postgresql://$host:$port/postgres",
     user = user,
     password = password,
     driver = driver
@@ -45,7 +45,7 @@ trait PostgresSpec
   }
 
   val database = Database.forURL(
-    s"$url:$dbname",
+    s"jdbc:postgresql://$host:$port/$dbname",
     user = user,
     password = password,
     driver = driver
@@ -55,7 +55,8 @@ trait PostgresSpec
 
 object PostgresSpec {
   private[this] val config = ConfigFactory.load().getConfig("postgres-test")
-  private val url = config.getString("url")
+  private val host = config.getString("host")
+  private val port = config.getInt("port")
   private val user = config.getString("user")
   private val password = config.getString("password")
 }
