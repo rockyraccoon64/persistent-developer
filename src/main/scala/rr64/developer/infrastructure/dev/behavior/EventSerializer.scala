@@ -11,6 +11,7 @@ import java.util.UUID
  */
 class EventSerializer extends SerializerWithStringManifest {
 
+  /** Манифесты для событий */
   private object Manifests {
     val TaskQueued = "TaskQueued"
     val TaskStarted = "TaskStarted"
@@ -51,6 +52,7 @@ class EventSerializer extends SerializerWithStringManifest {
       Event.Rested(None)
   }
 
+  /** Сериализовать задачу в бинарный формат */
   private def taskToByteArray(taskWithId: TaskWithId): Array[Byte] = {
     val id = taskWithId.id
     val difficulty = taskWithId.difficulty
@@ -61,6 +63,7 @@ class EventSerializer extends SerializerWithStringManifest {
       .array
   }
 
+  /** Десериализовать задачу из бинарного формата */
   private def taskFromByteArray(bytes: Array[Byte]): TaskWithId = {
     val buffer = ByteBuffer.wrap(bytes)
     val long1 = buffer.getLong()
