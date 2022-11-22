@@ -19,6 +19,8 @@ services:
 
   developer-service:
     image: persistent-developer
+    environment:
+      PD_DB_HOST: db
     ports:
       - "10538:10538"
     depends_on:
