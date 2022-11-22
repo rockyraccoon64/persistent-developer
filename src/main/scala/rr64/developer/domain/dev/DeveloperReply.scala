@@ -1,4 +1,4 @@
-package rr64.developer.domain
+package rr64.developer.domain.dev
 
 import java.util.UUID
 

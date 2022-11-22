@@ -1,6 +1,6 @@
 package rr64.developer.domain
 
-import rr64.developer.domain.dev.Developer
+import rr64.developer.domain.dev.{Developer, DeveloperReply}
 
 import java.util.UUID
 import scala.concurrent.{ExecutionContext, Future}

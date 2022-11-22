@@ -1,6 +1,6 @@
 package rr64.developer.infrastructure.api
 
-import rr64.developer.domain.DeveloperReply
+import rr64.developer.domain.dev.DeveloperReply
 import rr64.developer.infrastructure.api.CommonJsonFormats._
 import spray.json.DefaultJsonProtocol._
 import spray.json.RootJsonFormat

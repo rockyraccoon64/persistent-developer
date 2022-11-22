@@ -1,6 +1,6 @@
 package rr64.developer.domain.dev
 
-import rr64.developer.domain.{DeveloperReply, DeveloperState, Task}
+import rr64.developer.domain.{DeveloperState, Task}
 
 import scala.concurrent.{ExecutionContext, Future}
 
