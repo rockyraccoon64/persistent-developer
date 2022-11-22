@@ -1,7 +1,7 @@
 package rr64.developer.infrastructure.task
 
-import rr64.developer.domain.{Difficulty, TaskInfo, TaskStatus}
-import rr64.developer.infrastructure.task.TaskSlickRepository.TaskStatusAdapter
+import rr64.developer.domain.{Difficulty, TaskInfo}
+import rr64.developer.infrastructure.task.TaskSlickRepository.statusCodec
 import rr64.developer.infrastructure.task.query.LimitOffsetQuery
 import slick.jdbc.PostgresProfile.api._
 
@@ -15,7 +15,7 @@ import scala.concurrent.{ExecutionContext, Future}
 class TaskSlickRepository(db: Database) extends TaskRepository[LimitOffsetQuery] {
 
   override def save(taskInfo: TaskInfo): Future[_] = db.run {
-    val status = TaskStatusAdapter.toStringValue(taskInfo.status)
+    val status = statusCodec.encode(taskInfo.status)
     sqlu"""INSERT INTO task(uuid, difficulty, status)
           VALUES (${taskInfo.id.toString}::uuid, ${taskInfo.difficulty.value}, $status)
           ON CONFLICT (uuid)
@@ -30,7 +30,7 @@ class TaskSlickRepository(db: Database) extends TaskRepository[LimitOffsetQuery]
         """.as[(Int, String)]
         .headOption
         .map(_.map { case (difficulty, statusStr) =>
-          val status = TaskStatusAdapter.fromString(statusStr)
+          val status = statusCodec.decode(statusStr)
           TaskInfo(id, Difficulty(difficulty), status)
         })
     }
@@ -46,7 +46,7 @@ class TaskSlickRepository(db: Database) extends TaskRepository[LimitOffsetQuery]
         .as[(String, Int, String)]
         .map(_.map { case (idStr, difficulty, statusStr) =>
           val id = UUID.fromString(idStr)
-          val status = TaskStatusAdapter.fromString(statusStr)
+          val status = statusCodec.decode(statusStr)
           TaskInfo(id, Difficulty(difficulty), status)
         })
     }
@@ -56,24 +56,7 @@ class TaskSlickRepository(db: Database) extends TaskRepository[LimitOffsetQuery]
 
 object TaskSlickRepository {
 
-  private object TaskStatusAdapter {
-
-    private val InProgressStatus = "InProgress"
-    private val QueuedStatus = "Queued"
-    private val FinishedStatus = "Finished"
-
-    def toStringValue(status: TaskStatus): String = status match {
-      case TaskStatus.InProgress => InProgressStatus
-      case TaskStatus.Queued => QueuedStatus
-      case TaskStatus.Finished => FinishedStatus
-    }
-
-    def fromString(value: String): TaskStatus = value match {
-      case InProgressStatus => TaskStatus.InProgress
-      case QueuedStatus => TaskStatus.Queued
-      case FinishedStatus => TaskStatus.Finished
-    }
-
-  }
+  /** Кодек доменных статусов задач и статусов из БД */
+  private val statusCodec = new TaskStatusCodec
 
 }
