@@ -5,6 +5,13 @@ import akka.projection.jdbc.JdbcSession
 
 import java.sql.{Connection, DriverManager}
 
+/**
+ * Простая JDBC-сессия для проекций
+ * @param driverClass Класс JDBC-драйвера
+ * @param url URL базы данных
+ * @param user Имя пользователя
+ * @param password Пароль
+ * */
 class PlainJdbcSession(
   driverClass: String,
   url: String,
