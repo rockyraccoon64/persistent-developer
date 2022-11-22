@@ -10,6 +10,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 /**
  * Обработчик проекции для сохранения состояния разработчика в репозитории
+ * @param repository Репозиторий состояний
  * */
 class DeveloperStateToRepository(repository: DeveloperStateRepository)
     (implicit ec: ExecutionContext) extends Handler[EventEnvelope[Event]] {
@@ -26,7 +27,11 @@ class DeveloperStateToRepository(repository: DeveloperStateRepository)
       Future.successful(Done)
   }
 
-  /** Сохранить состояние разработчика в репозитории */
+  /**
+   * Сохранить состояние разработчика в репозитории
+   * @param id Идентификатор разработчика
+   * @param state Состояние
+   * */
   private def save(id: String, state: DeveloperState): Future[Done] = {
     repository.save(id, state).map(_ => Done)
   }
