@@ -6,12 +6,13 @@ import scala.concurrent.{ExecutionContext, Future}
 
 /**
  * Источник состояния разработчика из репозитория
+ * @param developerId Идентификатор разработчика
+ * @param repository Репозиторий состояний
  * */
 class DeveloperStateFromRepository(
   developerId: String,
   repository: DeveloperStateRepository
 ) extends DeveloperStateProvider {
-  /** Состояние разработчика */
   override def state(implicit ec: ExecutionContext): Future[DeveloperState] =
     repository.findById(developerId).map(_.getOrElse(DeveloperState.InitialState))
 }
