@@ -15,7 +15,8 @@ import scala.concurrent.{Await, Future}
  * */
 class DeveloperStateSlickRepositoryTestSuite extends PostgresSpec with AsyncFlatSpecLike with Matchers {
 
-  private val repository = new DeveloperStateSlickRepository(database)
+  private val codec = new DeveloperStateCodec
+  private val repository = new DeveloperStateSlickRepository(database, codec)
 
   override protected def beforeAll(): Unit = {
     super.beforeAll()

@@ -1,6 +1,7 @@
 package rr64.developer.infrastructure.dev
 
 import rr64.developer.domain.DeveloperState
+import rr64.developer.infrastructure.Codec
 import slick.jdbc.PostgresProfile.api._
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -8,10 +9,12 @@ import scala.concurrent.{ExecutionContext, Future}
 /**
  * Репозиторий состояний разработчиков на основе PostgreSQL + Slick
  * @param db База данных PostgreSQL
+ * @param codec Кодек состояния разработчика
  * */
-class DeveloperStateSlickRepository(db: Database) extends DeveloperStateRepository {
-
-  val codec = new DeveloperStateCodec
+class DeveloperStateSlickRepository(
+  db: Database,
+  codec: Codec[DeveloperState, String]
+) extends DeveloperStateRepository {
 
   override def save(id: String, state: DeveloperState)
       (implicit ec: ExecutionContext): Future[_] = {

@@ -19,9 +19,9 @@ import rr64.developer.infrastructure.PlainJdbcSession
 import rr64.developer.infrastructure.api.{QueryExtractor, RestApi}
 import rr64.developer.infrastructure.dev.behavior.DeveloperBehavior
 import rr64.developer.infrastructure.dev.behavior.DeveloperBehavior.DeveloperEvent
-import rr64.developer.infrastructure.dev.{DeveloperStateFromRepository, DeveloperStateSlickRepository, DeveloperStateToRepository, PersistentDeveloper}
-import rr64.developer.infrastructure.task.query.{LimitOffsetQuery, LimitOffsetQueryFactory, LimitOffsetQueryFactoryImpl, LimitOffsetQueryStringExtractor}
+import rr64.developer.infrastructure.dev._
 import rr64.developer.infrastructure.task._
+import rr64.developer.infrastructure.task.query.{LimitOffsetQuery, LimitOffsetQueryFactory, LimitOffsetQueryFactoryImpl, LimitOffsetQueryStringExtractor}
 import slick.basic.DatabaseConfig
 import slick.jdbc.PostgresProfile
 
@@ -101,8 +101,10 @@ object Main extends App {
   val dbConfig = DatabaseConfig.forConfig[PostgresProfile]("slick")
   val database = dbConfig.db
 
+  val developerStateCodec =
+    new DeveloperStateCodec
   val developerStateRepository =
-    new DeveloperStateSlickRepository(database)
+    new DeveloperStateSlickRepository(database, developerStateCodec)
   val developerStateProvider =
     new DeveloperStateFromRepository(developerPersistenceId, developerStateRepository)
   val developer: Developer =
