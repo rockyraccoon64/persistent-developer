@@ -17,7 +17,7 @@ class DeveloperStateCodecTestSuite
     "encode and decode the Free state" in {
       val state = DeveloperState.Free
       val encoded = codec.encode(state)
-      encoded shouldEqual codec.decode(encoded)
+      state shouldEqual codec.decode(encoded)
     }
   }
 
