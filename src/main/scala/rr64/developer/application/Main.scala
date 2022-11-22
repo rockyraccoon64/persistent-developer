@@ -21,7 +21,7 @@ import rr64.developer.infrastructure.dev.behavior.DeveloperBehavior
 import rr64.developer.infrastructure.dev.behavior.DeveloperBehavior.DeveloperEvent
 import rr64.developer.infrastructure.dev.{DeveloperStateFromRepository, DeveloperStateSlickRepository, DeveloperStateToRepository, PersistentDeveloper}
 import rr64.developer.infrastructure.task.query.{LimitOffsetQuery, LimitOffsetQueryFactory, LimitOffsetQueryFactoryImpl, LimitOffsetQueryStringExtractor}
-import rr64.developer.infrastructure.task.{TaskRepository, TaskSlickRepository, TaskToRepository, TasksFromRepository}
+import rr64.developer.infrastructure.task._
 import slick.basic.DatabaseConfig
 import slick.jdbc.PostgresProfile
 
@@ -114,8 +114,10 @@ object Main extends App {
 
   type Query = LimitOffsetQuery
 
+  val taskStatusCodec =
+    new TaskStatusCodec
   val taskRepository: TaskRepository[Query] =
-    new TaskSlickRepository(database)
+    new TaskSlickRepository(database, taskStatusCodec)
   val tasks: Tasks[Query] =
     new TasksFromRepository[Query](taskRepository)
 

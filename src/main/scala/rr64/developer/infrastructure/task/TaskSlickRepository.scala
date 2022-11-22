@@ -1,7 +1,7 @@
 package rr64.developer.infrastructure.task
 
-import rr64.developer.domain.{Difficulty, TaskInfo}
-import rr64.developer.infrastructure.task.TaskSlickRepository.statusCodec
+import rr64.developer.domain.{Difficulty, TaskInfo, TaskStatus}
+import rr64.developer.infrastructure.Codec
 import rr64.developer.infrastructure.task.query.LimitOffsetQuery
 import slick.jdbc.PostgresProfile.api._
 
@@ -11,8 +11,12 @@ import scala.concurrent.{ExecutionContext, Future}
 /**
  * Репозиторий задач на основе PostgreSQL + Slick
  * @param db База данных PostgreSQL
+ * @param statusCodec Кодек статусов задач в строку
  * */
-class TaskSlickRepository(db: Database) extends TaskRepository[LimitOffsetQuery] {
+class TaskSlickRepository(
+  db: Database,
+  statusCodec: Codec[TaskStatus, String]
+) extends TaskRepository[LimitOffsetQuery] {
 
   override def save(taskInfo: TaskInfo): Future[_] = db.run {
     val status = statusCodec.encode(taskInfo.status)
@@ -51,12 +55,5 @@ class TaskSlickRepository(db: Database) extends TaskRepository[LimitOffsetQuery]
         })
     }
   }
-
-}
-
-object TaskSlickRepository {
-
-  /** Кодек доменных статусов задач и статусов из БД */
-  private val statusCodec = new TaskStatusCodec
 
 }
