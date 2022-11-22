@@ -7,16 +7,20 @@ import spray.json.RootJsonFormat
 
 import java.util.UUID
 
-case class ApiReply(
-  id: UUID,
-  status: String
-)
+/**
+ * Представление ответа разработчика для REST API
+ * */
+case class ApiReply(id: UUID, status: String)
 
 object ApiReply {
+
+  /** JSON-формат ответа разработчика */
   implicit val apiReplyJsonFormat: RootJsonFormat[ApiReply] = jsonFormat2(ApiReply.apply)
 
+  /** Адаптер доменного ответа разработчика к представлению для REST API */
   implicit val adapter: Adapter[DeveloperReply, ApiReply] = {
     case DeveloperReply.TaskStarted(id) => ApiReply(id, "Started")
-    case DeveloperReply.TaskQueued(id) =>ApiReply(id, "Queued")
+    case DeveloperReply.TaskQueued(id) => ApiReply(id, "Queued")
   }
+
 }
