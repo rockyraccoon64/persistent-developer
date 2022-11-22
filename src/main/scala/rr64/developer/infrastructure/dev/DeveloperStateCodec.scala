@@ -4,6 +4,9 @@ import rr64.developer.domain.DeveloperState
 import rr64.developer.infrastructure.Codec
 import rr64.developer.infrastructure.dev.DeveloperStateCodec._
 
+/**
+ * Кодек состояний разработчика
+ */
 class DeveloperStateCodec extends Codec[DeveloperState, String] {
   override def encode(value: DeveloperState): String =
     value match {
