@@ -1,4 +1,4 @@
-package rr64.developer.domain
+package rr64.developer.domain.service
 
 import rr64.developer.domain.dev.{DeveloperReply, DeveloperState}
 import rr64.developer.domain.task.{Task, TaskInfo}
@@ -23,6 +23,7 @@ trait DeveloperService[Query] {
 
   /**
    * Информация о задаче
+   *
    * @param id Идентификатор задачи
    * */
   def taskInfo(id: UUID)(implicit ec: ExecutionContext): Future[Option[TaskInfo]]

@@ -1,6 +1,7 @@
 package rr64.developer.domain
 
 import rr64.developer.domain.dev.{Developer, DeveloperReply, DeveloperState}
+import rr64.developer.domain.service.DeveloperService
 import rr64.developer.domain.task.{Task, TaskInfo, Tasks}
 
 import java.util.UUID

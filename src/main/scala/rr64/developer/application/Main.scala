@@ -16,6 +16,7 @@ import akka.util.Timeout
 import com.typesafe.config.ConfigFactory
 import rr64.developer.domain._
 import rr64.developer.domain.dev.Developer
+import rr64.developer.domain.service.DeveloperService
 import rr64.developer.domain.task.Tasks
 import rr64.developer.domain.timing.Factor
 import rr64.developer.infrastructure.PlainJdbcSession
