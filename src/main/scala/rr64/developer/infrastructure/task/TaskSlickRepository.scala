@@ -1,4 +1,5 @@
 package rr64.developer.infrastructure.task
+
 import rr64.developer.domain.{Difficulty, TaskInfo, TaskStatus}
 import rr64.developer.infrastructure.task.TaskSlickRepository.TaskStatusAdapter
 import rr64.developer.infrastructure.task.query.LimitOffsetQuery
@@ -7,6 +8,10 @@ import slick.jdbc.PostgresProfile.api._
 import java.util.UUID
 import scala.concurrent.{ExecutionContext, Future}
 
+/**
+ * Репозиторий задач на основе PostgreSQL + Slick
+ * @param db База данных PostgreSQL
+ * */
 class TaskSlickRepository(db: Database) extends TaskRepository[LimitOffsetQuery] {
 
   override def save(taskInfo: TaskInfo): Future[_] = db.run {
@@ -53,16 +58,20 @@ object TaskSlickRepository {
 
   private object TaskStatusAdapter {
 
+    private val InProgressStatus = "InProgress"
+    private val QueuedStatus = "Queued"
+    private val FinishedStatus = "Finished"
+
     def toStringValue(status: TaskStatus): String = status match {
-      case TaskStatus.InProgress => "InProgress"
-      case TaskStatus.Queued => "Queued"
-      case TaskStatus.Finished => "Finished"
+      case TaskStatus.InProgress => InProgressStatus
+      case TaskStatus.Queued => QueuedStatus
+      case TaskStatus.Finished => FinishedStatus
     }
 
     def fromString(value: String): TaskStatus = value match {
-      case "InProgress" => TaskStatus.InProgress
-      case "Queued" => TaskStatus.Queued
-      case "Finished" => TaskStatus.Finished
+      case InProgressStatus => TaskStatus.InProgress
+      case QueuedStatus => TaskStatus.Queued
+      case FinishedStatus => TaskStatus.Finished
     }
 
   }
