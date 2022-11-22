@@ -1,6 +1,7 @@
 package rr64.developer.infrastructure.dev.behavior
 
 import akka.persistence.typed.scaladsl.Effect
+import rr64.developer.infrastructure.dev.behavior.Command._
 import rr64.developer.infrastructure.task.TaskWithId
 
 /**
@@ -17,7 +18,6 @@ object State {
 
   /** Разработчик свободен */
   case object Free extends State {
-    import Command._
 
     override def applyCommand(cmd: Command)(implicit setup: Setup): Effect[Event, State] =
       cmd match {
@@ -34,14 +34,19 @@ object State {
 
     override def applyEvent(evt: Event)(implicit setup: Setup): State =
       evt match {
-        case Event.TaskStarted(taskWithId) => Working(taskWithId, Nil)
+        case Event.TaskStarted(taskWithId) =>
+          // При получении задачи начинается работа над ней
+          Working(taskWithId, Nil)
       }
 
   }
 
-  /** Разработчик работает над задачей */
+  /**
+   * Разработчик работает над задачей
+   * @param currentTask Текущая задача
+   * @param taskQueue Очередь задач
+   * */
   case class Working(currentTask: TaskWithId, taskQueue: Seq[TaskWithId]) extends State {
-    import Command._
 
     override def applyCommand(cmd: Command)(implicit setup: Setup): Effect[Event, State] =
       cmd match {
@@ -62,15 +67,23 @@ object State {
 
     override def applyEvent(evt: Event)(implicit setup: Setup): State =
       evt match {
-        case Event.TaskFinished(taskWithId) => Resting(taskWithId, taskQueue)
-        case Event.TaskQueued(newTask) => Working(currentTask, taskQueue :+ newTask)
+        case Event.TaskFinished(taskWithId) =>
+          // После завершения задачи требуется отдых
+          Resting(taskWithId, taskQueue)
+
+        case Event.TaskQueued(newTask) =>
+          // Поставив новую задачу в очередь, разработчик продолажет работать над текущей
+          Working(currentTask, taskQueue :+ newTask)
       }
 
   }
 
-  /** Разработчик отдыхает */
+  /**
+   * Разработчик отдыхает
+   * @param lastCompleted Последняя завершённая задача
+   * @param taskQueue Очередь задач
+   * */
   case class Resting(lastCompleted: TaskWithId, taskQueue: Seq[TaskWithId]) extends State {
-    import Command._
 
     override def applyCommand(cmd: Command)(implicit setup: Setup): Effect[Event, State] =
       cmd match {
@@ -92,12 +105,15 @@ object State {
     override def applyEvent(evt: Event)(implicit setup: Setup): State =
       evt match {
         case Event.Rested(Some(task)) if taskQueue.headOption.contains(task) =>
+          // Если в очереди есть задачи, после отдыха начинается работа над первой
           Working(task, taskQueue.tail)
 
         case Event.Rested(None) =>
+          // Если в очереди нет задач, после отдыха разработчик свободен
           State.Free
 
         case Event.TaskQueued(newTask) =>
+          // Поставив новую задачу в очередь, разработчик продолажет отдыхать
           Resting(lastCompleted, taskQueue :+ newTask)
       }
 
