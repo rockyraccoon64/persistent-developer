@@ -5,6 +5,9 @@ import rr64.developer.domain.Factor
 
 /**
  * Данные инициализации актора
+ * @param workFactor Рабочий множитель
+ * @param restFactor Множитель отдыха
+ * @param timer Таймер работы/отдыха
  * */
 private[behavior] case class Setup(
   workFactor: Factor,
