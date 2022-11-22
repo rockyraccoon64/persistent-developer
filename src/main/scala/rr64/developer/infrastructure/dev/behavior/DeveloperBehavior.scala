@@ -7,14 +7,24 @@ import akka.persistence.typed.{PersistenceId, RecoveryCompleted}
 import rr64.developer.domain.Factor
 import rr64.developer.infrastructure.dev.behavior.Timers._
 
+/**
+ * Поведение персистентного актора разработчика
+ * */
 object DeveloperBehavior {
 
   type DeveloperCommand = Command
   type DeveloperEvent = Event
   type DeveloperRef = ActorRef[Command]
 
+  /** Тэг событий актора разработчика */
   val EventTag = "dev"
 
+  /**
+   * Инициализировать поведение разработчика
+   * @param persistenceId Persistence ID
+   * @param workFactor Рабочий множитель
+   * @param restFactor Множитель отдыха
+   * */
   def apply(persistenceId: PersistenceId, workFactor: Factor, restFactor: Factor): Behavior[Command] =
     Behaviors.withTimers { timer =>
       implicit val setup: Setup = Setup(workFactor, restFactor, timer)
