@@ -1,5 +1,6 @@
 package rr64.developer.infrastructure.api
 
+import rr64.developer.domain.Task
 import spray.json.DefaultJsonProtocol._
 import spray.json.RootJsonFormat
 
@@ -10,7 +11,13 @@ import spray.json.RootJsonFormat
 case class ApiTaskToAdd(difficulty: Int)
 
 object ApiTaskToAdd {
+
   /** JSON-формат новой задачи */
   implicit val apiAddTaskJsonFormat: RootJsonFormat[ApiTaskToAdd] =
     jsonFormat1(ApiTaskToAdd.apply)
+
+  /** Адаптер новой задачи к доменному представлению */
+  implicit val adapter: Adapter[ApiTaskToAdd, Task] =
+    apiTask => Task(apiTask.difficulty)
+
 }

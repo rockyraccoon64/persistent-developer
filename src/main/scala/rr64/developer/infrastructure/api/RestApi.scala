@@ -28,12 +28,13 @@ class RestApi[Query](
   private val developerStateAdapter = implicitly[Adapter[DeveloperState, ApiDeveloperState]]
   private val taskInfoAdapter = implicitly[Adapter[TaskInfo, ApiTaskInfo]]
   private val replyAdapter = implicitly[Adapter[DeveloperReply, ApiReply]]
+  private val taskToAddAdapter = implicitly[Adapter[ApiTaskToAdd, Task]]
 
   /** API для команды поручения задачи */
   private val addTaskRoute =
     (path("add-task") & entity(as[ApiTaskToAdd])) { taskToAdd =>
       extractExecutionContext { implicit exec =>
-        Try(Task(taskToAdd.difficulty)) match {
+        Try(taskToAddAdapter.convert(taskToAdd)) match {
           case Success(task) =>
             onSuccess(service.addTask(task)) { reply =>
               complete(StatusCodes.Created, replyAdapter.convert(reply))
