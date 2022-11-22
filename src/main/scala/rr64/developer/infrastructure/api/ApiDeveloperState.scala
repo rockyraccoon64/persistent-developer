@@ -6,6 +6,7 @@ import spray.json.RootJsonFormat
 
 /**
  * Состояние разработчика для REST API
+ * @param state Тип состояния
  * */
 case class ApiDeveloperState private(state: String)
 

@@ -5,12 +5,17 @@ import spray.json.RootJsonFormat
 
 /**
  * Представление ошибки для REST API
+ * @param error Тип ошибки
+ * @param message Детали ошибки
  * */
 case class ApiError(error: String, message: String)
 
 object ApiError {
 
-  /** Ошибка в запросе */
+  /**
+   * Ошибка в запросе
+   * @param message Детали ошибки
+   * */
   def inQuery(message: String): ApiError =
     ApiError("Query", message)
 
