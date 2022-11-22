@@ -5,6 +5,11 @@ import rr64.developer.domain.{TaskInfo, Tasks}
 import java.util.UUID
 import scala.concurrent.{ExecutionContext, Future}
 
+/**
+ * Сервис поиска задач на основе репозитория
+ * @tparam Query Параметры запроса списка задач
+ * @param repository Репозиторий задач
+ * */
 class TasksFromRepository[Query](repository: TaskRepository[Query]) extends Tasks[Query] {
   override def findById(id: UUID)(implicit ec: ExecutionContext): Future[Option[TaskInfo]] =
     repository.findById(id)
