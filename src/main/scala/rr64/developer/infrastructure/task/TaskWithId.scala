@@ -33,4 +33,12 @@ object TaskWithId {
   def apply(difficulty: Int, id: UUID): TaskWithId =
     TaskWithId(Task(difficulty), id)
 
+  /**
+   * Задача с присвоенным ей идентификатором
+   * @param difficulty Сложность задачи
+   * @param id Идентификатор задачи (UUID)
+   * */
+  def apply(difficulty: Int, id: String): TaskWithId =
+    TaskWithId(Task(difficulty), UUID.fromString(id))
+
 }
