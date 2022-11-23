@@ -22,21 +22,26 @@ class PersistentDeveloperTestSuite
   private implicit val ec: ExecutionContext = testKit.system.executionContext
   private implicit val scheduler: Scheduler = testKit.system.scheduler
 
+  /** Источник состояний без поведения */
   private val emptyProvider = new DeveloperStateProvider {
     override def state(implicit ec: ExecutionContext): Future[DeveloperState] =
       Future.failed(new NotImplementedError)
   }
 
+  /** Актор без поведения */
   private val emptyRef = testKit.spawn(Behaviors.empty[Command])
 
+  /** Заглушка актора на основе переданного обработчика сообщений */
   private def mockDeveloperRef(receive: Command => Behavior[Command]): DeveloperRef = {
     val mockBehavior = Behaviors.receiveMessage(receive)
     testKit.spawn(mockBehavior)
   }
 
+  /** Источник состояний, возвращающий конкретное значение */
   private def mockProvider(stateResult: DeveloperState): DeveloperStateProvider =
     (_: ExecutionContext) => Future.successful(stateResult)
 
+  /** Создать PersistentDeveloper на основе актора и источника состояний */
   private def createDeveloper(
     developerRef: DeveloperRef = emptyRef,
     provider: DeveloperStateProvider = emptyProvider
