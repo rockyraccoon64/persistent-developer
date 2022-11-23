@@ -41,6 +41,7 @@ class RestApiTestSuite
       (service.taskInfo(_: UUID)(_: ExecutionContext))
         .expects(id, *)
 
+    /** Проверка передачи информации о существующей задаче */
     def assertTaskInfoReturned(
       id: String,
       difficulty: Int,
@@ -175,6 +176,7 @@ class RestApiTestSuite
     def mockExpects(task: MockParameter[Task]) =
       (service.addTask(_: Task)(_: ExecutionContext)).expects(task, *)
 
+    /** Проверка успешного поручения задачи */
     def assertTaskCreated(
       difficulty: Int,
       domainReply: DeveloperReply,
