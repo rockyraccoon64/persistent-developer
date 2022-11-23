@@ -174,7 +174,11 @@ class RestApiTestSuite
     def mockExpects(task: MockParameter[Task]) =
       (service.addTask(_: Task)(_: ExecutionContext)).expects(task, *)
 
-    def checkReply(difficulty: Int, domainReply: DeveloperReply, apiReply: ApiReply) {
+    def checkReply(
+      difficulty: Int,
+      domainReply: DeveloperReply,
+      apiReply: ApiReply
+    ): Assertion = {
       val task = Task(difficulty)
       val postEntity = ApiTaskToAdd(difficulty)
 
