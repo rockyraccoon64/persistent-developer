@@ -1,4 +1,4 @@
-package rr64.developer.infrastructure.api
+package rr64.developer.infrastructure.api.model
 
 import spray.json.DefaultJsonProtocol._
 import spray.json.RootJsonFormat

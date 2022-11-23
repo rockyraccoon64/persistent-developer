@@ -11,7 +11,7 @@ import org.scalatest.wordspec.AnyWordSpec
 import rr64.developer.domain.dev.{DeveloperReply, DeveloperState}
 import rr64.developer.domain.service.DeveloperService
 import rr64.developer.domain.task.{Difficulty, Task, TaskInfo, TaskStatus}
-import rr64.developer.infrastructure.api.model.ApiDeveloperState
+import rr64.developer.infrastructure.api.model.{ApiDeveloperState, ApiError}
 import spray.json.DefaultJsonProtocol.immSeqFormat
 import spray.json.JsObject
 
