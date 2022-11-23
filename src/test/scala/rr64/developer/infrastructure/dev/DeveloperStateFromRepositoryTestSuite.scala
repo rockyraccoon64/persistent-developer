@@ -16,21 +16,25 @@ class DeveloperStateFromRepositoryTestSuite extends AsyncFlatSpec with Matchers 
   private val dev2 = "mark"
   private val dev3 = "gruff97"
 
-  private def mockRepository: DeveloperStateRepository = new DeveloperStateRepository {
-    private var states: Map[String, DeveloperState] = Map(
-      dev1 -> DeveloperState.Working,
-      dev2 -> DeveloperState.Resting,
-      dev3 -> DeveloperState.Free
-    )
-    override def save(id: String, state: DeveloperState)(implicit ec: ExecutionContext): Future[Unit] = {
-      states = states.updated(id, state)
-      Future.unit
+  private def mockRepository: DeveloperStateRepository =
+    new DeveloperStateRepository {
+      private var states: Map[String, DeveloperState] = Map(
+        dev1 -> DeveloperState.Working,
+        dev2 -> DeveloperState.Resting,
+        dev3 -> DeveloperState.Free
+      )
+      override def save(id: String, state: DeveloperState)
+          (implicit ec: ExecutionContext): Future[Unit] = {
+        states = states.updated(id, state)
+        Future.unit
+      }
+      override def findById(id: String)
+          (implicit ec: ExecutionContext): Future[Option[DeveloperState]] =
+        Future.successful(states.get(id))
     }
-    override def findById(id: String)(implicit ec: ExecutionContext): Future[Option[DeveloperState]] =
-      Future.successful(states.get(id))
-  }
 
-  private def createProvider(developerId: String) = new DeveloperStateFromRepository(developerId, mockRepository)
+  private def createProvider(developerId: String) =
+    new DeveloperStateFromRepository(developerId, mockRepository)
 
   def checkState(developerId: String, state: DeveloperState): Future[Assertion] = {
     val provider = createProvider(developerId)
