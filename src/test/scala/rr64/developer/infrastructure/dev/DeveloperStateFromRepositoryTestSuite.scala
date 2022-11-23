@@ -36,7 +36,7 @@ class DeveloperStateFromRepositoryTestSuite extends AsyncWordSpec with Matchers 
   private def createProvider(developerId: String) =
     new DeveloperStateFromRepository(developerId, mockRepository)
 
-  def checkState(developerId: String, state: DeveloperState): Future[Assertion] = {
+  private def assertState(developerId: String, state: DeveloperState): Future[Assertion] = {
     val provider = createProvider(developerId)
     provider.state.map(_ shouldEqual state)
   }
@@ -47,9 +47,9 @@ class DeveloperStateFromRepositoryTestSuite extends AsyncWordSpec with Matchers 
     /** Должен извлекать известное состояние разработчика из репозитория */
     "extract an existing state for the given developer id from the repository" in {
       for {
-        _ <- checkState(dev1, DeveloperState.Working)
-        _ <- checkState(dev2, DeveloperState.Resting)
-        _ <- checkState(dev3, DeveloperState.Free)
+        _ <- assertState(dev1, DeveloperState.Working)
+        _ <- assertState(dev2, DeveloperState.Resting)
+        _ <- assertState(dev3, DeveloperState.Free)
       } yield succeed
     }
 
@@ -57,7 +57,7 @@ class DeveloperStateFromRepositoryTestSuite extends AsyncWordSpec with Matchers 
      * то он ещё не получил задачу и находится в начальном состоянии */
     "return the initial state if the developer's state is not saved in the repository" in {
       val nonexistentDevId = "dave"
-      checkState(nonexistentDevId, DeveloperState.Free)
+      assertState(nonexistentDevId, DeveloperState.Free)
     }
 
   }
