@@ -6,8 +6,17 @@ import akka.projection.eventsourced.EventEnvelope
 import akka.projection.testkit.scaladsl.TestSourceProvider
 import akka.stream.scaladsl.Source
 
+/**
+ * Вспомогательные методы для тестирования проекций
+ * */
 object ProjectionTestUtils {
 
+  /**
+   * Source событий для проекции на основе последовательности событий
+   * @param events События
+   * @param persistenceId Persistence ID
+   * @param startOffset Offset первого события
+   * */
   def envelopeSource[T](
     events: Seq[T],
     persistenceId: String,
@@ -24,6 +33,7 @@ object ProjectionTestUtils {
       )
     }
 
+  /** Тестовый SourceProvider на основе Source */
   def providerFromSource[T](
     source: Source[EventEnvelope[T], NotUsed]
   ): TestSourceProvider[Offset, EventEnvelope[T]] =
