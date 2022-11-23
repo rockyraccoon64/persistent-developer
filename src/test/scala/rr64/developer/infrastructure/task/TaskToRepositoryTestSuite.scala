@@ -31,6 +31,7 @@ class TaskToRepositoryTestSuite
   /** Фикстура для тестирования обработчика проекции */
   private trait HandlerTest {
 
+    /** Репозиторий, изначально пустой */
     protected val mockRepository: TaskRepository[Any] =
       new TaskRepository[Any] {
         private var tasks: Map[UUID, TaskInfo] = Map.empty
@@ -46,9 +47,11 @@ class TaskToRepositoryTestSuite
           Future.successful(tasks.values.toSeq)
       }
 
+    /** Обработчик проекции */
     protected val handler: Handler[EventEnvelope[Event]] =
       new TaskToRepository(mockRepository)
 
+    /** Проекция на основе последовательности событий */
     protected def projectionFromEvents(
       events: Seq[Event],
       persistenceId: String = "proj"
@@ -57,6 +60,7 @@ class TaskToRepositoryTestSuite
       projectionFromSource(source)
     }
 
+    /** Проекция на основе Source событий */
     protected def projectionFromSource(
       source: Source[EventEnvelope[Event], NotUsed]
     ): TestProjection[Offset, EventEnvelope[Event]] =
@@ -66,6 +70,7 @@ class TaskToRepositoryTestSuite
         handler = () => handler
       )
 
+    /** Проверка состояния задачи */
     protected def assertInfo(taskInfo: TaskInfo): Assertion =
       mockRepository.findById(taskInfo.id).futureValue shouldEqual Some(taskInfo)
 
