@@ -131,7 +131,7 @@ class RestApiTestSuite
       (service.developerState(_: ExecutionContext)).expects(*)
 
     /** Проверка текущего состояния */
-    class StateTest(domain: DeveloperState, api: ApiDeveloperState) {
+    def assertStateReturned(domain: DeveloperState, api: ApiDeveloperState): Assertion = {
       mockService.returning(Future.successful(domain))
       StateRequest ~> route ~> check {
         responseAs[ApiDeveloperState] shouldEqual api
@@ -140,13 +140,13 @@ class RestApiTestSuite
     }
 
     /** Состояние "Свободен" */
-    "return the Free state" in new StateTest(DeveloperState.Free, ApiDeveloperState.Free)
+    "return the Free state" in assertStateReturned(DeveloperState.Free, ApiDeveloperState.Free)
 
     /** Состояние "Работает" */
-    "return the Working state" in new StateTest(DeveloperState.Working, ApiDeveloperState.Working)
+    "return the Working state" in assertStateReturned(DeveloperState.Working, ApiDeveloperState.Working)
 
     /** Состояние "Отдыхает" */
-    "return the Resting state" in new StateTest(DeveloperState.Resting, ApiDeveloperState.Resting)
+    "return the Resting state" in assertStateReturned(DeveloperState.Resting, ApiDeveloperState.Resting)
 
     /** При асинхронной ошибке возвращается 500 Internal Server Error */
     "return 500 Internal Server Error when encountering an asynchronous exception" in {
