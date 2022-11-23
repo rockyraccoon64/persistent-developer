@@ -28,6 +28,10 @@ class DeveloperStateToRepositoryTestSuite
   private val projectionTestKit = ProjectionTestKit(system)
   private implicit val ec: ExecutionContext = system.executionContext
 
+  private val defaultPersistenceId = "test-id"
+  private val defaultTask1 = Task(1).withRandomId
+  private val defaultTask2 = Task(5).withRandomId
+
   private trait HandlerTest {
 
     private val mockRepository: DeveloperStateRepository =
@@ -70,11 +74,6 @@ class DeveloperStateToRepositoryTestSuite
       mockRepository.findById(persistenceId).futureValue shouldEqual Some(state)
 
   }
-
-  private val defaultPersistenceId = "test-id"
-
-  private val defaultTask1 = Task(1).withRandomId
-  private val defaultTask2 = Task(5).withRandomId
 
   /** Обработчик проекции */
   "The handler" should {
