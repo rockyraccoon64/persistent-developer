@@ -29,8 +29,8 @@ class RestApiTestSuite
   private type Query = Option[Int]
 
   private val service = mock[DeveloperService[Query]]
-  private val extractQuery = mock[QueryExtractor[Option[String], Query]]
-  private val route = new RestApi[Query](service, extractQuery).route
+  private val queryExtractor = mock[QueryExtractor[Option[String], Query]]
+  private val route = new RestApi[Query](service, queryExtractor).route
 
   /** Запрос информации о задаче */
   "The service processing a single task info request" should {
@@ -283,7 +283,7 @@ class RestApiTestSuite
       expects: MockParameter[Option[String]] = *,
       returns: Either[String, Query] = Right(None)
     ) =
-      (extractQuery.extract _)
+      (queryExtractor.extract _)
         .expects(expects)
         .returning(returns)
 
