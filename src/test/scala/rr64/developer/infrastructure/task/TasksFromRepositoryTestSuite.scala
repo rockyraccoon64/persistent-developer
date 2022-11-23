@@ -4,8 +4,7 @@ import org.scalamock.scalatest.AsyncMockFactory
 import org.scalatest.flatspec.AsyncFlatSpecLike
 import org.scalatest.matchers.should.Matchers
 import rr64.developer.domain.task.TaskInfo.TaskInfoFromTaskWithId
-import rr64.developer.domain.task.{Task, TaskStatus}
-import rr64.developer.infrastructure.TaskTestUtils.TaskWithIdFactory
+import rr64.developer.domain.task.TaskStatus
 
 import java.util.UUID
 import scala.concurrent.{ExecutionContext, Future}
@@ -18,8 +17,12 @@ class TasksFromRepositoryTestSuite
     with AsyncFlatSpecLike
     with Matchers {
 
-  private val task1 = Task(33).withRandomId.withStatus(TaskStatus.Queued)
-  private val task2 = Task(85).withRandomId.withStatus(TaskStatus.InProgress)
+  private val task1 =
+    TaskWithId(33, "a68b3067-7ce1-4da2-9e2a-b8b38e9863d1")
+      .withStatus(TaskStatus.Queued)
+  private val task2 =
+    TaskWithId(85, "011a141e-d0a5-4693-9cd1-75a85c6284e1")
+      .withStatus(TaskStatus.InProgress)
 
   private val mockRepository = mock[TaskRepository[Any]]
   private val tasks = new TasksFromRepository(mockRepository)
