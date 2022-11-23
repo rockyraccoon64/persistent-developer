@@ -10,16 +10,16 @@ import rr64.developer.domain.timing.Factor.FactorException
  */
 class FactorTestSuite extends AnyWordSpec with Matchers {
 
+  private def assertFactorException(factor: Int): Assertion =
+    assertThrows[FactorException] {
+      Factor(factor)
+    }
+
+  private def assertNoException(factor: Int): Assertion =
+    noException should be thrownBy Factor(factor)
+
   /** Множители */
   "Factors" should {
-
-    def assertFactorException(factor: Int): Assertion =
-      assertThrows[FactorException] {
-        Factor(factor)
-      }
-
-    def assertNoException(factor: Int): Assertion =
-      noException should be thrownBy Factor(factor)
 
     /** Не должны быть меньше единицы */
     "not be allowed to be less than 1" in {
