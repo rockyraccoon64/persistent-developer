@@ -1,0 +1,166 @@
+openapi: 3.0.3
+info:
+  title: Persistent Developer REST API
+  description: Сервис выполнения задач
+  version: '0.1'
+servers:
+  - url: http://localhost:10538/api
+paths:
+  /command/add-task:
+    post:
+      summary: Поручить задачу
+      requestBody:
+        description: Задача
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TaskToAdd'
+        required: true
+      responses:
+        '201':
+          description: Задача принята
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeveloperReply'
+        '400':
+          description: Ошибка в запросе
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /query/developer-state:
+    get:
+      summary: Текущее состояние разработчика
+      responses:
+        '200':
+          description: Состояние разработчика
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeveloperState'
+  /query/task-list:
+    get:
+      summary: Список задач
+      parameters:
+        - name: query
+          in: query
+          description: Параметры запроса. Если передаются, требуется указать как limit, так и offset.
+          required: false
+          schema:
+            type: string
+            example: 'limit:15,offset:20'
+      responses:
+        '200':
+          description: Список задач
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TaskInfo'
+        '400':
+          description: Ошибка в параметрах запроса
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /query/task-info/{id}:
+    get:
+      summary: Найти задачу по идентификатору
+      parameters:
+        - name: id
+          in: path
+          description: Идентификатор задачи
+          required: true
+          schema:
+            $ref: '#/components/schemas/TaskId'
+      responses:
+        '200':
+          description: Задача
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaskInfo'
+        '404':
+          description: Задача не найдена
+components:
+  schemas:
+    TaskToAdd:
+      description: Новая задача
+      type: object
+      properties:
+        difficulty:
+          $ref: '#/components/schemas/TaskDifficulty'
+      required:
+        - difficulty
+    TaskInfo:
+      description: Существующая задача
+      type: object
+      properties:
+        id:
+          $ref: '#/components/schemas/TaskId'
+        difficulty:
+          $ref: '#/components/schemas/TaskDifficulty'
+        status:
+          $ref: '#/components/schemas/TaskStatus'
+      required:
+        - id
+        - difficulty
+        - status
+    DeveloperReply:
+      description: Ответ на команду добавления задачи
+      type: object
+      properties:
+        id:
+          $ref: '#/components/schemas/TaskId'
+        status:
+          $ref: '#/components/schemas/TaskStatus'
+      required:
+        - id
+        - status
+    DeveloperState:
+      description: Состояние разработчика
+      type: object
+      properties:
+        state:
+          description: Состояние разработчика
+          type: string
+          enum:
+            - Free
+            - Working
+            - Resting
+      required:
+        - state
+    Error:
+      description: Ошибка
+      type: object
+      properties:
+        error:
+          description: Тип ошибки
+          type: string
+          enum:
+            - Difficulty
+            - Query
+        message:
+          description: Детали ошибки
+          type: string
+      required:
+        - error
+        - message
+    TaskId:
+      description: Идентификатор задачи
+      type: string
+      format: uuid
+    TaskDifficulty:
+      description: Сложность задачи
+      type: integer
+      minimum: 1
+      maximum: 100
+    TaskStatus:
+      description: Статус задачи
+      type: string
+      enum:
+        - InProgress
+        - Queued
+        - Finished
