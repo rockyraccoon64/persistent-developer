@@ -41,7 +41,7 @@ class RestApiTestSuite
       (service.taskInfo(_: UUID)(_: ExecutionContext))
         .expects(id, *)
 
-    def checkTask(
+    def assertTaskInfoReturned(
       id: UUID,
       difficulty: Int,
       status: TaskStatus,
@@ -60,19 +60,19 @@ class RestApiTestSuite
 
     /** Когда задача существует, возвращается информация о ней */
     "return the existing task info for a given id" in {
-      checkTask(
+      assertTaskInfoReturned(
         id = UUID.fromString("6f9ed143-70f4-4406-9c6b-2d9ddd297304"),
         difficulty = 35,
         status = TaskStatus.InProgress,
         apiStatus = "InProgress"
       )
-      checkTask(
+      assertTaskInfoReturned(
         id = UUID.fromString("5f4e32f8-fc81-49c4-a05c-efbf5aa0d47d"),
         difficulty = 99,
         status = TaskStatus.Queued,
         apiStatus = "Queued"
       )
-      checkTask(
+      assertTaskInfoReturned(
         id = UUID.fromString("374b7d13-8174-4476-b1d6-1d8759d2a6ed"),
         difficulty = 1,
         status = TaskStatus.Finished,
