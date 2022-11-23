@@ -40,25 +40,29 @@ class DeveloperBehaviorTestSuite
       SerializationSettings.disabled
     )
 
+  override protected def beforeEach(): Unit = {
+    super.beforeEach()
+    developerTestKit.clear()
+  }
+
+  /** Поручить задачу */
   private def addTask(task: Task) =
     developerTestKit.runCommand(Command.AddTask(task, _))
 
+  /** Поставить задачу в очередь и получить идентификатор */
   private def queueTask(task: Task): TaskWithId = {
     val result = addTask(task)
     val id = result.replyOfType[Replies.TaskQueued].id
     TaskWithId(task, id)
   }
 
+  /** Расчитать время работы */
   private def calculateWorkTime(difficulty: Difficulty): FiniteDuration =
     Timing.calculateTime(difficulty, workFactor)
 
+  /** Расчитать время отдыха */
   private def calculateRestTime(difficulty: Difficulty): FiniteDuration =
     Timing.calculateTime(difficulty, restFactor)
-
-  override protected def beforeEach(): Unit = {
-    super.beforeEach()
-    developerTestKit.clear()
-  }
 
   /** Актор разработчика */
   "The developer" should {
