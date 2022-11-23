@@ -1,8 +1,8 @@
 package rr64.developer.infrastructure.dev
 
 import org.scalatest.Assertion
-import org.scalatest.flatspec.AsyncFlatSpec
 import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AsyncWordSpec
 import rr64.developer.domain.dev.DeveloperState
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -10,7 +10,7 @@ import scala.concurrent.{ExecutionContext, Future}
 /**
  * Тесты источника состояний разработчиков на основе репозитория
  */
-class DeveloperStateFromRepositoryTestSuite extends AsyncFlatSpec with Matchers {
+class DeveloperStateFromRepositoryTestSuite extends AsyncWordSpec with Matchers {
 
   private val dev1 = "walter"
   private val dev2 = "mark"
@@ -41,20 +41,25 @@ class DeveloperStateFromRepositoryTestSuite extends AsyncFlatSpec with Matchers 
     provider.state.map(_ shouldEqual state)
   }
 
-  /** Источник должен извлекать известное состояние разработчика из репозитория */
-  "The provider" should "extract an existing state for the given developer id from the repository" in {
-    for {
-      _ <- checkState(dev1, DeveloperState.Working)
-      _ <- checkState(dev2, DeveloperState.Resting)
-      _ <- checkState(dev3, DeveloperState.Free)
-    } yield succeed
-  }
+  /** Источник состояний разработчика */
+  "The developer state provider" should {
 
-  /** Если состояние разработчика не сохранено в репозитории,
-   * он ещё не получил задачу и находится в начальном состоянии */
-  "The provider" should "return the initial state if the developer's state is not saved in the repository" in {
-    val nonexistentDevId = "dave"
-    checkState(nonexistentDevId, DeveloperState.Free)
+    /** Должен извлекать известное состояние разработчика из репозитория */
+    "extract an existing state for the given developer id from the repository" in {
+      for {
+        _ <- checkState(dev1, DeveloperState.Working)
+        _ <- checkState(dev2, DeveloperState.Resting)
+        _ <- checkState(dev3, DeveloperState.Free)
+      } yield succeed
+    }
+
+    /** Если состояние разработчика не сохранено в репозитории,
+     * то он ещё не получил задачу и находится в начальном состоянии */
+    "return the initial state if the developer's state is not saved in the repository" in {
+      val nonexistentDevId = "dave"
+      checkState(nonexistentDevId, DeveloperState.Free)
+    }
+
   }
 
 }
