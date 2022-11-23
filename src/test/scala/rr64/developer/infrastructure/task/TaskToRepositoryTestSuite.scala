@@ -30,7 +30,7 @@ class TaskToRepositoryTestSuite
   private implicit val ec: ExecutionContext = system.executionContext
 
   /** Фикстура для тестирования обработчика проекции */
-  private trait Fixture {
+  private trait HandlerTest {
 
     protected val mockRepository: TaskRepository[Any] =
       new TaskRepository[Any] {
@@ -74,7 +74,7 @@ class TaskToRepositoryTestSuite
 
   /** В начале работы над задачей информация о текущем статусе должна сохраняться в репозиторий */
   "The current task state" should "be saved to the repository when the task is started" in
-    new Fixture {
+    new HandlerTest {
       val taskWithId = Task(90).withRandomId
       val taskInfo = taskWithId.withStatus(TaskStatus.InProgress)
       val events = Event.TaskStarted(taskWithId) :: Nil
@@ -86,7 +86,7 @@ class TaskToRepositoryTestSuite
 
   /** Когда задача ставится в очередь, её текущее состояние должно сохраняться в репозиторий */
   "The current task state" should "be saved to the repository when the task is queued" in
-    new Fixture {
+    new HandlerTest {
       val taskWithId = Task(100).withRandomId
       val taskInfo = taskWithId.withStatus(TaskStatus.Queued)
       val events = Event.TaskQueued(taskWithId) :: Nil
@@ -98,7 +98,7 @@ class TaskToRepositoryTestSuite
 
   /** Когда задача завершена, её текущее состояние должно сохраняться в репозиторий */
   "The current task state" should "be saved to the repository when the task is finished" in
-    new Fixture {
+    new HandlerTest {
       val taskWithId = Task(77).withRandomId
       val taskInfo = taskWithId.withStatus(TaskStatus.Finished)
       val events = Event.TaskFinished(taskWithId) :: Nil
@@ -110,7 +110,7 @@ class TaskToRepositoryTestSuite
 
   /** В начале работы над задачей после отдыха её статус должен сохраняться в репозиторий */
   "The current task state" should "be saved to the repository when the task is started after resting" in
-    new Fixture {
+    new HandlerTest {
       val taskWithId = TaskWithId(35, UUID.fromString("f33b67f0-2324-4c7d-8b5f-59ab8e4f5bd7"))
       val taskInfo = taskWithId.withStatus(TaskStatus.InProgress)
       val events = Event.Rested(Some(taskWithId)) :: Nil
@@ -122,7 +122,7 @@ class TaskToRepositoryTestSuite
 
   /** Когда событие не связано с задачей, обновления не происходит */
   "The task state" should "not be updated when there's no task events" in
-    new Fixture {
+    new HandlerTest {
       val taskWithId1 = Task(53).withRandomId
       val taskWithId2 = Task(10).withRandomId
       val taskInfo1 = taskWithId1.withStatus(TaskStatus.Queued)
