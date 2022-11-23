@@ -42,18 +42,19 @@ class RestApiTestSuite
         .expects(id, *)
 
     def assertTaskInfoReturned(
-      id: UUID,
+      id: String,
       difficulty: Int,
       status: TaskStatus,
       apiStatus: String
     ): Assertion = {
-      val taskInfo = TaskInfo(id, Difficulty(difficulty), status)
+      val uuid = UUID.fromString(id)
+      val taskInfo = TaskInfo(uuid, Difficulty(difficulty), status)
 
       val taskInfoFound = Future.successful(Some(taskInfo))
-      mockExpects(id).returning(taskInfoFound)
+      mockExpects(uuid).returning(taskInfoFound)
 
       Get(s"$baseUrl/$id") ~> route ~> check {
-        responseAs[ApiTaskInfo] shouldEqual ApiTaskInfo(id, difficulty, apiStatus)
+        responseAs[ApiTaskInfo] shouldEqual ApiTaskInfo(uuid, difficulty, apiStatus)
         response.status shouldEqual StatusCodes.OK
       }
     }
@@ -61,19 +62,19 @@ class RestApiTestSuite
     /** Когда задача существует, возвращается информация о ней */
     "return the existing task info for a given id" in {
       assertTaskInfoReturned(
-        id = UUID.fromString("6f9ed143-70f4-4406-9c6b-2d9ddd297304"),
+        id = "6f9ed143-70f4-4406-9c6b-2d9ddd297304",
         difficulty = 35,
         status = TaskStatus.InProgress,
         apiStatus = "InProgress"
       )
       assertTaskInfoReturned(
-        id = UUID.fromString("5f4e32f8-fc81-49c4-a05c-efbf5aa0d47d"),
+        id = "5f4e32f8-fc81-49c4-a05c-efbf5aa0d47d",
         difficulty = 99,
         status = TaskStatus.Queued,
         apiStatus = "Queued"
       )
       assertTaskInfoReturned(
-        id = UUID.fromString("374b7d13-8174-4476-b1d6-1d8759d2a6ed"),
+        id = "374b7d13-8174-4476-b1d6-1d8759d2a6ed",
         difficulty = 1,
         status = TaskStatus.Finished,
         apiStatus = "Finished"
