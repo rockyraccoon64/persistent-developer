@@ -11,6 +11,7 @@ class EventSerializerTestSuite extends AnyFlatSpec with Matchers {
 
   private val serializer = new EventSerializer
 
+  /** Проверка симметричности сериализации и десериализации */
   private def assertSerialized(event: Event) {
     val bytes = serializer.toBinary(event)
     val manifest = serializer.manifest(event)

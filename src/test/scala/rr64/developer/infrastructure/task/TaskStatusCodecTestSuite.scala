@@ -13,6 +13,7 @@ class TaskStatusCodecTestSuite
 
   private val codec = new TaskStatusCodec
 
+  /** Проверка симметричности кодирования и декодирования */
   private def codecTest(status: TaskStatus) {
     val encoded = codec.encode(status)
     codec.decode(encoded) shouldEqual status

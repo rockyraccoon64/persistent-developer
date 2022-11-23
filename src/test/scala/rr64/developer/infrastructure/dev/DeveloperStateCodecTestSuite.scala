@@ -14,6 +14,7 @@ class DeveloperStateCodecTestSuite
 
   private val codec = new DeveloperStateCodec
 
+  /** Проверка симметричности кодирования и декодирования */
   private def codecTest(state: DeveloperState): Assertion = {
     val encoded = codec.encode(state)
     state shouldEqual codec.decode(encoded)
