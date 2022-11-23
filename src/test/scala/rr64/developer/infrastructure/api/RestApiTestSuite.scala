@@ -191,6 +191,16 @@ class RestApiTestSuite
       }
     }
 
+    def assertDifficultyError(difficulty: Int) {
+      val postEntity = ApiTaskToAdd(difficulty)
+      val apiError = ApiError.TaskDifficulty
+
+      Post(url, postEntity) ~> route ~> check {
+        responseAs[ApiError] shouldEqual apiError
+        status shouldEqual StatusCodes.BadRequest
+      }
+    }
+
     /** Когда задача начата, возвращается её идентификатор и соответствующий признак */
     "return the Task Started reply" in {
       val difficulty = 9
@@ -211,27 +221,17 @@ class RestApiTestSuite
       assertTaskCreated(difficulty, domainReply, apiReply)
     }
 
-    class DifficultyErrorTest(difficulty: Int) {
-      val postEntity = ApiTaskToAdd(difficulty)
-      val apiError = ApiError.TaskDifficulty
-
-      Post(url, postEntity) ~> route ~> check {
-        responseAs[ApiError] shouldEqual apiError
-        status shouldEqual StatusCodes.BadRequest
-      }
-    }
-
     /** Если у задачи отрицательная сложность, возвращается 400 Bad Request и сообщение об ошибке */
     "return 400 Bad Request when the task has negative difficulty" in
-      new DifficultyErrorTest(-1)
+      assertDifficultyError(-1)
 
     /** Если у задачи сложность равна нулю, возвращается 400 Bad Request и сообщение об ошибке */
     "return 400 Bad Request when the task has zero difficulty" in
-      new DifficultyErrorTest(0)
+      assertDifficultyError(0)
 
     /** Если у задачи сложность больше 100, возвращается 400 Bad Request и сообщение об ошибке */
     "return 400 Bad Request when the task has difficulty greater than 100" in
-      new DifficultyErrorTest(101)
+      assertDifficultyError(101)
 
     /** В случае некорректного формата сущности возвращается 400 Bad Request */
     "return 400 Bad Request when encountering an invalid entity" in {
