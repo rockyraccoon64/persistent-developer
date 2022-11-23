@@ -5,6 +5,9 @@ import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import rr64.developer.domain.timing.Factor.FactorException
 
+/**
+ * Тесты множителей времени
+ */
 class FactorTestSuite extends AnyWordSpec with Matchers {
 
   /** Множители */
