@@ -8,7 +8,7 @@ import rr64.developer.domain.dev.{DeveloperReply, DeveloperState}
 import rr64.developer.domain.service.DeveloperService
 import rr64.developer.domain.task.Difficulty.DifficultyException
 import rr64.developer.domain.task.{Task, TaskInfo}
-import rr64.developer.infrastructure.api.model.{ApiDeveloperState, ApiError, ApiReply, ApiTaskInfo}
+import rr64.developer.infrastructure.api.model._
 import spray.json.DefaultJsonProtocol._
 
 import scala.util.{Failure, Success, Try}
