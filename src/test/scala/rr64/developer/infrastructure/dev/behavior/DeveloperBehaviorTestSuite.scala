@@ -9,7 +9,6 @@ import org.scalatest.Inside.inside
 import org.scalatest.flatspec.AnyFlatSpecLike
 import rr64.developer.domain.task.{Difficulty, Task}
 import rr64.developer.domain.timing.{Factor, Timing}
-import rr64.developer.infrastructure.TaskTestUtils.TaskWithIdFactory
 import rr64.developer.infrastructure.task.TaskWithId
 
 import java.util.UUID
