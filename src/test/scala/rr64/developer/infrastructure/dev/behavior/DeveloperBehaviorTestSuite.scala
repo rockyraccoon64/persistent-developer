@@ -15,6 +15,9 @@ import rr64.developer.infrastructure.task.TaskWithId
 import java.util.UUID
 import scala.concurrent.duration.{DurationInt, FiniteDuration}
 
+/**
+ * Тесты поведения персистентного актора разработчика
+ */
 class DeveloperBehaviorTestSuite
   extends ScalaTestWithActorTestKit(
     ManualTime.config
@@ -22,11 +25,7 @@ class DeveloperBehaviorTestSuite
   ) with AnyFlatSpecLike
     with BeforeAndAfterEach {
 
-  private type Kit = EventSourcedBehaviorTestKit[
-    Command,
-    Event,
-    State
-  ]
+  private type Kit = EventSourcedBehaviorTestKit[Command, Event, State]
 
   private val manualTime = ManualTime()
 
@@ -43,11 +42,11 @@ class DeveloperBehaviorTestSuite
       SerializationSettings.disabled
     )
 
-  private def addTask(task: Task, kit: Kit = developerTestKit) =
-    kit.runCommand(Command.AddTask(task, _))
+  private def addTask(task: Task) =
+    developerTestKit.runCommand(Command.AddTask(task, _))
 
-  private def queueTask(task: Task, kit: Kit = developerTestKit): TaskWithId = {
-    val result = addTask(task, kit)
+  private def queueTask(task: Task): TaskWithId = {
+    val result = addTask(task)
     val id = result.replyOfType[Replies.TaskQueued].id
     TaskWithId(task, id)
   }
@@ -138,7 +137,7 @@ class DeveloperBehaviorTestSuite
     val currentTask = Task(100).withRandomId
     val newTask = Task(10)
     developerTestKit.initialize(Event.TaskStarted(currentTask))
-    val result = addTask(newTask, developerTestKit)
+    val result = addTask(newTask)
     val reply = result.replyOfType[Replies.TaskQueued]
     reply.id should not be null
   }
@@ -149,9 +148,9 @@ class DeveloperBehaviorTestSuite
     val secondTask = Task(50)
     val thirdTask = Task(25)
 
-    val firstResult = addTask(firstTask, developerTestKit)
-    val secondResult = addTask(secondTask, developerTestKit)
-    val thirdResult = addTask(thirdTask, developerTestKit)
+    val firstResult = addTask(firstTask)
+    val secondResult = addTask(secondTask)
+    val thirdResult = addTask(thirdTask)
 
     firstResult.stateOfType[State.Working].taskQueue shouldEqual Nil
 
@@ -173,7 +172,7 @@ class DeveloperBehaviorTestSuite
     val secondTask = Task(50)
     val thirdTask = Task(25)
 
-    addTask(firstTask, developerTestKit)
+    addTask(firstTask)
 
     val secondTaskWithId = queueTask(secondTask)
     val thirdTaskWithId = queueTask(thirdTask)
@@ -194,7 +193,7 @@ class DeveloperBehaviorTestSuite
     val secondTask = Task(90)
     val thirdTask = Task(25)
 
-    addTask(firstTask, developerTestKit)
+    addTask(firstTask)
 
     val secondTaskWithId = queueTask(secondTask)
     val thirdTaskWithId = queueTask(thirdTask)
@@ -231,7 +230,7 @@ class DeveloperBehaviorTestSuite
     val initialTask = Task(1)
     val workTime = calculateWorkTime(initialTask.difficulty)
 
-    addTask(initialTask, developerTestKit)
+    addTask(initialTask)
 
     manualTime.timePasses(workTime)
 
