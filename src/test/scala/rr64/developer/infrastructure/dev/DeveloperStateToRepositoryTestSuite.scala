@@ -15,7 +15,6 @@ import rr64.developer.infrastructure.ProjectionTestUtils
 import rr64.developer.infrastructure.dev.behavior.Event
 import rr64.developer.infrastructure.task.TaskWithId
 
-import java.util.UUID
 import scala.concurrent.{ExecutionContext, Future}
 
 /**
@@ -28,16 +27,9 @@ class DeveloperStateToRepositoryTestSuite
   private val projectionTestKit = ProjectionTestKit(system)
   private implicit val ec: ExecutionContext = system.executionContext
 
-  private val defaultPersistenceId =
-    "test-id"
-  private val defaultTask1 = TaskWithId(
-    difficulty = 1,
-    id = UUID.fromString("ce85f496-4ef1-4407-af79-7bf6db56c0f3")
-  )
-  private val defaultTask2 = TaskWithId(
-    difficulty = 5,
-    id = UUID.fromString("c525986e-2d9a-4c1d-8fcb-747a23a42118")
-  )
+  private val defaultPersistenceId = "test-id"
+  private val defaultTask1 = TaskWithId(1, "ce85f496-4ef1-4407-af79-7bf6db56c0f3")
+  private val defaultTask2 = TaskWithId(5, "c525986e-2d9a-4c1d-8fcb-747a23a42118")
 
   /** Фикстура для тестирования обработчика проекции */
   private trait HandlerTest {

@@ -11,7 +11,6 @@ import rr64.developer.domain.task.{Difficulty, Task}
 import rr64.developer.domain.timing.{Factor, Timing}
 import rr64.developer.infrastructure.task.TaskWithId
 
-import java.util.UUID
 import scala.concurrent.duration.{DurationInt, FiniteDuration}
 
 /**
@@ -133,7 +132,7 @@ class DeveloperBehaviorTestSuite
    * то при получении новой задачи он присваивает ей идентификатор
    * и отправляет его в ответе */
   "The developer" should "reply with an identifier after receiving a new task while working" in {
-    val currentTask = TaskWithId(100, UUID.fromString("f490d7ca-dcbf-4905-be03-ffd7bf90b513"))
+    val currentTask = TaskWithId(100, "f490d7ca-dcbf-4905-be03-ffd7bf90b513")
     val newTask = Task(10)
     developerTestKit.initialize(Event.TaskStarted(currentTask))
     val result = addTask(newTask)
@@ -246,7 +245,7 @@ class DeveloperBehaviorTestSuite
 
   /** Если актор упал в рабочем состоянии, соответствующий таймер запускается по новой */
   "The developer actor" should "start the work timer when completing recovery in a Working state" in {
-    val taskWithId = TaskWithId(50, UUID.fromString("92ac4c4b-622f-44ba-b331-f1cf40a27c58"))
+    val taskWithId = TaskWithId(50, "92ac4c4b-622f-44ba-b331-f1cf40a27c58")
     val workTime = calculateWorkTime(taskWithId.difficulty)
 
     developerTestKit.initialize(Event.TaskStarted(taskWithId))
@@ -261,7 +260,7 @@ class DeveloperBehaviorTestSuite
 
   /** Если актор упал в состоянии отдыха, соответствующий таймер запускается по новой */
   "The developer actor" should "start the rest timer when completing recovery in a Resting state" in {
-    val taskWithId = TaskWithId(10, UUID.fromString("b807f5ff-6066-454e-8d53-2a90a3941cc4"))
+    val taskWithId = TaskWithId(10, "b807f5ff-6066-454e-8d53-2a90a3941cc4")
     val restTime = calculateRestTime(taskWithId.difficulty)
 
     developerTestKit.initialize(Event.TaskStarted(taskWithId), Event.TaskFinished(taskWithId))
@@ -276,9 +275,9 @@ class DeveloperBehaviorTestSuite
 
   /** После отдыха разработчик выполняет следующую задачу из очереди до конца */
   "After resting the developer" should "fully complete the next task in the queue" in {
-    val lastCompleted = TaskWithId(12, UUID.fromString("6bf0af94-4ee3-4857-9a38-3e31e529b37d"))
-    val taskQueue = TaskWithId(35, UUID.fromString("ba5be578-9af1-44a6-9b8b-0a11c340237b")) ::
-      TaskWithId(19, UUID.fromString("da2b386f-a53e-44a8-b943-8e7491d1010e")) ::
+    val lastCompleted = TaskWithId(12, "6bf0af94-4ee3-4857-9a38-3e31e529b37d")
+    val taskQueue = TaskWithId(35, "ba5be578-9af1-44a6-9b8b-0a11c340237b") ::
+      TaskWithId(19, "da2b386f-a53e-44a8-b943-8e7491d1010e") ::
       Nil
     val restTime = calculateRestTime(lastCompleted.difficulty)
     val nextTask = taskQueue.head
