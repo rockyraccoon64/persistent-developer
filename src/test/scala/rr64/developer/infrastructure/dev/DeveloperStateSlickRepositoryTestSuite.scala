@@ -28,6 +28,7 @@ class DeveloperStateSlickRepositoryTestSuite extends PostgresSpec with AsyncFlat
     }, 10.seconds)
   }
 
+  /** Сохранить состояние и запросом проверить, что оно сохранено */
   private def assertInsertedAndRetrieved(id: String, state: DeveloperState): Future[Assertion] =
     for {
       _ <- repository.save(id, state)
