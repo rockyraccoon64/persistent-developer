@@ -28,7 +28,7 @@ class RestApiTestSuite
   private type Query = Option[Int]
 
   private val service = mock[DeveloperService[Query]]
-  private val extractQuery = mock[QueryExtractor[Option[String], Option[Int]]]
+  private val extractQuery = mock[QueryExtractor[Option[String], Query]]
   private val route = new RestApi[Query](service, extractQuery).route
 
   /** Запрос информации о задаче */
