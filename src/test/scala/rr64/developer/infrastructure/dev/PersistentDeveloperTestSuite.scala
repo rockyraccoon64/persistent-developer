@@ -12,6 +12,9 @@ import rr64.developer.infrastructure.dev.behavior.{Command, Replies}
 import java.util.UUID
 import scala.concurrent.{ExecutionContext, Future}
 
+/**
+ * Тесты реализации разработчика на основе актора и источника состояний
+ */
 class PersistentDeveloperTestSuite
   extends ScalaTestWithActorTestKit
     with AsyncFlatSpecLike {
@@ -26,9 +29,7 @@ class PersistentDeveloperTestSuite
 
   private val emptyRef = testKit.spawn(Behaviors.empty[Command])
 
-  private def mockDeveloperRef(
-    receive: Command => Behavior[Command]
-  ): DeveloperRef = {
+  private def mockDeveloperRef(receive: Command => Behavior[Command]): DeveloperRef = {
     val mockBehavior = Behaviors.receiveMessage(receive)
     testKit.spawn(mockBehavior)
   }
@@ -53,7 +54,8 @@ class PersistentDeveloperTestSuite
     command.task shouldEqual task
   }
 
-  /** Когда разработчик отвечает "Задача начата", должно приходить соответствующее доменное сообщение */
+  /** Когда разработчик отвечает "Задача начата",
+   * должно приходить соответствующее доменное сообщение */
   "When a task is started, there" should "be a corresponding domain message" in {
     val id = UUID.randomUUID()
     val mockActor = mockDeveloperRef {
@@ -69,7 +71,8 @@ class PersistentDeveloperTestSuite
     replyFuture.map { _ shouldEqual DeveloperReply.TaskStarted(id) }
   }
 
-  /** Когда разработчик отвечает "Задача поставлена в очередь", приходит соответствующее доменное сообщение */
+  /** Когда разработчик отвечает "Задача поставлена в очередь",
+   * приходит соответствующее доменное сообщение */
   "When a task is queued, there" should "be a corresponding domain message" in {
     val id = UUID.randomUUID()
     val mockActor = mockDeveloperRef {
