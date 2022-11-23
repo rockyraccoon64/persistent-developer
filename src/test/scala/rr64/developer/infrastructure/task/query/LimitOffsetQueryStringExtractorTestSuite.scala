@@ -15,7 +15,7 @@ class LimitOffsetQueryStringExtractorTestSuite
     with MockFactory {
 
   /** Фикстура для тестирования парсера */
-  trait ExtractorTest {
+  private trait ExtractorTest {
     protected val factory = mock[LimitOffsetQueryFactory]
     protected val errorMessage = "Invalid limit + offset"
     protected val extractor = new LimitOffsetQueryStringExtractor(factory, errorMessage)

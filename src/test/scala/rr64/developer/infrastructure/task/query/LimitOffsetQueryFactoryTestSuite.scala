@@ -12,7 +12,7 @@ class LimitOffsetQueryFactoryTestSuite
     with Matchers {
 
   /** Фикстура для тестирования создания фабрики */
-  trait FactoryConstructionTest {
+  private trait FactoryConstructionTest {
 
     def assertException(defaultLimit: Int, maxLimit: Int): Assertion = {
       assertThrows[IllegalArgumentException] {
@@ -28,7 +28,7 @@ class LimitOffsetQueryFactoryTestSuite
   }
 
   /** Фикстура для тестирования создания запросов фабрикой */
-  trait QueryConstructionTest {
+  private trait QueryConstructionTest {
 
     private val factory = new LimitOffsetQueryFactoryImpl(defaultLimit = 10, maxLimit = 30)
 
