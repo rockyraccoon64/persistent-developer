@@ -28,7 +28,7 @@ class DeveloperStateSlickRepositoryTestSuite extends PostgresSpec with AsyncFlat
     }, 10.seconds)
   }
 
-  private def checkInsert(id: String, state: DeveloperState): Future[Assertion] =
+  private def assertInsertedAndRetrieved(id: String, state: DeveloperState): Future[Assertion] =
     for {
       _ <- repository.save(id, state)
       stateResult <- repository.findById(id)
@@ -37,26 +37,23 @@ class DeveloperStateSlickRepositoryTestSuite extends PostgresSpec with AsyncFlat
     }
 
   /** Состояние "Свободен" должно добавляться и извлекаться из репозитория */
-  "The free developer state" should "be inserted and retrieved from the repository" in {
-    checkInsert("dev-1", DeveloperState.Free)
-  }
+  "The free developer state" should "be inserted and retrieved from the repository" in
+    assertInsertedAndRetrieved("dev-1", DeveloperState.Free)
 
   /** Состояние "Работает" должно добавляться и извлекаться из репозитория */
-  "The Working developer state" should "be inserted and retrieved from the repository" in {
-    checkInsert("dev-2", DeveloperState.Working)
-  }
+  "The Working developer state" should "be inserted and retrieved from the repository" in
+    assertInsertedAndRetrieved("dev-2", DeveloperState.Working)
 
   /** Состояние "Отдыхает" должно добавляться и извлекаться из репозитория */
-  "The Resting developer state" should "be inserted and retrieved from the repository" in {
-    checkInsert("dev-3", DeveloperState.Resting)
-  }
+  "The Resting developer state" should "be inserted and retrieved from the repository" in
+    assertInsertedAndRetrieved("dev-3", DeveloperState.Resting)
 
   /** Состояние разработчика должно обновляться */
   "The developer state" should "be updated in the repository" in {
     val id = "dev-4"
     for {
       _ <- repository.save(id, DeveloperState.Working)
-      succeeded <- checkInsert(id, DeveloperState.Resting)
+      succeeded <- assertInsertedAndRetrieved(id, DeveloperState.Resting)
     } yield succeeded
   }
 
