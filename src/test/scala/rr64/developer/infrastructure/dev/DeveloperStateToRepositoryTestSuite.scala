@@ -28,7 +28,7 @@ class DeveloperStateToRepositoryTestSuite
   private val projectionTestKit = ProjectionTestKit(system)
   private implicit val ec: ExecutionContext = system.executionContext
 
-  trait Fixture {
+  private trait HandlerTest {
 
     private val mockRepository: DeveloperStateRepository =
       new DeveloperStateRepository {
@@ -82,7 +82,7 @@ class DeveloperStateToRepositoryTestSuite
 
     /** Должен обновлять состояние разработчика на "Работает", когда он начинает задачу */
     "update the developer state in the repository when a task is started" in
-      new Fixture {
+      new HandlerTest {
         val events = Event.TaskStarted(defaultTask1) :: Nil
         val projection = projectionFromEvents(events)
 
@@ -93,7 +93,7 @@ class DeveloperStateToRepositoryTestSuite
 
     /** Должен обновлять состояние разработчика на "Отдых", когда он заканчивает задачу */
     "update the developer state in the repository when a task is finished" in
-      new Fixture {
+      new HandlerTest {
         val events = Event.TaskStarted(defaultTask1) ::
           Event.TaskFinished(defaultTask1) :: Nil
         val projection = projectionFromEvents(events)
@@ -106,7 +106,7 @@ class DeveloperStateToRepositoryTestSuite
     /** Должен обновлять состояние разработчика на "Свободен",
      * когда он отдохнул и у него нет задач */
     "update the state to Free after the developer rests if he has no more tasks" in
-      new Fixture {
+      new HandlerTest {
         val events = Event.TaskStarted(defaultTask1) ::
           Event.TaskFinished(defaultTask1) ::
           Event.Rested(None) ::
@@ -121,7 +121,7 @@ class DeveloperStateToRepositoryTestSuite
     /** Должен обновлять состояние разработчика на "Работает",
      * когда он отдохнул и в очереди есть задача */
     "update the state to Working after the developer rests if there is a task in the queue" in
-      new Fixture {
+      new HandlerTest {
         val events = Event.TaskStarted(defaultTask1) ::
           Event.TaskQueued(defaultTask2) ::
           Event.TaskFinished(defaultTask1) ::
@@ -136,7 +136,7 @@ class DeveloperStateToRepositoryTestSuite
 
     /** Не должен обновлять состояние разработчика при получении задачи, когда он работает */
     "not update the state after receiving a new task while working" in
-      new Fixture {
+      new HandlerTest {
         val events = Event.TaskStarted(defaultTask1) ::
           Event.TaskQueued(defaultTask2) ::
           Nil
@@ -149,7 +149,7 @@ class DeveloperStateToRepositoryTestSuite
 
     /** Не должен обновлять состояние разработчика при получении задачи, когда он отдыхает */
     "not update the state when the developer receives a new task while resting" in
-      new Fixture {
+      new HandlerTest {
         val events = Event.TaskStarted(defaultTask1) ::
           Event.TaskFinished(defaultTask1) ::
           Event.TaskQueued(defaultTask2) ::
@@ -163,7 +163,7 @@ class DeveloperStateToRepositoryTestSuite
 
     /** Для каждого разработчика состояние обновляется отдельно */
     "update states for different developers separately" in
-      new Fixture {
+      new HandlerTest {
         val differentPersistenceId = "test-id2"
         val events1 = ProjectionTestUtils.envelopeSource[Event](
           events = Event.TaskStarted(defaultTask2) ::
