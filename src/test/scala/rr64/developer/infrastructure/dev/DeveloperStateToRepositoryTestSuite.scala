@@ -34,6 +34,7 @@ class DeveloperStateToRepositoryTestSuite
   /** Фикстура для тестирования обработчика проекции */
   private trait HandlerTest {
 
+    /** Репозиторий, изначально пустой */
     private val mockRepository: DeveloperStateRepository =
       new DeveloperStateRepository {
         private var states: Map[String, DeveloperState] = Map.empty
@@ -47,9 +48,11 @@ class DeveloperStateToRepositoryTestSuite
           Future.successful(states.get(id))
       }
 
+    /** Обработчик проекции */
     private val handler: Handler[EventEnvelope[Event]] =
       new DeveloperStateToRepository(mockRepository)
 
+    /** Создать проекцию из последовательности событий */
     protected def projectionFromEvents(
       events: Seq[Event],
       persistenceId: String = defaultPersistenceId
@@ -58,6 +61,7 @@ class DeveloperStateToRepositoryTestSuite
       projectionFromSource(source)
     }
 
+    /** Создать проекцию из Source событий */
     protected def projectionFromSource(
       source: Source[EventEnvelope[Event], NotUsed]
     ): TestProjection[Offset, EventEnvelope[Event]] =
@@ -67,11 +71,12 @@ class DeveloperStateToRepositoryTestSuite
         handler = () => handler
       )
 
+    /** Проверить текущее состояние */
     protected def assertState(
-      state: DeveloperState,
+      expected: DeveloperState,
       persistenceId: String = defaultPersistenceId
     ): Assertion =
-      mockRepository.findById(persistenceId).futureValue shouldEqual Some(state)
+      mockRepository.findById(persistenceId).futureValue shouldEqual Some(expected)
 
   }
 
