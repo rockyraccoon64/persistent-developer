@@ -174,7 +174,7 @@ class RestApiTestSuite
     def mockExpects(task: MockParameter[Task]) =
       (service.addTask(_: Task)(_: ExecutionContext)).expects(task, *)
 
-    def checkReply(
+    def assertTaskCreated(
       difficulty: Int,
       domainReply: DeveloperReply,
       apiReply: ApiReply
@@ -198,7 +198,7 @@ class RestApiTestSuite
       val domainReply = DeveloperReply.TaskStarted(id)
       val apiReply = ApiReply(id, "Started")
 
-      checkReply(difficulty, domainReply, apiReply)
+      assertTaskCreated(difficulty, domainReply, apiReply)
     }
 
     /** Когда задача поставлена в очередь, возвращается её идентификатор и соответствующий признак */
@@ -208,7 +208,7 @@ class RestApiTestSuite
       val domainReply = DeveloperReply.TaskQueued(id)
       val apiReply = ApiReply(id, "Queued")
 
-      checkReply(difficulty, domainReply, apiReply)
+      assertTaskCreated(difficulty, domainReply, apiReply)
     }
 
     class DifficultyErrorTest(difficulty: Int) {
