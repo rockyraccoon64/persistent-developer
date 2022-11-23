@@ -11,11 +11,11 @@ import akka.stream.scaladsl.Source
 import org.scalatest.Assertion
 import org.scalatest.wordspec.AnyWordSpecLike
 import rr64.developer.domain.dev.DeveloperState
-import rr64.developer.domain.task.Task
 import rr64.developer.infrastructure.ProjectionTestUtils
-import rr64.developer.infrastructure.TaskTestUtils.TaskWithIdFactory
 import rr64.developer.infrastructure.dev.behavior.Event
+import rr64.developer.infrastructure.task.TaskWithId
 
+import java.util.UUID
 import scala.concurrent.{ExecutionContext, Future}
 
 /**
@@ -28,10 +28,18 @@ class DeveloperStateToRepositoryTestSuite
   private val projectionTestKit = ProjectionTestKit(system)
   private implicit val ec: ExecutionContext = system.executionContext
 
-  private val defaultPersistenceId = "test-id"
-  private val defaultTask1 = Task(1).withRandomId
-  private val defaultTask2 = Task(5).withRandomId
+  private val defaultPersistenceId =
+    "test-id"
+  private val defaultTask1 = TaskWithId(
+    difficulty = 1,
+    id = UUID.fromString("ce85f496-4ef1-4407-af79-7bf6db56c0f3")
+  )
+  private val defaultTask2 = TaskWithId(
+    difficulty = 5,
+    id = UUID.fromString("c525986e-2d9a-4c1d-8fcb-747a23a42118")
+  )
 
+  /** Фикстура для тестирования обработчика проекции */
   private trait HandlerTest {
 
     private val mockRepository: DeveloperStateRepository =
