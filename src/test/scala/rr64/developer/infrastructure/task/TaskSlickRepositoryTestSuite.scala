@@ -77,7 +77,7 @@ class TaskSlickRepositoryTestSuite
   private def assertSaved(task: TaskInfo): Future[Assertion] =
     for (taskOpt <- repository.findById(task.id)) yield taskOpt shouldEqual Some(task)
 
-  private def listTest(
+  private def listQueryTest(
     limit: Int,
     offset: Int,
     initial: Seq[TaskInfo],
@@ -145,7 +145,7 @@ class TaskSlickRepositoryTestSuite
 
   /** Репозиторий должен ограничить количество возвращаемых задач переданным в limit числом */
   "The repository" should "limit the number of returned tasks" in
-    listTest(
+    listQueryTest(
       limit = 2,
       offset = 0,
       initial = taskList,
@@ -154,7 +154,7 @@ class TaskSlickRepositoryTestSuite
 
   /** Если задач меньше, чем limit, возвращаются все задачи */
   "The repository" should "return all tasks if the limit exceeds their amount" in
-    listTest(
+    listQueryTest(
       limit = 4,
       offset = 0,
       initial = taskList,
@@ -163,7 +163,7 @@ class TaskSlickRepositoryTestSuite
 
   /** Репозиторий должен возвращать задачи, начиная с переданного offset */
   "The repository" should "return tasks starting with the given offset" in
-    listTest(
+    listQueryTest(
       limit = 3,
       offset = 1,
       initial = taskList,
@@ -172,7 +172,7 @@ class TaskSlickRepositoryTestSuite
 
   /** Репозиторий должен учитывать как limit, так и offset */
   "The repository" should "return tasks starting with the given offset and limit their amount" in
-    listTest(
+    listQueryTest(
       limit = 1,
       offset = 1,
       initial = taskList,
@@ -181,7 +181,7 @@ class TaskSlickRepositoryTestSuite
 
   /** Если offset выходит за пределы количества имеющихся задач, возвращается пустой список */
   "The repository" should "return an empty list when the offset exceeds the amount of tasks" in
-    listTest(
+    listQueryTest(
       limit = 5,
       offset = 3,
       initial = taskList,
@@ -190,7 +190,7 @@ class TaskSlickRepositoryTestSuite
 
   /** Если задач нет, возвращается пустой список */
   "The repository" should "return an empty list when there are no tasks" in
-    listTest(
+    listQueryTest(
       limit = 10,
       offset = 0,
       initial = Nil,
