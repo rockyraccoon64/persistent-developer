@@ -68,15 +68,18 @@ class TaskSlickRepositoryTestSuite
     super.afterEach()
   }
 
+  /** Сохранить задачу и запросом проверить, что она сохранена */
   private def saveAndAssert(task: TaskInfo): Future[Assertion] =
     for {
       _ <- repository.save(task)
       succeeded <- assertSaved(task)
     } yield succeeded
 
+  /** Проверить, что задача сохранена в репозитории */
   private def assertSaved(task: TaskInfo): Future[Assertion] =
     for (taskOpt <- repository.findById(task.id)) yield taskOpt shouldEqual Some(task)
 
+  /** Тестирование запроса списка задач */
   private def listQueryTest(
     limit: Int,
     offset: Int,
