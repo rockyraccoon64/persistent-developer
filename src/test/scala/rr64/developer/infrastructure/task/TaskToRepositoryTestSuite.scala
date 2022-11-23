@@ -29,21 +29,26 @@ class TaskToRepositoryTestSuite
   private val projectionTestKit = ProjectionTestKit(system)
   private implicit val ec: ExecutionContext = system.executionContext
 
-  trait Fixture {
+  /** Фикстура для тестирования обработчика проекции */
+  private trait Fixture {
 
-    protected val mockRepository: TaskRepository[Any] = new TaskRepository[Any] {
-      private var tasks: Map[UUID, TaskInfo] = Map.empty
-      override def save(taskInfo: TaskInfo): Future[_] = {
-        tasks = tasks.updated(taskInfo.id, taskInfo)
-        Future.unit
+    protected val mockRepository: TaskRepository[Any] =
+      new TaskRepository[Any] {
+        private var tasks: Map[UUID, TaskInfo] = Map.empty
+        override def save(taskInfo: TaskInfo): Future[_] = {
+          tasks = tasks.updated(taskInfo.id, taskInfo)
+          Future.unit
+        }
+        override def findById(id: UUID)
+            (implicit ec: ExecutionContext): Future[Option[TaskInfo]] =
+          Future.successful(tasks.get(id))
+        override def list(query: Any)
+            (implicit ec: ExecutionContext): Future[Seq[TaskInfo]] =
+          Future.successful(tasks.values.toSeq)
       }
-      override def findById(id: UUID)(implicit ec: ExecutionContext): Future[Option[TaskInfo]] =
-        Future.successful(tasks.get(id))
-      override def list(query: Any)(implicit ec: ExecutionContext): Future[Seq[TaskInfo]] =
-        Future.successful(tasks.values.toSeq)
-    }
 
-    protected val handler: Handler[EventEnvelope[Event]] = new TaskToRepository(mockRepository)
+    protected val handler: Handler[EventEnvelope[Event]] =
+      new TaskToRepository(mockRepository)
 
     protected def projectionFromEvents(
       events: Seq[Event],
@@ -68,61 +73,69 @@ class TaskToRepositoryTestSuite
   }
 
   /** В начале работы над задачей информация о текущем статусе должна сохраняться в репозиторий */
-  "The current task state" should "be saved to the repository when the task is started" in new Fixture {
-    val taskWithId = Task(90).withRandomId
-    val taskInfo = taskWithId.withStatus(TaskStatus.InProgress)
-    val events = Event.TaskStarted(taskWithId) :: Nil
-    val projection = projectionFromEvents(events)
-    projectionTestKit.run(projection) {
-      assertInfo(taskInfo)
+  "The current task state" should "be saved to the repository when the task is started" in
+    new Fixture {
+      val taskWithId = Task(90).withRandomId
+      val taskInfo = taskWithId.withStatus(TaskStatus.InProgress)
+      val events = Event.TaskStarted(taskWithId) :: Nil
+      val projection = projectionFromEvents(events)
+      projectionTestKit.run(projection) {
+        assertInfo(taskInfo)
+      }
     }
-  }
 
   /** Когда задача ставится в очередь, её текущее состояние должно сохраняться в репозиторий */
-  "The current task state" should "be saved to the repository when the task is queued" in new Fixture {
-    val taskWithId = Task(100).withRandomId
-    val taskInfo = taskWithId.withStatus(TaskStatus.Queued)
-    val events = Event.TaskQueued(taskWithId) :: Nil
-    val projection = projectionFromEvents(events)
-    projectionTestKit.run(projection) {
-      assertInfo(taskInfo)
+  "The current task state" should "be saved to the repository when the task is queued" in
+    new Fixture {
+      val taskWithId = Task(100).withRandomId
+      val taskInfo = taskWithId.withStatus(TaskStatus.Queued)
+      val events = Event.TaskQueued(taskWithId) :: Nil
+      val projection = projectionFromEvents(events)
+      projectionTestKit.run(projection) {
+        assertInfo(taskInfo)
+      }
     }
-  }
 
   /** Когда задача завершена, её текущее состояние должно сохраняться в репозиторий */
-  "The current task state" should "be saved to the repository when the task is finished" in new Fixture {
-    val taskWithId = Task(77).withRandomId
-    val taskInfo = taskWithId.withStatus(TaskStatus.Finished)
-    val events = Event.TaskFinished(taskWithId) :: Nil
-    val projection = projectionFromEvents(events)
-    projectionTestKit.run(projection) {
-      assertInfo(taskInfo)
+  "The current task state" should "be saved to the repository when the task is finished" in
+    new Fixture {
+      val taskWithId = Task(77).withRandomId
+      val taskInfo = taskWithId.withStatus(TaskStatus.Finished)
+      val events = Event.TaskFinished(taskWithId) :: Nil
+      val projection = projectionFromEvents(events)
+      projectionTestKit.run(projection) {
+        assertInfo(taskInfo)
+      }
     }
-  }
 
   /** В начале работы над задачей после отдыха её статус должен сохраняться в репозиторий */
-  "The current task state" should "be saved to the repository when the task is started after resting" in new Fixture {
-    val taskWithId = TaskWithId(35, UUID.fromString("f33b67f0-2324-4c7d-8b5f-59ab8e4f5bd7"))
-    val taskInfo = taskWithId.withStatus(TaskStatus.InProgress)
-    val events = Event.Rested(Some(taskWithId)) :: Nil
-    val projection = projectionFromEvents(events)
-    projectionTestKit.run(projection) {
-      assertInfo(taskInfo)
+  "The current task state" should "be saved to the repository when the task is started after resting" in
+    new Fixture {
+      val taskWithId = TaskWithId(35, UUID.fromString("f33b67f0-2324-4c7d-8b5f-59ab8e4f5bd7"))
+      val taskInfo = taskWithId.withStatus(TaskStatus.InProgress)
+      val events = Event.Rested(Some(taskWithId)) :: Nil
+      val projection = projectionFromEvents(events)
+      projectionTestKit.run(projection) {
+        assertInfo(taskInfo)
+      }
     }
-  }
 
   /** Когда событие не связано с задачей, обновления не происходит */
-  "The task state" should "not be updated when there's no task events" in new Fixture {
-    val taskWithId1 = Task(53).withRandomId
-    val taskWithId2 = Task(10).withRandomId
-    val taskInfo1 = taskWithId1.withStatus(TaskStatus.Queued)
-    val taskInfo2 = taskWithId2.withStatus(TaskStatus.Finished)
-    val events = Event.TaskQueued(taskWithId1) :: Event.TaskFinished(taskWithId2) :: Event.Rested(None) :: Nil
-    val projection = projectionFromEvents(events)
-    projectionTestKit.run(projection) {
-      assertInfo(taskInfo1)
-      assertInfo(taskInfo2)
+  "The task state" should "not be updated when there's no task events" in
+    new Fixture {
+      val taskWithId1 = Task(53).withRandomId
+      val taskWithId2 = Task(10).withRandomId
+      val taskInfo1 = taskWithId1.withStatus(TaskStatus.Queued)
+      val taskInfo2 = taskWithId2.withStatus(TaskStatus.Finished)
+      val events = Event.TaskQueued(taskWithId1) ::
+        Event.TaskFinished(taskWithId2) ::
+        Event.Rested(None) ::
+        Nil
+      val projection = projectionFromEvents(events)
+      projectionTestKit.run(projection) {
+        assertInfo(taskInfo1)
+        assertInfo(taskInfo2)
+      }
     }
-  }
 
 }
