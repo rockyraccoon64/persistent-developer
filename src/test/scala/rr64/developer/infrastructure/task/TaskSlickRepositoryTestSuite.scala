@@ -12,6 +12,9 @@ import java.util.UUID
 import scala.concurrent.duration.DurationInt
 import scala.concurrent.{Await, Future}
 
+/**
+ * Тесты репозитория задач на основе PostgreSQL + Slick
+ */
 class TaskSlickRepositoryTestSuite
   extends PostgresSpec
     with AsyncFlatSpecLike
@@ -20,6 +23,7 @@ class TaskSlickRepositoryTestSuite
 
   private val statusCodec = new TaskStatusCodec
   private val repository = new TaskSlickRepository(database, statusCodec)
+  private val queryFactory = new LimitOffsetQueryFactoryImpl(defaultLimit = 20, maxLimit = 100)
 
   private val queuedTask = TaskInfo(
     id = UUID.fromString("30dbff1f-88dc-4972-aa70-a057bf5f1c88"),
@@ -73,20 +77,34 @@ class TaskSlickRepositoryTestSuite
   private def assertSaved(task: TaskInfo): Future[Assertion] =
     for (taskOpt <- repository.findById(task.id)) yield taskOpt shouldEqual Some(task)
 
-  /** Репозиторий должен сохранять задачи со статусом "В очереди" */
-  "The repository" should "save queued tasks" in {
-    saveAndAssert(queuedTask)
+  private def listTest(
+    limit: Int,
+    offset: Int,
+    initial: Seq[TaskInfo],
+    expected: Seq[TaskInfo]
+  ): Future[Assertion] = {
+    val query = queryFactory.create(limit, offset)
+    for {
+      _ <- initial.foldLeft[Future[Any]](Future.unit) { (acc, task) =>
+        acc.flatMap(_ => repository.save(task))
+      }
+      list <- repository.list(query)
+    } yield {
+      list should contain theSameElementsInOrderAs expected
+    }
   }
+
+  /** Репозиторий должен сохранять задачи со статусом "В очереди" */
+  "The repository" should "save queued tasks" in
+    saveAndAssert(queuedTask)
 
   /** Репозиторий должен сохранять задачи со статусом "В разработке" */
-  "The repository" should "save tasks in progress" in {
+  "The repository" should "save tasks in progress" in
     saveAndAssert(taskInProgress)
-  }
 
   /** Репозиторий должен сохранять задачи со статусом "Завершено" */
-  "The repository" should "save finished tasks" in {
+  "The repository" should "save finished tasks" in
     saveAndAssert(finishedTask)
-  }
 
   /** Репозиторий должен обновлять статус у существующих задач */
   "The repository" should "update existing tasks' status" in {
@@ -125,48 +143,32 @@ class TaskSlickRepositoryTestSuite
     } yield taskOpt shouldEqual None
   }
 
-  private val queryFactory = new LimitOffsetQueryFactoryImpl(defaultLimit = 20, maxLimit = 100)
-
-  def listTest(
-    limit: Int,
-    offset: Int,
-    initial: Seq[TaskInfo],
-    expected: Seq[TaskInfo]
-  ): Future[Assertion] = {
-    val query = queryFactory.create(limit, offset)
-    for {
-      _ <- initial.foldLeft[Future[Any]](Future.unit) { (acc, task) =>
-        acc.flatMap(_ => repository.save(task))
-      }
-      list <- repository.list(query)
-    } yield {
-      list should contain theSameElementsInOrderAs expected
-    }
-  }
-
   /** Репозиторий должен ограничить количество возвращаемых задач переданным в limit числом */
-  "The repository" should "limit the number of returned tasks" in listTest(
-    limit = 2,
-    offset = 0,
-    initial = taskList,
-    expected = taskList.take(2)
-  )
+  "The repository" should "limit the number of returned tasks" in
+    listTest(
+      limit = 2,
+      offset = 0,
+      initial = taskList,
+      expected = taskList.take(2)
+    )
 
   /** Если задач меньше, чем limit, возвращаются все задачи */
-  "The repository" should "return all tasks if the limit exceeds their amount" in listTest(
-    limit = 4,
-    offset = 0,
-    initial = taskList,
-    expected = taskList
-  )
+  "The repository" should "return all tasks if the limit exceeds their amount" in
+    listTest(
+      limit = 4,
+      offset = 0,
+      initial = taskList,
+      expected = taskList
+    )
 
   /** Репозиторий должен возвращать задачи, начиная с переданного offset */
-  "The repository" should "return tasks starting with the given offset" in listTest(
-    limit = 3,
-    offset = 1,
-    initial = taskList,
-    expected = taskList.tail
-  )
+  "The repository" should "return tasks starting with the given offset" in
+    listTest(
+      limit = 3,
+      offset = 1,
+      initial = taskList,
+      expected = taskList.tail
+    )
 
   /** Репозиторий должен учитывать как limit, так и offset */
   "The repository" should "return tasks starting with the given offset and limit their amount" in
@@ -187,11 +189,12 @@ class TaskSlickRepositoryTestSuite
     )
 
   /** Если задач нет, возвращается пустой список */
-  "The repository" should "return an empty list when there are no tasks" in listTest(
-    limit = 10,
-    offset = 0,
-    initial = Nil,
-    expected = Nil
-  )
+  "The repository" should "return an empty list when there are no tasks" in
+    listTest(
+      limit = 10,
+      offset = 0,
+      initial = Nil,
+      expected = Nil
+    )
 
 }
