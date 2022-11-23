@@ -5,12 +5,16 @@ import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatest.{Assertion, EitherValues}
 
+/**
+ * Тесты парсера параметров запроса limit/offset из строки
+ */
 class LimitOffsetQueryStringExtractorTestSuite
   extends AnyWordSpec
     with Matchers
     with EitherValues
     with MockFactory {
 
+  /** Фикстура для тестирования парсера */
   trait ExtractorTest {
     protected val factory = mock[LimitOffsetQueryFactory]
     protected val errorMessage = "Invalid limit + offset"
@@ -37,39 +41,45 @@ class LimitOffsetQueryStringExtractorTestSuite
     }
 
     /** Должен возвращать сообщение об ошибке, когда запрос сформирован некорректно */
-    "return an error message when the query format is incorrect" in new ExtractorTest {
-      assertError("What's this query")
-    }
+    "return an error message when the query format is incorrect" in
+      new ExtractorTest {
+        assertError("What's this query")
+      }
 
     /** Должен возвращать сообщение об ошибке, когда limit больше, чем Integer.MAX_VALUE */
-    "return an error message when the limit is greater than Integer.MAX_VALUE" in new ExtractorTest {
-      assertError("limit:123456789012345,offset:55")
-    }
+    "return an error message when the limit is greater than Integer.MAX_VALUE" in
+      new ExtractorTest {
+        assertError("limit:123456789012345,offset:55")
+      }
 
     /** Должен возвращать сообщение об ошибке, когда offset больше, чем Integer.MAX_VALUE */
-    "return an error message when the offset is greater than Integer.MAX_VALUE" in new ExtractorTest {
-      assertError("limit:15,offset:987654321098")
-    }
+    "return an error message when the offset is greater than Integer.MAX_VALUE" in
+      new ExtractorTest {
+        assertError("limit:15,offset:987654321098")
+      }
 
     /** Должен возвращать сообщение об ошибке, когда одно из значений пустое */
-    "return an error message when one of the values is not provided" in new ExtractorTest {
-      assertError("limit:15,offset:")
-    }
+    "return an error message when one of the values is not provided" in
+      new ExtractorTest {
+        assertError("limit:15,offset:")
+      }
 
     /** Должен возвращать сообщение об ошибке, когда запрос пустой */
-    "return an error message when the query is empty" in new ExtractorTest {
-      assertError("")
-    }
+    "return an error message when the query is empty" in
+      new ExtractorTest {
+        assertError("")
+      }
 
     /** Должен возвращать значение по умолчанию, когда запрос не передаётся */
-    "return the default query when there is no input" in new ExtractorTest {
-      val default = new LimitOffsetQuery {
-        override def limit: Int = 5
-        override def offset: Int = 4
+    "return the default query when there is no input" in
+      new ExtractorTest {
+        val default = new LimitOffsetQuery {
+          override def limit: Int = 5
+          override def offset: Int = 4
+        }
+        (factory.default _).expects().returning(default)
+        extractor.extract(None).value shouldEqual default
       }
-      (factory.default _).expects().returning(default)
-      extractor.extract(None).value shouldEqual default
-    }
 
   }
 
