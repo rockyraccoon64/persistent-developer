@@ -21,31 +21,28 @@ class TasksFromRepositoryTestSuite
   private val task1 = Task(33).withRandomId.withStatus(TaskStatus.Queued)
   private val task2 = Task(85).withRandomId.withStatus(TaskStatus.InProgress)
 
+  private val mockRepository = mock[TaskRepository[Any]]
+  private val tasks = new TasksFromRepository(mockRepository)
+
   /** Запрос информации о задаче должен делегироваться репозиторию */
   "Single task queries" should "be redirected to the repository" in {
     val task = task1
-    val mockRepository = mock[TaskRepository[Any]]
     (mockRepository.findById(_: UUID)(_: ExecutionContext))
       .expects(task.id, *)
-      .once()
       .returning {
         Future.successful(Some(task))
       }
-    val tasks = new TasksFromRepository(mockRepository)
     tasks.findById(task.id).map(_ shouldEqual Some(task))
   }
 
   /** Запрос списка задач должен делегироваться репозиторию */
   "Task list queries" should "be delegated to the repository" in {
     val taskSeq = Seq(task1, task2)
-    val mockRepository = mock[TaskRepository[Any]]
     (mockRepository.list(_: Any)(_: ExecutionContext))
       .expects(*, *)
-      .once()
       .returning {
         Future.successful(taskSeq)
       }
-    val tasks = new TasksFromRepository(mockRepository)
     tasks.list().map(_ should contain theSameElementsInOrderAs taskSeq)
   }
 
