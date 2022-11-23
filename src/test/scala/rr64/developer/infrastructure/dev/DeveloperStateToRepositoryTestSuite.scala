@@ -65,10 +65,9 @@ class DeveloperStateToRepositoryTestSuite
 
     protected def assertState(
       state: DeveloperState,
-      persistenceId: String = defaultPersistenceId,
-      repository: DeveloperStateRepository = mockRepository
+      persistenceId: String = defaultPersistenceId
     ): Assertion =
-      repository.findById(persistenceId).futureValue shouldEqual Some(state)
+      mockRepository.findById(persistenceId).futureValue shouldEqual Some(state)
 
   }
 
