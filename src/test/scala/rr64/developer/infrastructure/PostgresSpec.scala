@@ -8,17 +8,25 @@ import slick.jdbc.PostgresProfile.api._
 import scala.concurrent.Await
 import scala.concurrent.duration.DurationInt
 
+/**
+ * Набор тестов с использованием PostgreSQL
+ * */
 trait PostgresSpec
   extends Suite
     with BeforeAndAfterAll {
 
+  /** Таймаут ожидания ответа при создании/удалении тестовой БД */
   private val timeout = 10.seconds
 
+  /** Название тестовой БД */
   private val dbname =
     getClass.getSimpleName.toLowerCase
+
+  /** JDBC-драйвер PostgreSQL */
   private val driver =
     "org.postgresql.Driver"
 
+  /** База данных по умолчанию для создания тестовой БД */
   private val postgres = Database.forURL(
     s"jdbc:postgresql://$host:$port/$defaultDatabase",
     user = user,
@@ -44,6 +52,7 @@ trait PostgresSpec
     super.afterAll()
   }
 
+  /** БД для использования в тестах */
   val database = Database.forURL(
     s"jdbc:postgresql://$host:$port/$dbname",
     user = user,
