@@ -134,7 +134,7 @@ class DeveloperBehaviorTestSuite
    * то при получении новой задачи он присваивает ей идентификатор
    * и отправляет его в ответе */
   "The developer" should "reply with an identifier after receiving a new task while working" in {
-    val currentTask = Task(100).withRandomId
+    val currentTask = TaskWithId(100, UUID.fromString("f490d7ca-dcbf-4905-be03-ffd7bf90b513"))
     val newTask = Task(10)
     developerTestKit.initialize(Event.TaskStarted(currentTask))
     val result = addTask(newTask)
