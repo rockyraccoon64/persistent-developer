@@ -16,11 +16,15 @@ class LimitOffsetQueryStringExtractorTestSuite
 
   /** Фикстура для тестирования парсера */
   private trait ExtractorTest {
+
     protected val factory = mock[LimitOffsetQueryFactory]
     protected val errorMessage = "Invalid limit + offset"
     protected val extractor = new LimitOffsetQueryStringExtractor(factory, errorMessage)
+
+    /** Проверка на наличие ошибки */
     protected def assertError(query: String): Assertion =
       extractor.extract(Some(query)).left.value shouldEqual errorMessage
+
   }
 
   /** Парсер запроса */
