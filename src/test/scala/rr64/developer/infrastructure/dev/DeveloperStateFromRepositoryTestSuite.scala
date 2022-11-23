@@ -16,7 +16,8 @@ class DeveloperStateFromRepositoryTestSuite extends AsyncWordSpec with Matchers 
   private val dev2 = "mark"
   private val dev3 = "gruff97"
 
-  private def mockRepository: DeveloperStateRepository =
+  /** Репозиторий, из которого берутся состояния */
+  private val mockRepository: DeveloperStateRepository =
     new DeveloperStateRepository {
       private var states: Map[String, DeveloperState] = Map(
         dev1 -> DeveloperState.Working,
@@ -33,9 +34,11 @@ class DeveloperStateFromRepositoryTestSuite extends AsyncWordSpec with Matchers 
         Future.successful(states.get(id))
     }
 
+  /** Создать источник состояний для конкретного разработчика */
   private def createProvider(developerId: String) =
     new DeveloperStateFromRepository(developerId, mockRepository)
 
+  /** Создать источник состояний и проверить текущее состояние */
   private def assertState(developerId: String, state: DeveloperState): Future[Assertion] = {
     val provider = createProvider(developerId)
     provider.state.map(_ shouldEqual state)
