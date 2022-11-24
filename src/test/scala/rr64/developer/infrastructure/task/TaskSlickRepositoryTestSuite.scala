@@ -45,6 +45,16 @@ class TaskSlickRepositoryTestSuite
 
   private val taskList = Seq(queuedTask, finishedTask, taskInProgress)
 
+
+  override protected def beforeAll(): Unit = {
+    super.beforeAll()
+    Await.result(
+      database.run {
+        sqlu"CREATE TYPE task_status AS ENUM ('Queued', 'InProgress', 'Finished')"
+      }, 10.seconds
+    )
+  }
+
   override protected def beforeEach(): Unit = {
     super.beforeEach()
     Await.result(
@@ -53,7 +63,7 @@ class TaskSlickRepositoryTestSuite
              uuid UUID PRIMARY KEY,
              created_at TIMESTAMP NOT NULL DEFAULT NOW(),
              difficulty INT NOT NULL,
-             status VARCHAR(10) NOT NULL
+             status task_status NOT NULL
            )"""
       }, 10.seconds
     )
