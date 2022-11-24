@@ -37,17 +37,17 @@ object DeveloperBehavior {
             state.applyCommand(cmd)
           },
           eventHandler = (state, evt) => state.applyEvent(evt)
-        ).receiveSignal {
-          case (State.Working(taskWithId, _), RecoveryCompleted) =>
-            context.log.info("Starting work timer after recovery for task {}", taskWithId)
-            startWorkTimer(taskWithId)
-
-          case (State.Resting(lastCompleted, _), RecoveryCompleted) =>
-            context.log.info("Starting rest timer after recovery for task {}", lastCompleted)
-            startRestTimer(lastCompleted)
-
-          case (_, RecoveryCompleted) =>
-            context.log.info("Developer recovery completed")
+        ).receiveSignal { case (state, RecoveryCompleted) =>
+          context.log.info("Developer recovery completed")
+          state match {
+            case State.Working(currentTask, _) =>
+              context.log.info("Starting work timer after recovery for task {}", currentTask)
+              startWorkTimer(currentTask)
+            case State.Resting(lastCompleted, _) =>
+              context.log.info("Starting rest timer after recovery for task {}", lastCompleted)
+              startRestTimer(lastCompleted)
+            case State.Free =>
+          }
         }.withTagger(_ => Set(EventTag))
       }
     }
