@@ -14,6 +14,7 @@ import akka.projection.scaladsl.SourceProvider
 import akka.projection.{ProjectionBehavior, ProjectionId}
 import akka.util.Timeout
 import com.typesafe.config.ConfigFactory
+import org.slf4j.LoggerFactory
 import rr64.developer.domain.dev.Developer
 import rr64.developer.domain.service.{DeveloperService, DeveloperServiceFacade}
 import rr64.developer.domain.task.Tasks
@@ -36,6 +37,8 @@ import scala.jdk.DurationConverters.JavaDurationOps
  * Точка входа в приложение
  * */
 object Main extends App {
+
+  private val log = LoggerFactory.getLogger(getClass)
 
   /**
    * Чтение файла конфигурации
@@ -97,6 +100,8 @@ object Main extends App {
 
   val developerRef = spawn(supervisedBehavior, developerName)
 
+  log.info("Developer actor initialized")
+
   /**
    * Инициализация сервиса разработчика
    * */
@@ -113,6 +118,8 @@ object Main extends App {
   val developer: Developer =
     PersistentDeveloper(developerRef, developerStateProvider)
 
+  log.info("Developer initialized")
+
   /**
    * Инициализация сервиса задач
    * */
@@ -128,6 +135,8 @@ object Main extends App {
 
   val service: DeveloperService[Query] =
     new DeveloperServiceFacade[Query](developer, tasks)
+
+  log.info("Task service initialized")
 
   /**
    * Инициализация проекций
@@ -176,6 +185,8 @@ object Main extends App {
   val developerStateProjectionRef =
     spawn(developerStateProjectionBehavior, developerProjectionName)
 
+  log.info("Developer state projection initialized")
+
   /**
    * Инициализация проекции хранилища задач
    * */
@@ -198,6 +209,8 @@ object Main extends App {
   val taskProjectionRef =
     spawn(taskProjectionBehavior, taskProjectionName)
 
+  log.info("Task projection initialized")
+
   /**
    * Инициализация REST API
    * */
@@ -214,6 +227,9 @@ object Main extends App {
 
   val restApi = new RestApi[Query](service, queryExtractor)
   val server = Http().newServerAt(apiInterface, apiPort).bind(restApi.route)
-  server.map(_.addToCoordinatedShutdown(hardTerminationDeadline = 10.seconds))
+  server.map { binding =>
+    binding.addToCoordinatedShutdown(hardTerminationDeadline = 10.seconds)
+    log.info(s"REST API initialized at ${binding.localAddress}")
+  }
 
 }

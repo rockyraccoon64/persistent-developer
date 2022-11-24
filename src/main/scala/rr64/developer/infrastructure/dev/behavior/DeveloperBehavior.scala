@@ -26,20 +26,30 @@ object DeveloperBehavior {
    * @param restFactor Множитель отдыха
    * */
   def apply(persistenceId: PersistenceId, workFactor: Factor, restFactor: Factor): Behavior[Command] =
-    Behaviors.withTimers { timer =>
-      implicit val setup: Setup = Setup(workFactor, restFactor, timer)
-      EventSourcedBehavior[Command, Event, State](
-        persistenceId = persistenceId,
-        emptyState = State.Free,
-        commandHandler = (state, cmd) => state.applyCommand(cmd),
-        eventHandler = (state, evt) => state.applyEvent(evt)
-      ).receiveSignal {
-        case (State.Working(taskWithId, _), RecoveryCompleted) =>
-          startWorkTimer(taskWithId)
-
-        case (State.Resting(lastCompleted, _), RecoveryCompleted) =>
-          startRestTimer(lastCompleted)
-      }.withTagger(_ => Set(EventTag))
+    Behaviors.setup { context =>
+      Behaviors.withTimers { timer =>
+        implicit val setup: Setup = Setup(workFactor, restFactor, timer, context)
+        EventSourcedBehavior[Command, Event, State](
+          persistenceId = persistenceId,
+          emptyState = State.Free,
+          commandHandler = (state, cmd) => {
+            context.log.debug("Got command {} in state {}", cmd, state)
+            state.applyCommand(cmd)
+          },
+          eventHandler = (state, evt) => state.applyEvent(evt)
+        ).receiveSignal { case (state, RecoveryCompleted) =>
+          context.log.info("Developer recovery completed")
+          state match {
+            case State.Working(currentTask, _) =>
+              context.log.info("Starting work timer after recovery for task {}", currentTask)
+              startWorkTimer(currentTask)
+            case State.Resting(lastCompleted, _) =>
+              context.log.info("Starting rest timer after recovery for task {}", lastCompleted)
+              startRestTimer(lastCompleted)
+            case State.Free =>
+          }
+        }.withTagger(_ => Set(EventTag))
+      }
     }
 
 }

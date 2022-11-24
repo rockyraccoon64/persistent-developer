@@ -1,6 +1,7 @@
 package rr64.developer.infrastructure.dev.behavior
 
-import akka.actor.typed.scaladsl.TimerScheduler
+import akka.actor.typed.scaladsl.{ActorContext, TimerScheduler}
+import org.slf4j.Logger
 import rr64.developer.domain.timing.Factor
 
 /**
@@ -12,5 +13,8 @@ import rr64.developer.domain.timing.Factor
 private[behavior] case class Setup(
   workFactor: Factor,
   restFactor: Factor,
-  timer: TimerScheduler[Command]
-)
+  timer: TimerScheduler[Command],
+  context: ActorContext[Command]
+) {
+  def log: Logger = context.log
+}
