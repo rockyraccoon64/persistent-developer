@@ -1,6 +1,8 @@
+CREATE TYPE dev_state_type AS ENUM ('Free', 'Working', 'Resting');
+
 CREATE TABLE dev_state(
 	id VARCHAR(100) PRIMARY KEY,
-	state VARCHAR(10) NOT NULL
+	state dev_state_type NOT NULL
 );
 
 CREATE TYPE task_status AS ENUM ('Queued', 'InProgress', 'Finished');

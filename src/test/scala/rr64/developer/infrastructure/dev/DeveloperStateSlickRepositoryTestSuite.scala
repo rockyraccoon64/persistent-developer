@@ -12,7 +12,10 @@ import scala.concurrent.Future
 /**
  * Тесты репозитория состояний разработчиков на основе PostgreSQL + Slick
  * */
-class DeveloperStateSlickRepositoryTestSuite extends PostgresSpec with AsyncFlatSpecLike with Matchers {
+class DeveloperStateSlickRepositoryTestSuite
+  extends PostgresSpec
+    with AsyncFlatSpecLike
+    with Matchers {
 
   private val codec = new DeveloperStateCodec
   private val repository = new DeveloperStateSlickRepository(database, codec)
@@ -20,10 +23,12 @@ class DeveloperStateSlickRepositoryTestSuite extends PostgresSpec with AsyncFlat
   override protected def beforeAll(): Unit = {
     super.beforeAll()
     runQuery {
-      sqlu"""CREATE TABLE dev_state(
-            id VARCHAR(100) PRIMARY KEY,
-            state VARCHAR(10) NOT NULL
-          )"""
+      sqlu"""
+        CREATE TYPE dev_state_type AS ENUM ('Free', 'Working', 'Resting');
+        CREATE TABLE dev_state(
+          id VARCHAR(100) PRIMARY KEY,
+          state dev_state_type NOT NULL
+        );"""
     }
   }
 
