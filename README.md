@@ -117,15 +117,22 @@ sbt test
 сборки uber jar и создания Docker-образа:
 ```shell
 sbt assembly
-docker build -t persistent-developer --build-arg version=0.1
+docker build -f tools/pd-docker/Dockerfile -t persistent-developer .
 ```
 
-В корне репозитория хранится конфигурация Docker Compose 
+Для создания образа требуется только созданный на первом шаге jar-файл.
+По умолчанию берётся файл `./target/scala-2.13/persistent-developer-assembly-0.1.jar`,
+но путь к нему можно переопределить, передав аргумент `JAR_PATH`:
+```shell
+docker build -f tools/pd-docker/Dockerfile -t persistent-developer --build-arg JAR_PATH=my-app.jar .
+```
+
+В папке [tools/pd-docker](tools/pd-docker) также хранится конфигурация Docker Compose 
 для запуска образа приложения совместно с базой данных PostgreSQL. 
 Схема базы данных для приложения создаётся при первом запуске образа, 
 а её данные сохраняются в томе Docker.
 
-После сборки образа для запуска достаточно выполнить:
+После сборки образа для запуска достаточно перейти в `tools/pd-docker` и выполнить:
 
 ```shell
 docker-compose up -d
