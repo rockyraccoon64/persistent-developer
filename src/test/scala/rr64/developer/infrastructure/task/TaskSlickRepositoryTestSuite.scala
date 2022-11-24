@@ -50,8 +50,8 @@ class TaskSlickRepositoryTestSuite
     Await.result(
       database.run {
         sqlu"""CREATE TABLE task(
-             serial_id SERIAL PRIMARY KEY,
-             uuid UUID NOT NULL UNIQUE,
+             uuid UUID PRIMARY KEY,
+             created_at TIMESTAMP NOT NULL DEFAULT NOW(),
              difficulty INT NOT NULL,
              status VARCHAR(10) NOT NULL
            )"""
