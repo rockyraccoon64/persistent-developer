@@ -103,7 +103,12 @@ components:
         difficulty:
           $ref: '#/components/schemas/TaskDifficulty'
         status:
-          $ref: '#/components/schemas/TaskStatus'
+          description: Статус задачи
+          type: string
+          enum:
+            - InProgress
+            - Queued
+            - Finished
       required:
         - id
         - difficulty
@@ -115,7 +120,11 @@ components:
         id:
           $ref: '#/components/schemas/TaskId'
         status:
-          $ref: '#/components/schemas/TaskStatus'
+          description: Результат добавления задачи
+          type: string
+          enum:
+            - Started
+            - Queued
       required:
         - id
         - status
@@ -157,10 +166,3 @@ components:
       type: integer
       minimum: 1
       maximum: 100
-    TaskStatus:
-      description: Статус задачи
-      type: string
-      enum:
-        - InProgress
-        - Queued
-        - Finished
