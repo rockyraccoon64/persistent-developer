@@ -31,6 +31,7 @@ import slick.jdbc.PostgresProfile
 
 import scala.concurrent.duration.DurationInt
 import scala.concurrent.{Await, ExecutionContext}
+import scala.io.StdIn
 import scala.jdk.DurationConverters.JavaDurationOps
 import scala.util.{Failure, Success}
 
@@ -235,5 +236,11 @@ object Main extends App {
     case Failure(exception) =>
       log.error(s"Failed to initialize REST API at $apiInterface:$apiPort", exception)
   }
+
+  /**
+   * Остановка приложения при нажатии Enter
+   * */
+  StdIn.readLine()
+  system.terminate()
 
 }
