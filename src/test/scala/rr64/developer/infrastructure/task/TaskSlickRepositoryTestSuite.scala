@@ -146,6 +146,15 @@ class TaskSlickRepositoryTestSuite
     } yield taskOpt shouldEqual None
   }
 
+  /** Репозиторий должен возвращать задачи в обратном порядке их создания */
+  "The repository" should "list tasks ordered by descending creation date" in
+    listQueryTest(
+      limit = taskList.size,
+      offset = 0,
+      initial = taskList,
+      expected = taskList.reverse
+    )
+
   /** Репозиторий должен ограничить количество возвращаемых задач переданным в limit числом */
   "The repository" should "limit the number of returned tasks" in
     listQueryTest(
