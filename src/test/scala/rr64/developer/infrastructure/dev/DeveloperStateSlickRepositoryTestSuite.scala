@@ -7,8 +7,7 @@ import rr64.developer.domain.dev.DeveloperState
 import rr64.developer.infrastructure.PostgresSpec
 import slick.jdbc.PostgresProfile.api._
 
-import scala.concurrent.duration.DurationInt
-import scala.concurrent.{Await, Future}
+import scala.concurrent.Future
 
 /**
  * Тесты репозитория состояний разработчиков на основе PostgreSQL + Slick
@@ -20,12 +19,12 @@ class DeveloperStateSlickRepositoryTestSuite extends PostgresSpec with AsyncFlat
 
   override protected def beforeAll(): Unit = {
     super.beforeAll()
-    Await.result(database.run {
+    runQuery {
       sqlu"""CREATE TABLE dev_state(
             id VARCHAR(100) PRIMARY KEY,
             state VARCHAR(10) NOT NULL
           )"""
-    }, 10.seconds)
+    }
   }
 
   /** Сохранить состояние и запросом проверить, что оно сохранено */
