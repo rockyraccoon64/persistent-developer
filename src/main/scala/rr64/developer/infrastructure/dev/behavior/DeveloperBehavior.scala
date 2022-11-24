@@ -32,14 +32,22 @@ object DeveloperBehavior {
         EventSourcedBehavior[Command, Event, State](
           persistenceId = persistenceId,
           emptyState = State.Free,
-          commandHandler = (state, cmd) => state.applyCommand(cmd),
+          commandHandler = (state, cmd) => {
+            context.log.debug("Got command {} in state {}", cmd, state)
+            state.applyCommand(cmd)
+          },
           eventHandler = (state, evt) => state.applyEvent(evt)
         ).receiveSignal {
           case (State.Working(taskWithId, _), RecoveryCompleted) =>
+            context.log.info("Starting work timer after recovery for task {}", taskWithId)
             startWorkTimer(taskWithId)
 
           case (State.Resting(lastCompleted, _), RecoveryCompleted) =>
+            context.log.info("Starting rest timer after recovery for task {}", lastCompleted)
             startRestTimer(lastCompleted)
+
+          case (_, RecoveryCompleted) =>
+            context.log.info("Developer recovery completed")
         }.withTagger(_ => Set(EventTag))
       }
     }

@@ -24,8 +24,11 @@ object State {
         case AddTask(task, replyTo) =>
           // Начать работу над задачей
           val taskWithId = TaskWithId.fromTask(task)
-          Effect.persist(Event.TaskStarted(taskWithId))
-            .thenRun((_: State) => Timers.startWorkTimer(taskWithId))
+          Effect.persist[Event, State](Event.TaskStarted(taskWithId))
+            .thenRun { case Working(task, _) =>
+              setup.log.info("Received task {}, starting work timer", task)
+              Timers.startWorkTimer(task)
+            }
             .thenReply(replyTo)(_ => Replies.TaskStarted(taskWithId.id))
 
         case _ =>
@@ -53,11 +56,15 @@ object State {
         case FinishTask(id) if id == currentTask.id =>
           // Завершить работу над задачей
           Effect.persist(Event.TaskFinished(currentTask))
-            .thenRun((_: State) => Timers.startRestTimer(currentTask))
+            .thenRun { case Resting(lastCompleted, _) =>
+              setup.log.info("Task {} finished, starting rest timer", lastCompleted)
+              Timers.startRestTimer(lastCompleted)
+            }
 
         case AddTask(task, replyTo) =>
           // Поставить задачу в очередь
           val taskWithId = TaskWithId.fromTask(task)
+          setup.log.info("Adding task {} to queue, currently working", taskWithId)
           Effect.persist(Event.TaskQueued(taskWithId))
             .thenReply(replyTo)(_ => Replies.TaskQueued(taskWithId.id))
 
@@ -90,11 +97,18 @@ object State {
         case StopResting =>
           // Завершить отдых
           Effect.persist(Event.Rested(taskQueue.headOption))
-            .thenRun((_: State) => taskQueue.headOption.foreach(Timers.startWorkTimer))
+            .thenRun {
+              case Working(task, _) =>
+                setup.log.info("Done resting, starting work timer for task {}", task)
+                Timers.startWorkTimer(task)
+              case Free =>
+                setup.log.info("Done resting, no more tasks")
+            }
 
         case AddTask(task, replyTo) =>
           // Поставить задачу в очередь
           val taskWithId = TaskWithId.fromTask(task)
+          setup.log.info("Adding task {} to queue, currently resting", taskWithId)
           Effect.persist(Event.TaskQueued(taskWithId))
             .thenReply(replyTo)(_ => Replies.TaskQueued(taskWithId.id))
 
