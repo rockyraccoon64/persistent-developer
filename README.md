@@ -117,7 +117,7 @@ sbt test
 сборки uber jar и создания Docker-образа:
 ```shell
 sbt assembly
-docker build -t persistent-developer --build-arg version=0.1
+docker build -f tools/docker/Dockerfile -t persistent-developer --build-arg version=0.1 .
 ```
 
 В корне репозитория хранится конфигурация Docker Compose 
