@@ -146,13 +146,22 @@ class TaskSlickRepositoryTestSuite
     } yield taskOpt shouldEqual None
   }
 
+  /** Репозиторий должен возвращать задачи в обратном порядке их создания */
+  "The repository" should "list tasks ordered by descending creation date" in
+    listQueryTest(
+      limit = taskList.size,
+      offset = 0,
+      initial = taskList,
+      expected = taskList.reverse
+    )
+
   /** Репозиторий должен ограничить количество возвращаемых задач переданным в limit числом */
   "The repository" should "limit the number of returned tasks" in
     listQueryTest(
       limit = 2,
       offset = 0,
       initial = taskList,
-      expected = taskList.take(2)
+      expected = taskList.reverse.take(2)
     )
 
   /** Если задач меньше, чем limit, возвращаются все задачи */
@@ -161,7 +170,7 @@ class TaskSlickRepositoryTestSuite
       limit = 4,
       offset = 0,
       initial = taskList,
-      expected = taskList
+      expected = taskList.reverse
     )
 
   /** Репозиторий должен возвращать задачи, начиная с переданного offset */
@@ -170,7 +179,7 @@ class TaskSlickRepositoryTestSuite
       limit = 3,
       offset = 1,
       initial = taskList,
-      expected = taskList.tail
+      expected = taskList.reverse.tail
     )
 
   /** Репозиторий должен учитывать как limit, так и offset */
@@ -179,7 +188,7 @@ class TaskSlickRepositoryTestSuite
       limit = 1,
       offset = 1,
       initial = taskList,
-      expected = taskList.slice(1, 2)
+      expected = taskList.reverse.slice(1, 2)
     )
 
   /** Если offset выходит за пределы количества имеющихся задач, возвращается пустой список */

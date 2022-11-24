@@ -44,7 +44,7 @@ class TaskSlickRepository(
     db.run {
       sql"""SELECT uuid, difficulty, status
            FROM task
-           ORDER BY serial_id
+           ORDER BY serial_id DESC
            OFFSET ${query.offset}
            LIMIT ${query.limit}"""
         .as[(String, Int, String)]
