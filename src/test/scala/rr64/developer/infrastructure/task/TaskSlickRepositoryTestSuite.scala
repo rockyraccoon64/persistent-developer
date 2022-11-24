@@ -9,8 +9,7 @@ import rr64.developer.infrastructure.task.query.LimitOffsetQueryFactoryImpl
 import slick.jdbc.PostgresProfile.api._
 
 import java.util.UUID
-import scala.concurrent.duration.DurationInt
-import scala.concurrent.{Await, Future}
+import scala.concurrent.Future
 
 /**
  * Тесты репозитория задач на основе PostgreSQL + Slick
@@ -45,36 +44,29 @@ class TaskSlickRepositoryTestSuite
 
   private val taskList = Seq(queuedTask, finishedTask, taskInProgress)
 
-
   override protected def beforeAll(): Unit = {
     super.beforeAll()
-    Await.result(
-      database.run {
-        sqlu"CREATE TYPE task_status AS ENUM ('Queued', 'InProgress', 'Finished')"
-      }, 10.seconds
-    )
+    runQuery {
+      sqlu"CREATE TYPE task_status AS ENUM ('Queued', 'InProgress', 'Finished')"
+    }
   }
 
   override protected def beforeEach(): Unit = {
     super.beforeEach()
-    Await.result(
-      database.run {
-        sqlu"""CREATE TABLE task(
-             uuid UUID PRIMARY KEY,
-             created_at TIMESTAMP NOT NULL DEFAULT NOW(),
-             difficulty INT NOT NULL,
-             status task_status NOT NULL
-           )"""
-      }, 10.seconds
-    )
+    runQuery {
+      sqlu"""CREATE TABLE task(
+           uuid UUID PRIMARY KEY,
+           created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+           difficulty INT NOT NULL,
+           status task_status NOT NULL
+         )"""
+    }
   }
 
   override protected def afterEach(): Unit = {
-    Await.result(
-      database.run {
-        sqlu"""DROP TABLE task"""
-      }, 10.seconds
-    )
+    runQuery {
+      sqlu"""DROP TABLE task"""
+    }
     super.afterEach()
   }
 
