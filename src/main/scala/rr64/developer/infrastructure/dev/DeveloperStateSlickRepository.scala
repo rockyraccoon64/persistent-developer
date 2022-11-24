@@ -21,9 +21,9 @@ class DeveloperStateSlickRepository(
     val name = codec.encode(state)
     db.run {
       sqlu"""INSERT INTO dev_state (id, state)
-            VALUES ($id, $name)
+            VALUES ($id, $name::dev_state_type)
             ON CONFLICT (id)
-            DO UPDATE SET state = $name"""
+            DO UPDATE SET state = $name::dev_state_type"""
     }
   }
 

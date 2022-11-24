@@ -21,9 +21,9 @@ class TaskSlickRepository(
   override def save(taskInfo: TaskInfo): Future[_] = db.run {
     val status = statusCodec.encode(taskInfo.status)
     sqlu"""INSERT INTO task(uuid, difficulty, status)
-          VALUES (${taskInfo.id.toString}::uuid, ${taskInfo.difficulty.value}, $status)
+          VALUES (${taskInfo.id.toString}::uuid, ${taskInfo.difficulty.value}, $status::task_status)
           ON CONFLICT (uuid)
-          DO UPDATE SET status = $status
+          DO UPDATE SET status = $status::task_status
         """
   }
 

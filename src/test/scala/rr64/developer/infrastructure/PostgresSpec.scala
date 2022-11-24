@@ -3,6 +3,7 @@ package rr64.developer.infrastructure
 import com.typesafe.config.ConfigFactory
 import org.scalatest.{BeforeAndAfterAll, Suite}
 import rr64.developer.infrastructure.PostgresSpec._
+import slick.dbio.{DBIOAction, NoStream}
 import slick.jdbc.PostgresProfile.api._
 
 import scala.concurrent.Await
@@ -34,24 +35,6 @@ trait PostgresSpec
     driver = driver
   )
 
-  override protected def beforeAll(): Unit = {
-    super.beforeAll()
-    Await.result(postgres.run {
-      sqlu"DROP DATABASE IF EXISTS #$dbname"
-    }, timeout)
-
-    Await.result(postgres.run {
-      sqlu"CREATE DATABASE #$dbname"
-    }, timeout)
-  }
-
-  override protected def afterAll() {
-    Await.result(postgres.run {
-      sqlu"DROP DATABASE #$dbname"
-    }, timeout)
-    super.afterAll()
-  }
-
   /** БД для использования в тестах */
   val database = Database.forURL(
     s"jdbc:postgresql://$host:$port/$dbname",
@@ -59,6 +42,29 @@ trait PostgresSpec
     password = password,
     driver = driver
   )
+
+  override protected def beforeAll(): Unit = {
+    super.beforeAll()
+    runPrepQuery(sqlu"DROP DATABASE IF EXISTS #$dbname")
+    runPrepQuery(sqlu"CREATE DATABASE #$dbname")
+  }
+
+  override protected def afterAll() {
+    runPrepQuery(sqlu"DROP DATABASE #$dbname")
+    super.afterAll()
+  }
+
+  /** Выполнить запрос в тестовой базе данных */
+  protected def runQuery[R](query: DBIOAction[R, NoStream, Nothing]): R =
+    runImpl(query, database)
+
+  /** Выполнить запрос для подготовки тестовой базы данных */
+  private def runPrepQuery[R](query: DBIOAction[R, NoStream, Nothing]): R =
+    runImpl(query, postgres)
+
+  /** Выполнить запрос в базе данных */
+  private def runImpl[R](query: DBIOAction[R, NoStream, Nothing], database: Database): R =
+    Await.result(database.run(query), timeout)
 
 }
 
