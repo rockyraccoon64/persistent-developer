@@ -31,7 +31,9 @@ import slick.jdbc.PostgresProfile
 
 import scala.concurrent.duration.DurationInt
 import scala.concurrent.{Await, ExecutionContext}
+import scala.io.StdIn
 import scala.jdk.DurationConverters.JavaDurationOps
+import scala.util.{Failure, Success}
 
 /**
  * Точка входа в приложение
@@ -227,9 +229,18 @@ object Main extends App {
 
   val restApi = new RestApi[Query](service, queryExtractor)
   val server = Http().newServerAt(apiInterface, apiPort).bind(restApi.route)
-  server.map { binding =>
-    binding.addToCoordinatedShutdown(hardTerminationDeadline = 10.seconds)
-    log.info(s"REST API initialized at ${binding.localAddress}")
+  server.onComplete {
+    case Success(binding) =>
+      binding.addToCoordinatedShutdown(hardTerminationDeadline = 10.seconds)
+      log.info("REST API initialized at {}:{}", apiInterface, apiPort)
+    case Failure(exception) =>
+      log.error(s"Failed to initialize REST API at $apiInterface:$apiPort", exception)
   }
+
+  /**
+   * Остановка приложения при нажатии Enter
+   * */
+  StdIn.readLine()
+  system.terminate()
 
 }

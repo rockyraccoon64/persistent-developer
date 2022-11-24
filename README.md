@@ -93,8 +93,7 @@ Persistent Developer - пример небольшого полноценног�
 передав в качестве точки входа класс `rr64.developer.application.Main`:
 ```shell
 sbt update
-sbt compile
-sbt runMain rr64.developer.application.Main
+sbt compile run
 ```
 
 ### Тесты
