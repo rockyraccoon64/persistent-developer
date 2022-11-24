@@ -127,12 +127,12 @@ docker build -f tools/docker/Dockerfile -t persistent-developer .
 docker build -f tools/docker/Dockerfile -t persistent-developer --build-arg JAR_PATH=my-app.jar .
 ```
 
-В корне репозитория хранится конфигурация Docker Compose 
+В папке [tools/docker](tools/docker) также хранится конфигурация Docker Compose 
 для запуска образа приложения совместно с базой данных PostgreSQL. 
 Схема базы данных для приложения создаётся при первом запуске образа, 
 а её данные сохраняются в томе Docker.
 
-После сборки образа для запуска достаточно выполнить:
+После сборки образа для запуска достаточно перейти в `tools/docker` и выполнить:
 
 ```shell
 docker-compose up -d

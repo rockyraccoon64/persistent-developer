@@ -10,7 +10,7 @@ services:
       POSTGRES_DB: persistent_developer
       POSTGRES_PASSWORD: postgres
     volumes:
-      - "./tools/postgres-initdb:/docker-entrypoint-initdb.d"
+      - "../postgres-initdb:/docker-entrypoint-initdb.d"
       - "pg-data:/var/lib/postgresql/data"
     healthcheck:
       test: [ "CMD-SHELL", "pg_isready -U postgres" ]
