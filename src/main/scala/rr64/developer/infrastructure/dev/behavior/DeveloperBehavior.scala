@@ -26,20 +26,22 @@ object DeveloperBehavior {
    * @param restFactor Множитель отдыха
    * */
   def apply(persistenceId: PersistenceId, workFactor: Factor, restFactor: Factor): Behavior[Command] =
-    Behaviors.withTimers { timer =>
-      implicit val setup: Setup = Setup(workFactor, restFactor, timer)
-      EventSourcedBehavior[Command, Event, State](
-        persistenceId = persistenceId,
-        emptyState = State.Free,
-        commandHandler = (state, cmd) => state.applyCommand(cmd),
-        eventHandler = (state, evt) => state.applyEvent(evt)
-      ).receiveSignal {
-        case (State.Working(taskWithId, _), RecoveryCompleted) =>
-          startWorkTimer(taskWithId)
+    Behaviors.setup { context =>
+      Behaviors.withTimers { timer =>
+        implicit val setup: Setup = Setup(workFactor, restFactor, timer, context)
+        EventSourcedBehavior[Command, Event, State](
+          persistenceId = persistenceId,
+          emptyState = State.Free,
+          commandHandler = (state, cmd) => state.applyCommand(cmd),
+          eventHandler = (state, evt) => state.applyEvent(evt)
+        ).receiveSignal {
+          case (State.Working(taskWithId, _), RecoveryCompleted) =>
+            startWorkTimer(taskWithId)
 
-        case (State.Resting(lastCompleted, _), RecoveryCompleted) =>
-          startRestTimer(lastCompleted)
-      }.withTagger(_ => Set(EventTag))
+          case (State.Resting(lastCompleted, _), RecoveryCompleted) =>
+            startRestTimer(lastCompleted)
+        }.withTagger(_ => Set(EventTag))
+      }
     }
 
 }
