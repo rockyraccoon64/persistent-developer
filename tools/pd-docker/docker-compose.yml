@@ -22,6 +22,7 @@ services:
     image: persistent-developer
     environment:
       PD_DB_HOST: db
+    stdin_open: true
     ports:
       - "10538:10538"
     depends_on:
