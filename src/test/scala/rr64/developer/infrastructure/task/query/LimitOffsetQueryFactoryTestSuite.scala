@@ -33,17 +33,17 @@ class LimitOffsetQueryFactoryTestSuite
   private trait QueryConstructionTest {
 
     private val factory = createFactory(defaultLimit = 10, maxLimit = 30)
-    private val doCreate = createQueryFromFactory(factory) _
+    private val doCreateQuery = createQueryFromFactory(factory) _
 
     /** Проверка на наличие исключения */
     def assertException(limit: Int = 10, offset: Int = 0): Assertion =
       assertThrows[LimitOffsetException] {
-        doCreate(limit, offset)
+        doCreateQuery(limit, offset)
       }
 
     /** Проверка на отсутствие исключения */
     def assertNoException(limit: Int = 10, offset: Int = 0): Assertion =
-      noException should be thrownBy doCreate(limit, offset)
+      noException should be thrownBy doCreateQuery(limit, offset)
 
   }
 
