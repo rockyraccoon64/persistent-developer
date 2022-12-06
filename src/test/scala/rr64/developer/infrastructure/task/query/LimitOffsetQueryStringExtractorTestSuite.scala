@@ -36,9 +36,7 @@ class LimitOffsetQueryStringExtractorTestSuite
       val limit = 15
       val offset = 55
       val expected: LimitOffsetQuery = createQuery(limit, offset)
-      (factory.create _)
-        .expects(limit, offset)
-        .returning(expected)
+      setupFactoryExpectation(factory)(limit, offset)(expected)
 
       val input = Some(s"limit:$limit,offset:$offset")
       extractor.extract(input).value shouldEqual expected
