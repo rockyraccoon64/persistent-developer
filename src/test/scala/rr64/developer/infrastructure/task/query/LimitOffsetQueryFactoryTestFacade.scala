@@ -11,6 +11,10 @@ trait LimitOffsetQueryFactoryTestFacade {
       maxLimit = maxLimit
     )
 
+  def createQueryFromFactory(factory: LimitOffsetQueryFactory)
+      (limit: Int, offset: Int): LimitOffsetQuery =
+    factory.create(limit, offset)
+
 }
 
 object LimitOffsetQueryFactoryTestFacade
