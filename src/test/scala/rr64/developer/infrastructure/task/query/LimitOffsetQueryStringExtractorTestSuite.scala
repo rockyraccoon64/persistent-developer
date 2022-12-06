@@ -26,7 +26,7 @@ class LimitOffsetQueryStringExtractorTestSuite
     protected def assertError(query: String): Assertion =
       extractError(extractor)(query) shouldEqual errorMessage
 
-    /** Успешное извлечение запроса */
+    /** Успешное извлечение параметров запроса */
     protected def extractQuery(query: Option[String]): LimitOffsetQuery =
       extractQuerySuccessfully(extractor)(query)
 

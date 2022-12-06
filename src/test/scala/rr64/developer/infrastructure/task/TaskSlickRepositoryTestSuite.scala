@@ -5,7 +5,7 @@ import org.scalatest.matchers.should.Matchers
 import org.scalatest.{Assertion, BeforeAndAfterEach}
 import rr64.developer.domain.task.{Difficulty, TaskInfo, TaskStatus}
 import rr64.developer.infrastructure.PostgresSpec
-import rr64.developer.infrastructure.task.query.LimitOffsetQueryTestFacade._
+import rr64.developer.infrastructure.task.query.LimitOffsetQueryTestFacade
 import slick.jdbc.PostgresProfile.api._
 
 import java.util.UUID
@@ -22,7 +22,10 @@ class TaskSlickRepositoryTestSuite
 
   private val statusCodec = new TaskStatusCodec
   private val repository = new TaskSlickRepository(database, statusCodec)
-  private val queryFactory = createFactory(defaultLimit = 20, maxLimit = 100)
+  private val queryFactory = LimitOffsetQueryTestFacade.createFactory(
+    defaultLimit = 20,
+    maxLimit = 100
+  )
 
   private val queuedTask = TaskInfo(
     id = UUID.fromString("30dbff1f-88dc-4972-aa70-a057bf5f1c88"),
