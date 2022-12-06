@@ -39,7 +39,7 @@ class LimitOffsetQueryStringExtractorTestSuite
       setupFactoryExpectation(factory)(limit, offset)(expected)
 
       val input = Some(s"limit:$limit,offset:$offset")
-      extractor.extract(input).value shouldEqual expected
+      extractQuerySuccessfully(extractor)(input) shouldEqual expected
     }
 
     /** Должен возвращать сообщение об ошибке, когда запрос сформирован некорректно */
@@ -77,7 +77,7 @@ class LimitOffsetQueryStringExtractorTestSuite
       new ExtractorTest {
         val default = createQuery(5, 4)
         setupFactoryDefaultExpectation(factory)(default)
-        extractor.extract(None).value shouldEqual default
+        extractQuerySuccessfully(extractor)(None) shouldEqual default
       }
 
   }

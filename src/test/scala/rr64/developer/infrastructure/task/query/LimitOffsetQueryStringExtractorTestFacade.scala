@@ -17,6 +17,10 @@ trait LimitOffsetQueryStringExtractorTestFacade {
       (input: String): String =
     extractor.extract(Some(input)).left.value
 
+  def extractQuerySuccessfully(extractor: LimitOffsetQueryStringExtractor)
+      (input: Option[String]): LimitOffsetQuery =
+    extractor.extract(input).value
+
 }
 
 object LimitOffsetQueryStringExtractorTestFacade
