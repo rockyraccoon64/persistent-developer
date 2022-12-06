@@ -25,6 +25,12 @@ trait LimitOffsetQueryFactoryTestFacade extends Mock {
       .expects(limit, offset)
       .returning(expected)
 
+  def setupFactoryDefaultExpectation(factory: LimitOffsetQueryFactory)
+      (result: LimitOffsetQuery): Unit =
+    (factory.default _)
+      .expects()
+      .returning(result)
+
 }
 
 object LimitOffsetQueryFactoryTestFacade

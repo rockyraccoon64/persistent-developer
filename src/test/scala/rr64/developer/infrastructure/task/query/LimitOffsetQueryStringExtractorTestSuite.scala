@@ -76,7 +76,7 @@ class LimitOffsetQueryStringExtractorTestSuite
     "return the default query when there is no input" in
       new ExtractorTest {
         val default = createQuery(5, 4)
-        (factory.default _).expects().returning(default)
+        setupFactoryDefaultExpectation(factory)(default)
         extractor.extract(None).value shouldEqual default
       }
 
