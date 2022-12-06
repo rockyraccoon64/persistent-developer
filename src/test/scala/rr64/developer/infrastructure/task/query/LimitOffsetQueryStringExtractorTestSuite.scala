@@ -4,7 +4,8 @@ import org.scalamock.scalatest.MockFactory
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatest.{Assertion, EitherValues}
-import rr64.developer.infrastructure.task.query.LimitOffsetQueryTestFacade._
+import rr64.developer.infrastructure.task.query.LimitOffsetQueryExtractorTestFacade._
+import rr64.developer.infrastructure.task.query.LimitOffsetQueryTestFacade.createQuery
 
 /**
  * Тесты парсера параметров запроса limit/offset из строки

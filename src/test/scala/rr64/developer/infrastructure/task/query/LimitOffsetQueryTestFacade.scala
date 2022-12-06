@@ -14,15 +14,6 @@ trait LimitOffsetQueryTestFacade {
   def createFactory(defaultLimit: Int, maxLimit: Int): LimitOffsetQueryFactoryImpl =
     new LimitOffsetQueryFactoryImpl(defaultLimit = defaultLimit, maxLimit = maxLimit)
 
-  def createExtractor(
-    factory: LimitOffsetQueryFactory,
-    errorMessage: String
-  ): LimitOffsetQueryStringExtractor =
-    new LimitOffsetQueryStringExtractor(
-      factory = factory,
-      errorMessage = errorMessage
-    )
-
 }
 
 object LimitOffsetQueryTestFacade extends LimitOffsetQueryTestFacade
