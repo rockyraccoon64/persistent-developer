@@ -4,6 +4,7 @@ import org.scalamock.scalatest.MockFactory
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatest.{Assertion, EitherValues}
+import rr64.developer.infrastructure.task.query.LimitOffsetQueryTestFacade._
 
 /**
  * Тесты парсера параметров запроса limit/offset из строки
@@ -32,10 +33,7 @@ class LimitOffsetQueryStringExtractorTestSuite
 
     /** Должен перенаправлять корректно сформированный запрос фабрике */
     "extract correct queries" in new ExtractorTest {
-      val expected: LimitOffsetQuery = new LimitOffsetQuery {
-        override def limit: Int = 15
-        override def offset: Int = 55
-      }
+      val expected: LimitOffsetQuery = createQuery(15, 55)
       (factory.create _)
         .expects(15, 55)
         .returning(expected)
@@ -77,10 +75,7 @@ class LimitOffsetQueryStringExtractorTestSuite
     /** Должен возвращать значение по умолчанию, когда запрос не передаётся */
     "return the default query when there is no input" in
       new ExtractorTest {
-        val default = new LimitOffsetQuery {
-          override def limit: Int = 5
-          override def offset: Int = 4
-        }
+        val default = createQuery(5, 4)
         (factory.default _).expects().returning(default)
         extractor.extract(None).value shouldEqual default
       }
