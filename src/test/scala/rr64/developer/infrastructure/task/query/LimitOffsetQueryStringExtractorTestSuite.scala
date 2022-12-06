@@ -4,6 +4,7 @@ import org.scalamock.scalatest.MockFactory
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatest.{Assertion, EitherValues}
+import rr64.developer.infrastructure.task.query.LimitOffsetQueryTestFacade._
 
 /**
  * Тесты парсера параметров запроса limit/offset из строки
@@ -19,11 +20,15 @@ class LimitOffsetQueryStringExtractorTestSuite
 
     protected val factory = mock[LimitOffsetQueryFactory]
     protected val errorMessage = "Invalid limit + offset"
-    protected val extractor = new LimitOffsetQueryStringExtractor(factory, errorMessage)
+    protected val extractor = createExtractor(factory, errorMessage)
 
     /** Проверка на наличие ошибки */
     protected def assertError(query: String): Assertion =
-      extractor.extract(Some(query)).left.value shouldEqual errorMessage
+      extractError(extractor)(query) shouldEqual errorMessage
+
+    /** Успешное извлечение параметров запроса */
+    protected def extractQuery(query: Option[String]): LimitOffsetQuery =
+      extractQuerySuccessfully(extractor)(query)
 
   }
 
@@ -32,16 +37,13 @@ class LimitOffsetQueryStringExtractorTestSuite
 
     /** Должен перенаправлять корректно сформированный запрос фабрике */
     "extract correct queries" in new ExtractorTest {
-      val expected: LimitOffsetQuery = new LimitOffsetQuery {
-        override def limit: Int = 15
-        override def offset: Int = 55
-      }
-      (factory.create _)
-        .expects(15, 55)
-        .returning(expected)
+      val limit = 15
+      val offset = 55
+      val expected: LimitOffsetQuery = createQuery(limit, offset)
+      setupFactoryExpectation(factory)(limit, offset)(expected)
 
-      val input = Some("limit:15,offset:55")
-      extractor.extract(input).value shouldEqual expected
+      val input = Some(s"limit:$limit,offset:$offset")
+      extractQuery(input) shouldEqual expected
     }
 
     /** Должен возвращать сообщение об ошибке, когда запрос сформирован некорректно */
@@ -77,12 +79,9 @@ class LimitOffsetQueryStringExtractorTestSuite
     /** Должен возвращать значение по умолчанию, когда запрос не передаётся */
     "return the default query when there is no input" in
       new ExtractorTest {
-        val default = new LimitOffsetQuery {
-          override def limit: Int = 5
-          override def offset: Int = 4
-        }
-        (factory.default _).expects().returning(default)
-        extractor.extract(None).value shouldEqual default
+        val default = createQuery(5, 4)
+        setupFactoryDefaultExpectation(factory)(default)
+        extractQuery(None) shouldEqual default
       }
 
   }

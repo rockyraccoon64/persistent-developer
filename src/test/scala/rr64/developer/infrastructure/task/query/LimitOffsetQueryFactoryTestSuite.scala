@@ -3,6 +3,7 @@ package rr64.developer.infrastructure.task.query
 import org.scalatest.Assertion
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
+import rr64.developer.infrastructure.task.query.LimitOffsetQueryTestFacade._
 
 /**
  * Тесты фабрики параметров запроса
@@ -17,13 +18,13 @@ class LimitOffsetQueryFactoryTestSuite
     /** Проверка на наличие исключения */
     def assertException(defaultLimit: Int, maxLimit: Int): Assertion =
       assertThrows[IllegalArgumentException] {
-        new LimitOffsetQueryFactoryImpl(defaultLimit = defaultLimit, maxLimit = maxLimit)
+        createFactory(defaultLimit, maxLimit)
       }
 
     /** Проверка на отсутствие исключения */
     def assertNoException(defaultLimit: Int, maxLimit: Int): Assertion =
       noException should be thrownBy {
-        new LimitOffsetQueryFactoryImpl(defaultLimit = defaultLimit, maxLimit = maxLimit)
+        createFactory(defaultLimit, maxLimit)
       }
 
   }
@@ -31,17 +32,18 @@ class LimitOffsetQueryFactoryTestSuite
   /** Фикстура для тестирования создания запросов фабрикой */
   private trait QueryConstructionTest {
 
-    private val factory = new LimitOffsetQueryFactoryImpl(defaultLimit = 10, maxLimit = 30)
+    private val factory = createFactory(defaultLimit = 10, maxLimit = 30)
+    private val doCreateQuery = createQueryFromFactory(factory) _
 
     /** Проверка на наличие исключения */
     def assertException(limit: Int = 10, offset: Int = 0): Assertion =
       assertThrows[LimitOffsetException] {
-        factory.create(limit = limit, offset = offset)
+        doCreateQuery(limit, offset)
       }
 
     /** Проверка на отсутствие исключения */
     def assertNoException(limit: Int = 10, offset: Int = 0): Assertion =
-      noException should be thrownBy factory.create(limit = limit, offset = offset)
+      noException should be thrownBy doCreateQuery(limit, offset)
 
   }
 
