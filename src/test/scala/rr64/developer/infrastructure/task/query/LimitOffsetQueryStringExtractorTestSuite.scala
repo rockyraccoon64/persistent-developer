@@ -33,12 +33,14 @@ class LimitOffsetQueryStringExtractorTestSuite
 
     /** Должен перенаправлять корректно сформированный запрос фабрике */
     "extract correct queries" in new ExtractorTest {
-      val expected: LimitOffsetQuery = createQuery(15, 55)
+      val limit = 15
+      val offset = 55
+      val expected: LimitOffsetQuery = createQuery(limit, offset)
       (factory.create _)
-        .expects(15, 55)
+        .expects(limit, offset)
         .returning(expected)
 
-      val input = Some("limit:15,offset:55")
+      val input = Some(s"limit:$limit,offset:$offset")
       extractor.extract(input).value shouldEqual expected
     }
 
