@@ -3,7 +3,7 @@ package rr64.developer.infrastructure.task.query
 import org.scalatest.Assertion
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
-import rr64.developer.infrastructure.task.query.LimitOffsetQueryFactoryTestFacade._
+import rr64.developer.infrastructure.task.query.LimitOffsetQueryTestFacade._
 
 /**
  * Тесты фабрики параметров запроса
