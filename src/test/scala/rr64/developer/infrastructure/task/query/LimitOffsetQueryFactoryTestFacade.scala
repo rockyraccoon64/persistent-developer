@@ -3,8 +3,13 @@ package rr64.developer.infrastructure.task.query
 import org.scalamock.clazz.Mock
 import org.scalamock.matchers.MockParameter
 
+/**
+ * Фасад для тестов с использованием
+ * фабрики параметров запроса limit/offset
+ */
 trait LimitOffsetQueryFactoryTestFacade extends Mock {
 
+  /** Создать фабрику */
   def createFactory(
     defaultLimit: Int,
     maxLimit: Int
@@ -14,10 +19,12 @@ trait LimitOffsetQueryFactoryTestFacade extends Mock {
       maxLimit = maxLimit
     )
 
+  /** Создать параметры запроса с использованием фабрики */
   def createQueryFromFactory(factory: LimitOffsetQueryFactory)
       (limit: Int, offset: Int): LimitOffsetQuery =
     factory.create(limit, offset)
 
+  /** Установить поведение заглушки фабрики параметров запроса */
   def setupFactoryExpectation(factory: LimitOffsetQueryFactory)
       (limit: MockParameter[Int], offset: MockParameter[Int])
       (expected: LimitOffsetQuery): Unit =
@@ -25,6 +32,8 @@ trait LimitOffsetQueryFactoryTestFacade extends Mock {
       .expects(limit, offset)
       .returning(expected)
 
+  /** Установить заглушку значения по умолчанию
+   * в фабрике параметров запроса */
   def setupFactoryDefaultExpectation(factory: LimitOffsetQueryFactory)
       (result: LimitOffsetQuery): Unit =
     (factory.default _)
