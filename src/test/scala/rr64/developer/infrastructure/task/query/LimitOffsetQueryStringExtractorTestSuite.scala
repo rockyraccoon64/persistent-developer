@@ -24,7 +24,7 @@ class LimitOffsetQueryStringExtractorTestSuite
 
     /** Проверка на наличие ошибки */
     protected def assertError(query: String): Assertion =
-      extractor.extract(Some(query)).left.value shouldEqual errorMessage
+      extractError(extractor)(query) shouldEqual errorMessage
 
   }
 
