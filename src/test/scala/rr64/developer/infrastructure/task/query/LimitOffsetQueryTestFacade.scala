@@ -2,9 +2,6 @@ package rr64.developer.infrastructure.task.query
 
 trait LimitOffsetQueryTestFacade {
 
-  def createFactory(defaultLimit: Int, maxLimit: Int): LimitOffsetQueryFactoryImpl =
-    new LimitOffsetQueryFactoryImpl(defaultLimit = defaultLimit, maxLimit = maxLimit)
-
   def createQuery(limit: Int, offset: Int): LimitOffsetQuery = {
     val lim = limit
     val off = offset
@@ -13,6 +10,18 @@ trait LimitOffsetQueryTestFacade {
       override def offset: Int = off
     }
   }
+
+  def createFactory(defaultLimit: Int, maxLimit: Int): LimitOffsetQueryFactoryImpl =
+    new LimitOffsetQueryFactoryImpl(defaultLimit = defaultLimit, maxLimit = maxLimit)
+
+  def createExtractor(
+    factory: LimitOffsetQueryFactory,
+    errorMessage: String
+  ): LimitOffsetQueryStringExtractor =
+    new LimitOffsetQueryStringExtractor(
+      factory = factory,
+      errorMessage = errorMessage
+    )
 
 }
 
