@@ -1,6 +1,6 @@
 package rr64.developer.infrastructure.task.query
 
-trait LimitOffsetQueryTestFacade {
+trait LimitOffsetQueryInstanceTestFacade {
 
   def createQuery(limit: Int, offset: Int): LimitOffsetQuery = {
     val lim = limit
@@ -13,5 +13,5 @@ trait LimitOffsetQueryTestFacade {
 
 }
 
-object LimitOffsetQueryTestFacade
-  extends LimitOffsetQueryTestFacade
+object LimitOffsetQueryInstanceTestFacade
+  extends LimitOffsetQueryInstanceTestFacade
