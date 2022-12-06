@@ -1,6 +1,6 @@
 package rr64.developer.infrastructure.task.query
 
-trait LimitOffsetQueryExtractorTestFacade {
+trait LimitOffsetQueryStringExtractorTestFacade {
 
   def createExtractor(
     factory: LimitOffsetQueryFactory,
@@ -13,5 +13,5 @@ trait LimitOffsetQueryExtractorTestFacade {
 
 }
 
-object LimitOffsetQueryExtractorTestFacade
-  extends LimitOffsetQueryExtractorTestFacade
+object LimitOffsetQueryStringExtractorTestFacade
+  extends LimitOffsetQueryStringExtractorTestFacade
