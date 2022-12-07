@@ -51,6 +51,14 @@ trait TaskTestFacade {
     for (taskOpt <- findTaskInRepository(repository)(task.id)) yield
       taskOpt shouldEqual Some(task)
 
+  /** Сохранить задачу и проверить, что она сохранена */
+  def saveTaskToRepositoryAndAssertSaved(repository: TaskSlickRepository)
+    (task: TaskInfo)(implicit ec: ExecutionContext): Future[Assertion] =
+    for {
+      _ <- saveTaskToRepository(repository)(task)
+      succeeded <- assertTaskExistsInRepository(repository)(task)
+    } yield succeeded
+
 }
 
 object TaskTestFacade
