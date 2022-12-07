@@ -5,6 +5,7 @@ import org.scalatest.matchers.should.Matchers
 import org.scalatest.{Assertion, BeforeAndAfterEach}
 import rr64.developer.domain.task.{Difficulty, TaskInfo, TaskStatus}
 import rr64.developer.infrastructure.PostgresSpec
+import rr64.developer.infrastructure.task.TaskTestFacade._
 import rr64.developer.infrastructure.task.query.LimitOffsetQueryTestFacade
 import slick.jdbc.PostgresProfile.api._
 
@@ -27,19 +28,19 @@ class TaskSlickRepositoryTestSuite
     maxLimit = 100
   )
 
-  private val queuedTask = TaskInfo(
+  private val queuedTask = createTaskInfo(
     id = UUID.fromString("30dbff1f-88dc-4972-aa70-a057bf5f1c88"),
     difficulty = Difficulty(5),
     status = TaskStatus.Queued
   )
 
-  private val taskInProgress = TaskInfo(
+  private val taskInProgress = createTaskInfo(
     id = UUID.fromString("959c3bee-9f0b-472e-b45b-1285aa78f215"),
     difficulty = Difficulty(38),
     status = TaskStatus.InProgress
   )
 
-  private val finishedTask = TaskInfo(
+  private val finishedTask = createTaskInfo(
     id = UUID.fromString("cc972e84-c43a-49dc-8ab2-3a2a36676ac8"),
     difficulty = Difficulty(100),
     status = TaskStatus.InProgress
@@ -116,7 +117,7 @@ class TaskSlickRepositoryTestSuite
 
   /** Репозиторий должен обновлять статус у существующих задач */
   "The repository" should "update existing tasks' status" in {
-    val initialTask = TaskInfo(
+    val initialTask = createTaskInfo(
       id = UUID.fromString("a67fb9da-9c25-4bce-ac57-abe4de23f208"),
       difficulty = Difficulty(50),
       status = TaskStatus.InProgress
@@ -130,7 +131,7 @@ class TaskSlickRepositoryTestSuite
 
   /** Репозиторий не должен обновлять сложность у существующих задач */
   "The repository" should "not update existing tasks' difficulty" in {
-    val initialTask = TaskInfo(
+    val initialTask = createTaskInfo(
       id = UUID.fromString("8d22593a-f477-48a2-be4a-79f2d8e34f91"),
       difficulty = Difficulty(15),
       status = TaskStatus.InProgress
