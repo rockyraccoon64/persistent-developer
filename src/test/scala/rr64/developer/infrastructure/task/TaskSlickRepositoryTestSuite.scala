@@ -23,10 +23,6 @@ class TaskSlickRepositoryTestSuite
 
   private val statusCodec = new TaskStatusCodec
   private val repository = new TaskSlickRepository(database, statusCodec)
-  private val queryFactory = LimitOffsetQueryTestFacade.createFactory(
-    defaultLimit = 20,
-    maxLimit = 100
-  )
 
   private val queuedTask = createTaskInfo(
     id = UUID.fromString("30dbff1f-88dc-4972-aa70-a057bf5f1c88"),
@@ -92,7 +88,7 @@ class TaskSlickRepositoryTestSuite
     initial: Seq[TaskInfo],
     expected: Seq[TaskInfo]
   ): Future[Assertion] = {
-    val query = queryFactory.create(limit, offset)
+    val query = LimitOffsetQueryTestFacade.createQuery(limit, offset)
     for {
       _ <- initial.foldLeft[Future[Any]](Future.unit) { (acc, task) =>
         acc.flatMap(_ => repository.save(task))
