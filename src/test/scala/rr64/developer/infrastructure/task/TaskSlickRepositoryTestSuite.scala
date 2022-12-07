@@ -21,8 +21,7 @@ class TaskSlickRepositoryTestSuite
     with BeforeAndAfterEach
     with Matchers {
 
-  private val statusCodec = new TaskStatusCodec
-  private val repository = new TaskSlickRepository(database, statusCodec)
+  private val repository = createTaskSlickRepository(database)
 
   private val queuedTask = createTaskInfo(
     id = UUID.fromString("30dbff1f-88dc-4972-aa70-a057bf5f1c88"),
