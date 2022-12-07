@@ -6,7 +6,6 @@ import org.scalatest.{Assertion, BeforeAndAfterEach}
 import rr64.developer.domain.task.{Difficulty, TaskInfo, TaskStatus}
 import rr64.developer.infrastructure.PostgresSpec
 import rr64.developer.infrastructure.task.TaskTestFacade._
-import rr64.developer.infrastructure.task.query.LimitOffsetQueryTestFacade
 import slick.jdbc.PostgresProfile.api._
 
 import java.util.UUID
@@ -92,15 +91,13 @@ class TaskSlickRepositoryTestSuite
     offset: Int,
     initial: Seq[TaskInfo],
     expected: Seq[TaskInfo]
-  ): Future[Assertion] = {
-    val query = LimitOffsetQueryTestFacade.createQuery(limit, offset)
+  ): Future[Assertion] =
     for {
       _ <- saveTasks(initial)
-      list <- listTasks(query)
+      list <- listTasks(limit, offset)
     } yield {
       list should contain theSameElementsInOrderAs expected
     }
-  }
 
   /** Репозиторий должен сохранять задачи со статусом "В очереди" */
   "The repository" should "save queued tasks" in
