@@ -26,6 +26,12 @@ trait TaskTestFacade {
       (task: TaskInfo): Future[_] =
     repository.save(task)
 
+  def saveTasksToRepositoryInSequence(repository: TaskSlickRepository)
+      (tasks: Seq[TaskInfo])(implicit ec: ExecutionContext): Future[Any] =
+    tasks.foldLeft[Future[Any]](Future.unit) { (acc, task) =>
+      acc.flatMap(_ => saveTaskToRepository(repository)(task))
+    }
+
   def findTaskInRepository(repository: TaskSlickRepository)(id: UUID)
       (implicit ec: ExecutionContext): Future[Option[TaskInfo]] =
     repository.findById(id)

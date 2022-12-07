@@ -24,6 +24,7 @@ class TaskSlickRepositoryTestSuite
   private val repository = createTaskSlickRepository(database)
 
   private val saveTask = saveTaskToRepository(repository) _
+  private val saveTasks = saveTasksToRepositoryInSequence(repository) _
   private val findTask = findTaskInRepository(repository) _
   private val listTasks = listTasksFromRepository(repository) _
 
@@ -94,9 +95,7 @@ class TaskSlickRepositoryTestSuite
   ): Future[Assertion] = {
     val query = LimitOffsetQueryTestFacade.createQuery(limit, offset)
     for {
-      _ <- initial.foldLeft[Future[Any]](Future.unit) { (acc, task) =>
-        acc.flatMap(_ => saveTask(task))
-      }
+      _ <- saveTasks(initial)
       list <- listTasks(query)
     } yield {
       list should contain theSameElementsInOrderAs expected
@@ -138,8 +137,7 @@ class TaskSlickRepositoryTestSuite
     )
     val updatedTask = initialTask.copy(difficulty = Difficulty(1))
     for {
-      _ <- saveTask(initialTask)
-      _ <- saveTask(updatedTask)
+      _ <- saveTasks(initialTask :: updatedTask :: Nil)
       succeeded <- assertSaved(initialTask)
     } yield succeeded
   }
