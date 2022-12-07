@@ -3,6 +3,7 @@ package rr64.developer.infrastructure.task
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import rr64.developer.domain.task.TaskStatus
+import rr64.developer.infrastructure.CodecTestFacade._
 
 /**
  * Тесты кодека статусов задач
@@ -12,12 +13,7 @@ class TaskStatusCodecTestSuite
     with Matchers {
 
   private val codec = new TaskStatusCodec
-
-  /** Проверка симметричности кодирования и декодирования */
-  private def codecTest(status: TaskStatus) {
-    val encoded = codec.encode(status)
-    codec.decode(encoded) shouldEqual status
-  }
+  private val codecTest = assertCodecSymmetrical(codec) _
 
   /** Кодек должен кодировать и декодировать статус задачи */
   "The task status codec" should {
