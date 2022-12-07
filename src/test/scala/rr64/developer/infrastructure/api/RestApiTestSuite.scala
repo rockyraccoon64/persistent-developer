@@ -322,9 +322,9 @@ class RestApiTestSuite
 
     /** Возвращать список задач */
     "return the task list" in {
-      val domainTasks = createTaskInfo(UUID.randomUUID(), Difficulty(99), TaskStatus.Finished) ::
-        createTaskInfo(UUID.randomUUID(), Difficulty(51), TaskStatus.InProgress) ::
-        createTaskInfo(UUID.randomUUID(), Difficulty(65), TaskStatus.Queued) ::
+      val domainTasks = createTaskInfo(UUID.fromString("8506c214-757c-46b8-8a97-b6a361b1470d"), Difficulty(99), TaskStatus.Finished) ::
+        createTaskInfo(UUID.fromString("a5cfdd2e-7dcf-43b1-8dd6-a38d6d568845"), Difficulty(51), TaskStatus.InProgress) ::
+        createTaskInfo(UUID.fromString("e85dda7f-391e-4fd7-87a6-201a2022675f"), Difficulty(65), TaskStatus.Queued) ::
         Nil
 
       val apiTasks = domainTasks.map(ApiTaskInfo.adapter.convert)

@@ -62,7 +62,7 @@ class PersistentDeveloperTestSuite
   /** Когда разработчик отвечает "Задача начата",
    * должно приходить соответствующее доменное сообщение */
   "When a task is started, there" should "be a corresponding domain message" in {
-    val id = UUID.randomUUID()
+    val id = UUID.fromString("cd9e1104-aff1-4085-b740-463f79376638")
     val mockActor = mockDeveloperRef {
       case Command.AddTask(_, replyTo) =>
         replyTo ! Replies.TaskStarted(id)
@@ -79,7 +79,7 @@ class PersistentDeveloperTestSuite
   /** Когда разработчик отвечает "Задача поставлена в очередь",
    * приходит соответствующее доменное сообщение */
   "When a task is queued, there" should "be a corresponding domain message" in {
-    val id = UUID.randomUUID()
+    val id = UUID.fromString("3427ee7f-6e97-4e60-bca9-ba10c29e33bc")
     val mockActor = mockDeveloperRef {
       case Command.AddTask(_, replyTo) =>
         replyTo ! Replies.TaskQueued(id)
