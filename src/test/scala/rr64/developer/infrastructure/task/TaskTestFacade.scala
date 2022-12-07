@@ -21,6 +21,13 @@ trait TaskTestFacade {
     status = status
   )
 
+  implicit class TaskTransformers(task: TaskInfo) {
+    def withDifficulty(difficulty: Int): TaskInfo =
+      task.copy(difficulty = Difficulty(difficulty))
+    def withStatus(status: TaskStatus): TaskInfo =
+      task.copy(status = status)
+  }
+
   def createTaskSlickRepository(database: Database): TaskSlickRepository =
     new TaskSlickRepository(database, new TaskStatusCodec)
 

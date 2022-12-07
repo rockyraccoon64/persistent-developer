@@ -3,7 +3,7 @@ package rr64.developer.infrastructure.task
 import org.scalatest.flatspec.AsyncFlatSpecLike
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.{Assertion, BeforeAndAfterEach}
-import rr64.developer.domain.task.{Difficulty, TaskInfo, TaskStatus}
+import rr64.developer.domain.task.{TaskInfo, TaskStatus}
 import rr64.developer.infrastructure.PostgresSpec
 import rr64.developer.infrastructure.task.TaskTestFacade._
 import slick.jdbc.PostgresProfile.api._
@@ -107,7 +107,7 @@ class TaskSlickRepositoryTestSuite
       difficulty = 50,
       status = TaskStatus.InProgress
     )
-    val updatedTask = initialTask.copy(status = TaskStatus.Finished)
+    val updatedTask = initialTask.withStatus(TaskStatus.Finished)
     for {
       _ <- saveTasks(initialTask :: updatedTask :: Nil)
       succeeded <- assertSaved(updatedTask)
@@ -121,7 +121,7 @@ class TaskSlickRepositoryTestSuite
       difficulty = 15,
       status = TaskStatus.InProgress
     )
-    val updatedTask = initialTask.copy(difficulty = Difficulty(1))
+    val updatedTask = initialTask.withDifficulty(1)
     for {
       _ <- saveTasks(initialTask :: updatedTask :: Nil)
       succeeded <- assertSaved(initialTask)
