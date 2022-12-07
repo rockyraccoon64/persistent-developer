@@ -24,6 +24,7 @@ class TaskSlickRepositoryTestSuite
   private val repository = createTaskSlickRepository(database)
 
   private val saveTask = saveTaskToRepository(repository) _
+  private val findTask = findTaskInRepository(repository) _
 
   private val queuedTask = createTaskInfo(
     id = UUID.fromString("30dbff1f-88dc-4972-aa70-a057bf5f1c88"),
@@ -80,7 +81,8 @@ class TaskSlickRepositoryTestSuite
 
   /** Проверить, что задача сохранена в репозитории */
   private def assertSaved(task: TaskInfo): Future[Assertion] =
-    for (taskOpt <- repository.findById(task.id)) yield taskOpt shouldEqual Some(task)
+    for (taskOpt <- findTask(task.id)) yield
+      taskOpt shouldEqual Some(task)
 
   /** Тестирование запроса списка задач */
   private def listQueryTest(
@@ -145,7 +147,7 @@ class TaskSlickRepositoryTestSuite
   "The repository" should "not find nonexistent tasks" in {
     val nonexistentId = UUID.fromString("6b8a92d0-f331-410e-bd28-8c23f00ef285")
     for {
-      taskOpt <- repository.findById(nonexistentId)
+      taskOpt <- findTask(nonexistentId)
     } yield taskOpt shouldEqual None
   }
 

@@ -4,7 +4,7 @@ import rr64.developer.domain.task.{Difficulty, TaskInfo, TaskStatus}
 import slick.jdbc.PostgresProfile.api._
 
 import java.util.UUID
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 trait TaskTestFacade {
 
@@ -24,6 +24,10 @@ trait TaskTestFacade {
   def saveTaskToRepository(repository: TaskSlickRepository)
       (task: TaskInfo): Future[_] =
     repository.save(task)
+
+  def findTaskInRepository(repository: TaskSlickRepository)(id: UUID)
+      (implicit ec: ExecutionContext): Future[Option[TaskInfo]] =
+    repository.findById(id)
 
 }
 
