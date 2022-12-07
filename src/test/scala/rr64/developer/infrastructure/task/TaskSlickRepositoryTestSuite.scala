@@ -23,6 +23,8 @@ class TaskSlickRepositoryTestSuite
 
   private val repository = createTaskSlickRepository(database)
 
+  private val saveTask = saveTaskToRepository(repository) _
+
   private val queuedTask = createTaskInfo(
     id = UUID.fromString("30dbff1f-88dc-4972-aa70-a057bf5f1c88"),
     difficulty = Difficulty(5),
@@ -72,7 +74,7 @@ class TaskSlickRepositoryTestSuite
   /** Сохранить задачу и запросом проверить, что она сохранена */
   private def saveAndAssert(task: TaskInfo): Future[Assertion] =
     for {
-      _ <- repository.save(task)
+      _ <- saveTask(task)
       succeeded <- assertSaved(task)
     } yield succeeded
 
@@ -90,7 +92,7 @@ class TaskSlickRepositoryTestSuite
     val query = LimitOffsetQueryTestFacade.createQuery(limit, offset)
     for {
       _ <- initial.foldLeft[Future[Any]](Future.unit) { (acc, task) =>
-        acc.flatMap(_ => repository.save(task))
+        acc.flatMap(_ => saveTask(task))
       }
       list <- repository.list(query)
     } yield {
@@ -119,7 +121,7 @@ class TaskSlickRepositoryTestSuite
     )
     val updatedTask = initialTask.copy(status = TaskStatus.Finished)
     for {
-      _ <- repository.save(initialTask)
+      _ <- saveTask(initialTask)
       succeeded <- saveAndAssert(updatedTask)
     } yield succeeded
   }
@@ -133,8 +135,8 @@ class TaskSlickRepositoryTestSuite
     )
     val updatedTask = initialTask.copy(difficulty = Difficulty(1))
     for {
-      _ <- repository.save(initialTask)
-      _ <- repository.save(updatedTask)
+      _ <- saveTask(initialTask)
+      _ <- saveTask(updatedTask)
       succeeded <- assertSaved(initialTask)
     } yield succeeded
   }
