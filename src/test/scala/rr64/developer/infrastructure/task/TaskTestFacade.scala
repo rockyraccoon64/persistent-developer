@@ -12,12 +12,12 @@ import scala.concurrent.{ExecutionContext, Future}
 trait TaskTestFacade {
 
   def createTaskInfo(
-    id: UUID,
-    difficulty: Difficulty,
+    id: String,
+    difficulty: Int,
     status: TaskStatus
   ): TaskInfo = TaskInfo(
-    id = id,
-    difficulty = difficulty,
+    id = UUID.fromString(id),
+    difficulty = Difficulty(difficulty),
     status = status
   )
 

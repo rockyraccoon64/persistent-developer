@@ -10,7 +10,7 @@ import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import rr64.developer.domain.dev.{DeveloperReply, DeveloperState}
 import rr64.developer.domain.service.DeveloperService
-import rr64.developer.domain.task.{Difficulty, Task, TaskStatus}
+import rr64.developer.domain.task.{Task, TaskStatus}
 import rr64.developer.infrastructure.api.model._
 import rr64.developer.infrastructure.task.TaskTestFacade.createTaskInfo
 import spray.json.DefaultJsonProtocol.immSeqFormat
@@ -51,7 +51,7 @@ class RestApiTestSuite
       apiStatus: String
     ): Assertion = {
       val uuid = UUID.fromString(id)
-      val taskInfo = createTaskInfo(uuid, Difficulty(difficulty), status)
+      val taskInfo = createTaskInfo(id, difficulty, status)
 
       val taskInfoFound = Future.successful(Some(taskInfo))
       mockExpects(uuid).returning(taskInfoFound)
@@ -322,9 +322,9 @@ class RestApiTestSuite
 
     /** Возвращать список задач */
     "return the task list" in {
-      val domainTasks = createTaskInfo(UUID.fromString("8506c214-757c-46b8-8a97-b6a361b1470d"), Difficulty(99), TaskStatus.Finished) ::
-        createTaskInfo(UUID.fromString("a5cfdd2e-7dcf-43b1-8dd6-a38d6d568845"), Difficulty(51), TaskStatus.InProgress) ::
-        createTaskInfo(UUID.fromString("e85dda7f-391e-4fd7-87a6-201a2022675f"), Difficulty(65), TaskStatus.Queued) ::
+      val domainTasks = createTaskInfo("8506c214-757c-46b8-8a97-b6a361b1470d", 99, TaskStatus.Finished) ::
+        createTaskInfo("a5cfdd2e-7dcf-43b1-8dd6-a38d6d568845", 51, TaskStatus.InProgress) ::
+        createTaskInfo("e85dda7f-391e-4fd7-87a6-201a2022675f", 65, TaskStatus.Queued) ::
         Nil
 
       val apiTasks = domainTasks.map(ApiTaskInfo.adapter.convert)
