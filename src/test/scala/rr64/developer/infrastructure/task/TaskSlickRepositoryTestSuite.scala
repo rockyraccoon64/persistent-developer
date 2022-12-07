@@ -26,6 +26,7 @@ class TaskSlickRepositoryTestSuite
   private val saveTasks = saveTasksToRepositoryInSequence(repository) _
   private val findTask = findTaskInRepository(repository) _
   private val listTasks = listTasksFromRepository(repository) _
+  private val assertSaved = assertTaskExistsInRepository(repository) _
 
   private val queuedTask = createTaskInfo(
     id = UUID.fromString("30dbff1f-88dc-4972-aa70-a057bf5f1c88"),
@@ -79,11 +80,6 @@ class TaskSlickRepositoryTestSuite
       _ <- saveTask(task)
       succeeded <- assertSaved(task)
     } yield succeeded
-
-  /** Проверить, что задача сохранена в репозитории */
-  private def assertSaved(task: TaskInfo): Future[Assertion] =
-    for (taskOpt <- findTask(task.id)) yield
-      taskOpt shouldEqual Some(task)
 
   /** Тестирование запроса списка задач */
   private def listQueryTest(
