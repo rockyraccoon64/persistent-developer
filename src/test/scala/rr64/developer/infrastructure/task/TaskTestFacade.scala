@@ -1,6 +1,7 @@
 package rr64.developer.infrastructure.task
 
 import rr64.developer.domain.task.{Difficulty, TaskInfo, TaskStatus}
+import rr64.developer.infrastructure.task.query.LimitOffsetQuery
 import slick.jdbc.PostgresProfile.api._
 
 import java.util.UUID
@@ -28,6 +29,11 @@ trait TaskTestFacade {
   def findTaskInRepository(repository: TaskSlickRepository)(id: UUID)
       (implicit ec: ExecutionContext): Future[Option[TaskInfo]] =
     repository.findById(id)
+
+  def listTasksFromRepository(repository: TaskSlickRepository)
+      (query: LimitOffsetQuery)
+      (implicit ec: ExecutionContext): Future[Seq[TaskInfo]] =
+    repository.list(query)
 
 }
 

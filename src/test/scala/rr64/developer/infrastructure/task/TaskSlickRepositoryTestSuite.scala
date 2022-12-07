@@ -25,6 +25,7 @@ class TaskSlickRepositoryTestSuite
 
   private val saveTask = saveTaskToRepository(repository) _
   private val findTask = findTaskInRepository(repository) _
+  private val listTasks = listTasksFromRepository(repository) _
 
   private val queuedTask = createTaskInfo(
     id = UUID.fromString("30dbff1f-88dc-4972-aa70-a057bf5f1c88"),
@@ -96,7 +97,7 @@ class TaskSlickRepositoryTestSuite
       _ <- initial.foldLeft[Future[Any]](Future.unit) { (acc, task) =>
         acc.flatMap(_ => saveTask(task))
       }
-      list <- repository.list(query)
+      list <- listTasks(query)
     } yield {
       list should contain theSameElementsInOrderAs expected
     }
