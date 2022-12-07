@@ -22,7 +22,6 @@ class TaskSlickRepositoryTestSuite
 
   private val repository = createTaskSlickRepository(database)
 
-  private val saveTask = saveTaskToRepository(repository) _
   private val saveTasks = saveTasksToRepositoryInSequence(repository) _
   private val findTask = findTaskInRepository(repository) _
   private val listTasks = listTasksFromRepository(repository) _
@@ -110,8 +109,8 @@ class TaskSlickRepositoryTestSuite
     )
     val updatedTask = initialTask.copy(status = TaskStatus.Finished)
     for {
-      _ <- saveTask(initialTask)
-      succeeded <- saveAndAssert(updatedTask)
+      _ <- saveTasks(initialTask :: updatedTask :: Nil)
+      succeeded <- assertSaved(updatedTask)
     } yield succeeded
   }
 
