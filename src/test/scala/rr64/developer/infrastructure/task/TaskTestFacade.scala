@@ -136,7 +136,7 @@ trait TaskRepositoryTestFacade {
 
   }
 
-  implicit class TestSlickRepository(repository: TaskSlickRepository) {
+  implicit class TestTaskSlickRepository(repository: TaskSlickRepository) {
 
     /** Получить список задач из репозитория на основе Slick */
     def listTasksFromRepository(limit: Int, offset: Int)
