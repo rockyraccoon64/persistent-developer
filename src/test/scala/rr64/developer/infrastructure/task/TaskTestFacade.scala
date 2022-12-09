@@ -117,14 +117,6 @@ trait TaskRepositoryTestFacade {
   def createTaskSlickRepository(database: Database): TaskSlickRepository =
     new TaskSlickRepository(database, new TaskStatusCodec)
 
-  /** Получить список задач из репозитория на основе Slick */
-  def listTasksFromRepository(repository: TaskSlickRepository)
-      (limit: Int, offset: Int)
-      (implicit ec: ExecutionContext): Future[Seq[TaskInfo]] = {
-    val query = LimitOffsetQueryTestFacade.createQuery(limit, offset)
-    repository.list(query)
-  }
-
   /** Простой in-memory репозиторий для задач */
   def simpleTaskRepository: TaskRepository[Any] =
     new TaskRepository[Any] {
@@ -143,6 +135,13 @@ trait TaskRepositoryTestFacade {
 
   implicit class TestSlickRepository(repository: TaskSlickRepository) {
 
+    /** Получить список задач из репозитория на основе Slick */
+    def listTasksFromRepository(limit: Int, offset: Int)
+        (implicit ec: ExecutionContext): Future[Seq[TaskInfo]] = {
+      val query = LimitOffsetQueryTestFacade.createQuery(limit, offset)
+      repository.list(query)
+    }
+
     /** Тестирование запроса списка задач */
     def testListQuery(
       limit: Int,
@@ -152,7 +151,7 @@ trait TaskRepositoryTestFacade {
     )(implicit ec: ExecutionContext): Future[Assertion] =
       for {
         _ <- saveTasksToRepositoryInSequence(repository)(initial)
-        list <- listTasksFromRepository(repository)(limit, offset)
+        list <- listTasksFromRepository(limit, offset)
       } yield {
         list should contain theSameElementsInOrderAs expected
       }
