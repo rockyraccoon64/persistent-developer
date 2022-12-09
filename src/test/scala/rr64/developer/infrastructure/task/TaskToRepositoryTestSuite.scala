@@ -57,9 +57,12 @@ class TaskToRepositoryTestSuite
     private val handler: ProjHandler =
       new TaskToRepository(mockRepository)
 
+    /** Интерфейс для тестов с использованием репозитория */
+    private val testRepository = new TestTaskRepository(mockRepository)
+
     /** Проверка состояния задачи */
     private def assertInfo(taskInfo: TaskInfo): Assertion =
-      assertTaskExistsInRepository(mockRepository)(taskInfo).futureValue
+      testRepository.assertExists(taskInfo).futureValue
 
   }
 
