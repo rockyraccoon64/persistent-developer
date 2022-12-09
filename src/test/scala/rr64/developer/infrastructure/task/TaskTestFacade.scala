@@ -105,33 +105,33 @@ trait TaskRepositoryTestFacade {
   implicit class TestTaskRepository[Q](repository: TaskRepository[Q]) {
 
     /** Сохранить задачу в репозитории */
-    def saveTaskToRepository(task: TaskInfo): Future[_] =
+    def save(task: TaskInfo): Future[_] =
       repository.save(task)
 
     /** Сохранить последовательность задач в репозитории */
-    def saveTasksToRepositoryInSequence(tasks: Seq[TaskInfo])
+    def saveInSequence(tasks: Seq[TaskInfo])
         (implicit ec: ExecutionContext): Future[Any] =
       tasks.foldLeft[Future[Any]](Future.unit) { (acc, task) =>
-        acc.flatMap(_ => saveTaskToRepository(task))
+        acc.flatMap(_ => save(task))
       }
 
     /** Найти задачу в репозитории */
-    def findTaskInRepository(id: UUID)
+    def find(id: UUID)
         (implicit ec: ExecutionContext): Future[Option[TaskInfo]] =
       repository.findById(id)
 
     /** Проверить, что задача существует в репозитории */
-    def assertTaskExistsInRepository(task: TaskInfo)
+    def assertExists(task: TaskInfo)
         (implicit ec: ExecutionContext): Future[Assertion] =
-      for (taskOpt <- findTaskInRepository(task.id)) yield
+      for (taskOpt <- find(task.id)) yield
         taskOpt shouldEqual Some(task)
 
     /** Сохранить задачу и проверить, что она сохранена */
-    def saveTaskToRepositoryAndAssertSaved(task: TaskInfo)
+    def saveAndAssert(task: TaskInfo)
         (implicit ec: ExecutionContext): Future[Assertion] =
       for {
-        _ <- saveTaskToRepository(task)
-        succeeded <- assertTaskExistsInRepository(task)
+        _ <- save(task)
+        succeeded <- assertExists(task)
       } yield succeeded
 
   }
@@ -139,7 +139,7 @@ trait TaskRepositoryTestFacade {
   implicit class TestTaskSlickRepository(repository: TaskSlickRepository) {
 
     /** Получить список задач из репозитория на основе Slick */
-    def listTasksFromRepository(limit: Int, offset: Int)
+    def list(limit: Int, offset: Int)
         (implicit ec: ExecutionContext): Future[Seq[TaskInfo]] = {
       val query = LimitOffsetQueryTestFacade.createQuery(limit, offset)
       repository.list(query)
@@ -153,8 +153,8 @@ trait TaskRepositoryTestFacade {
       expected: Seq[TaskInfo]
     )(implicit ec: ExecutionContext): Future[Assertion] =
       for {
-        _ <- repository.saveTasksToRepositoryInSequence(initial)
-        list <- listTasksFromRepository(limit, offset)
+        _ <- repository.saveInSequence(initial)
+        list <- list(limit, offset)
       } yield {
         list should contain theSameElementsInOrderAs expected
       }

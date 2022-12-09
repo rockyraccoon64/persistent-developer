@@ -20,10 +20,10 @@ class TaskSlickRepositoryTestSuite
 
   private val repository = createTaskSlickRepository(database)
 
-  private val saveTasks = repository.saveTasksToRepositoryInSequence _
-  private val findTask = repository.findTaskInRepository _
-  private val assertSaved = repository.assertTaskExistsInRepository _
-  private val saveAndAssert = repository.saveTaskToRepositoryAndAssertSaved _
+  private val saveTasks = repository.saveInSequence _
+  private val findTask = repository.find _
+  private val assertSaved = repository.assertExists _
+  private val saveAndAssert = repository.saveAndAssert _
 
   private val queuedTask = createTaskInfo(
     id = "30dbff1f-88dc-4972-aa70-a057bf5f1c88",
