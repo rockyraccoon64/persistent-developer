@@ -61,10 +61,8 @@ class DeveloperStateToRepositoryTestSuite
     protected def projectionFromEvents(
       events: Seq[Event],
       persistenceId: String = defaultPersistenceId
-    ): TestProjection[Offset, EventEnvelope[Event]] = {
-      val source = ProjectionTestUtils.envelopeSource(events, persistenceId)
-      projectionFromSource(source)
-    }
+    ): TestProjection[Offset, EventEnvelope[Event]] =
+      EventProjectionTestFacade.projectionFromEvents(handler, projectionId)(events, persistenceId)
 
     /** Проверить текущее состояние */
     protected def assertState(

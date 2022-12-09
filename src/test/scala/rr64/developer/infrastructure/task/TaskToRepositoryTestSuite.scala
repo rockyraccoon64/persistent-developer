@@ -10,9 +10,9 @@ import org.scalatest.Assertion
 import org.scalatest.flatspec.AnyFlatSpecLike
 import rr64.developer.domain.task.TaskInfo.TaskInfoFromTaskWithId
 import rr64.developer.domain.task.{TaskInfo, TaskStatus}
+import rr64.developer.infrastructure.EventProjectionTestFacade
 import rr64.developer.infrastructure.dev.behavior.Event
 import rr64.developer.infrastructure.task.TaskTestFacade._
-import rr64.developer.infrastructure.{EventProjectionTestFacade, ProjectionTestUtils}
 
 import scala.concurrent.ExecutionContext
 
@@ -48,10 +48,14 @@ class TaskToRepositoryTestSuite
     protected def projectionFromEvents(
       events: Seq[Event],
       persistenceId: String = "proj"
-    ): TestProjection[Offset, EventEnvelope[Event]] = {
-      val source = ProjectionTestUtils.envelopeSource(events, persistenceId)
-      projectionFromSource(source)
-    }
+    ): TestProjection[Offset, EventEnvelope[Event]] =
+      EventProjectionTestFacade.projectionFromEvents(
+        handler,
+        projectionId
+      )(
+        events,
+        persistenceId
+      )
 
     /** Проверка состояния задачи */
     protected def assertInfo(taskInfo: TaskInfo): Assertion =

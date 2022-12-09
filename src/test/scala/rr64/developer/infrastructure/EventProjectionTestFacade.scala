@@ -24,6 +24,18 @@ trait EventProjectionTestFacade {
       handler = () => handler
     )
 
+  /** Проекция на основе последовательности событий */
+  def projectionFromEvents(
+    handler: Handler[EventEnvelope[Event]],
+    projectionId: ProjectionId
+  )(
+    events: Seq[Event],
+    persistenceId: String
+  ): TestProjection[Offset, EventEnvelope[Event]] = {
+    val source = ProjectionTestUtils.envelopeSource(events, persistenceId)
+    projectionFromSource(handler, projectionId)(source)
+  }
+
 }
 
 object EventProjectionTestFacade
