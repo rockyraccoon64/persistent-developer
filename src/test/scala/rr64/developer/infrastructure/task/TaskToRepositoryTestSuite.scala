@@ -40,10 +40,12 @@ class TaskToRepositoryTestSuite
     /** Идентификатор проекции */
     private val projectionId = ProjectionId("task-proj-test", "0")
 
+    /** Persistence ID актора, от которого пришли события */
+    private val persistenceId = "test-id"
+
     /** Проекция на основе последовательности событий */
     protected def projectionFromEvents(
-      events: Seq[Event],
-      persistenceId: String = "proj"
+      events: Seq[Event]
     ): TestProjection[Offset, EventEnvelope[Event]] =
       projectionFromEventSequence(
         handler,
