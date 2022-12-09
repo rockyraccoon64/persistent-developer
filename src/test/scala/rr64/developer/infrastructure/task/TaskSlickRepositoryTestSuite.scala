@@ -1,14 +1,13 @@
 package rr64.developer.infrastructure.task
 
+import org.scalatest.BeforeAndAfterEach
 import org.scalatest.flatspec.AsyncFlatSpecLike
 import org.scalatest.matchers.should.Matchers
-import org.scalatest.{Assertion, BeforeAndAfterEach}
 import rr64.developer.infrastructure.PostgresSpec
 import rr64.developer.infrastructure.task.TaskTestFacade._
 import slick.jdbc.PostgresProfile.api._
 
 import java.util.UUID
-import scala.concurrent.Future
 
 /**
  * Тесты репозитория задач на основе PostgreSQL + Slick
@@ -23,7 +22,6 @@ class TaskSlickRepositoryTestSuite
 
   private val saveTasks = saveTasksToRepositoryInSequence(repository) _
   private val findTask = findTaskInRepository(repository) _
-  private val listTasks = listTasksFromRepository(repository) _
   private val assertSaved = assertTaskExistsInRepository(repository) _
   private val saveAndAssert = saveTaskToRepositoryAndAssertSaved(repository) _
 
@@ -72,20 +70,6 @@ class TaskSlickRepositoryTestSuite
     }
     super.afterEach()
   }
-
-  /** Тестирование запроса списка задач */
-  private def listQueryTest(
-    limit: Int,
-    offset: Int,
-    initial: Seq[TaskInfo],
-    expected: Seq[TaskInfo]
-  ): Future[Assertion] =
-    for {
-      _ <- saveTasks(initial)
-      list <- listTasks(limit, offset)
-    } yield {
-      list should contain theSameElementsInOrderAs expected
-    }
 
   /** Репозиторий должен сохранять задачи со статусом "В очереди" */
   "The repository" should "save queued tasks" in
@@ -137,7 +121,7 @@ class TaskSlickRepositoryTestSuite
 
   /** Репозиторий должен возвращать задачи в обратном порядке их создания */
   "The repository" should "list tasks ordered by descending creation date" in
-    listQueryTest(
+    repository.testListQuery(
       limit = taskList.size,
       offset = 0,
       initial = taskList,
@@ -146,7 +130,7 @@ class TaskSlickRepositoryTestSuite
 
   /** Репозиторий должен ограничить количество возвращаемых задач переданным в limit числом */
   "The repository" should "limit the number of returned tasks" in
-    listQueryTest(
+    repository.testListQuery(
       limit = 2,
       offset = 0,
       initial = taskList,
@@ -155,7 +139,7 @@ class TaskSlickRepositoryTestSuite
 
   /** Если задач меньше, чем limit, возвращаются все задачи */
   "The repository" should "return all tasks if the limit exceeds their amount" in
-    listQueryTest(
+    repository.testListQuery(
       limit = 4,
       offset = 0,
       initial = taskList,
@@ -164,7 +148,7 @@ class TaskSlickRepositoryTestSuite
 
   /** Репозиторий должен возвращать задачи, начиная с переданного offset */
   "The repository" should "return tasks starting with the given offset" in
-    listQueryTest(
+    repository.testListQuery(
       limit = 3,
       offset = 1,
       initial = taskList,
@@ -173,7 +157,7 @@ class TaskSlickRepositoryTestSuite
 
   /** Репозиторий должен учитывать как limit, так и offset */
   "The repository" should "return tasks starting with the given offset and limit their amount" in
-    listQueryTest(
+    repository.testListQuery(
       limit = 1,
       offset = 1,
       initial = taskList,
@@ -182,7 +166,7 @@ class TaskSlickRepositoryTestSuite
 
   /** Если offset выходит за пределы количества имеющихся задач, возвращается пустой список */
   "The repository" should "return an empty list when the offset exceeds the amount of tasks" in
-    listQueryTest(
+    repository.testListQuery(
       limit = 5,
       offset = 3,
       initial = taskList,
@@ -191,7 +175,7 @@ class TaskSlickRepositoryTestSuite
 
   /** Если задач нет, возвращается пустой список */
   "The repository" should "return an empty list when there are no tasks" in
-    listQueryTest(
+    repository.testListQuery(
       limit = 10,
       offset = 0,
       initial = Nil,

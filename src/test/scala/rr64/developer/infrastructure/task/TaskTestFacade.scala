@@ -1,7 +1,7 @@
 package rr64.developer.infrastructure.task
 
 import org.scalatest.Assertion
-import org.scalatest.matchers.should.Matchers.convertToAnyShouldWrapper
+import org.scalatest.matchers.should.Matchers._
 import rr64.developer.domain.task.{Difficulty, TaskInfo, TaskStatus}
 import rr64.developer.infrastructure.task.query.LimitOffsetQueryTestFacade
 import slick.jdbc.PostgresProfile.api._
@@ -140,6 +140,24 @@ trait TaskRepositoryTestFacade {
           (implicit ec: ExecutionContext): Future[Seq[TaskInfo]] =
         Future.successful(tasks.values.toSeq)
     }
+
+  implicit class TestSlickRepository(repository: TaskSlickRepository) {
+
+    /** Тестирование запроса списка задач */
+    def testListQuery(
+      limit: Int,
+      offset: Int,
+      initial: Seq[TaskInfo],
+      expected: Seq[TaskInfo]
+    )(implicit ec: ExecutionContext): Future[Assertion] =
+      for {
+        _ <- saveTasksToRepositoryInSequence(repository)(initial)
+        list <- listTasksFromRepository(repository)(limit, offset)
+      } yield {
+        list should contain theSameElementsInOrderAs expected
+      }
+
+  }
 
 }
 
