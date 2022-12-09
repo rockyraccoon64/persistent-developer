@@ -5,6 +5,8 @@ import rr64.developer.infrastructure.task.TaskWithId
 
 trait EventTestFacade {
 
+  type Event = rr64.developer.infrastructure.dev.behavior.Event
+
   def taskStartedEvent(taskWithId: TaskWithId): Event.TaskStarted =
     Event.TaskStarted(taskWithId)
 

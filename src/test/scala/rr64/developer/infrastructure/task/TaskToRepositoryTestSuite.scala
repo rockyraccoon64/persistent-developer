@@ -12,7 +12,6 @@ import rr64.developer.domain.task.TaskInfo.TaskInfoFromTaskWithId
 import rr64.developer.domain.task.{TaskInfo, TaskStatus}
 import rr64.developer.infrastructure.EventProjectionTestFacade._
 import rr64.developer.infrastructure.EventTestFacade._
-import rr64.developer.infrastructure.dev.behavior.Event
 import rr64.developer.infrastructure.task.TaskTestFacade._
 
 import scala.concurrent.ExecutionContext
