@@ -61,14 +61,11 @@ trait TaskInfoTestFacade {
 
 trait TaskRepositoryTestFacade {
 
-  def createTaskSlickRepository(database: Database): TaskSlickRepository =
-    new TaskSlickRepository(database, new TaskStatusCodec)
-
-  def saveTaskToRepository(repository: TaskSlickRepository)
+  def saveTaskToRepository[Q](repository: TaskRepository[Q])
       (task: TaskInfo): Future[_] =
     repository.save(task)
 
-  def saveTasksToRepositoryInSequence(repository: TaskSlickRepository)
+  def saveTasksToRepositoryInSequence[Q](repository: TaskRepository[Q])
       (tasks: Seq[TaskInfo])(implicit ec: ExecutionContext): Future[Any] =
     tasks.foldLeft[Future[Any]](Future.unit) { (acc, task) =>
       acc.flatMap(_ => saveTaskToRepository(repository)(task))
@@ -78,13 +75,6 @@ trait TaskRepositoryTestFacade {
       (implicit ec: ExecutionContext): Future[Option[TaskInfo]] =
     repository.findById(id)
 
-  def listTasksFromRepository(repository: TaskSlickRepository)
-      (limit: Int, offset: Int)
-      (implicit ec: ExecutionContext): Future[Seq[TaskInfo]] = {
-    val query = LimitOffsetQueryTestFacade.createQuery(limit, offset)
-    repository.list(query)
-  }
-
   /** Проверить, что задача существует в репозитории */
   def assertTaskExistsInRepository[Q](repository: TaskRepository[Q])
       (task: TaskInfo)(implicit ec: ExecutionContext): Future[Assertion] =
@@ -92,12 +82,22 @@ trait TaskRepositoryTestFacade {
       taskOpt shouldEqual Some(task)
 
   /** Сохранить задачу и проверить, что она сохранена */
-  def saveTaskToRepositoryAndAssertSaved(repository: TaskSlickRepository)
+  def saveTaskToRepositoryAndAssertSaved[Q](repository: TaskRepository[Q])
     (task: TaskInfo)(implicit ec: ExecutionContext): Future[Assertion] =
     for {
       _ <- saveTaskToRepository(repository)(task)
       succeeded <- assertTaskExistsInRepository(repository)(task)
     } yield succeeded
+
+  def createTaskSlickRepository(database: Database): TaskSlickRepository =
+    new TaskSlickRepository(database, new TaskStatusCodec)
+
+  def listTasksFromRepository(repository: TaskSlickRepository)
+      (limit: Int, offset: Int)
+      (implicit ec: ExecutionContext): Future[Seq[TaskInfo]] = {
+    val query = LimitOffsetQueryTestFacade.createQuery(limit, offset)
+    repository.list(query)
+  }
 
   def simpleTaskRepository: TaskRepository[Any] =
     new TaskRepository[Any] {
