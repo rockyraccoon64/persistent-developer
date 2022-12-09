@@ -3,7 +3,7 @@ package rr64.developer.infrastructure
 import rr64.developer.infrastructure.dev.behavior.Event
 import rr64.developer.infrastructure.task.TaskWithId
 
-trait EventTestFacade {
+trait DeveloperEventTestFacade {
 
   type Event = rr64.developer.infrastructure.dev.behavior.Event
 
@@ -21,5 +21,5 @@ trait EventTestFacade {
 
 }
 
-object EventTestFacade
-  extends EventTestFacade
+object DeveloperEventTestFacade
+  extends DeveloperEventTestFacade

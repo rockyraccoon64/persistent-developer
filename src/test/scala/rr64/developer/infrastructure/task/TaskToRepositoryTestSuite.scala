@@ -11,7 +11,7 @@ import org.scalatest.flatspec.AnyFlatSpecLike
 import rr64.developer.domain.task.TaskInfo.TaskInfoFromTaskWithId
 import rr64.developer.domain.task.{TaskInfo, TaskStatus}
 import rr64.developer.infrastructure.EventProjectionTestFacade._
-import rr64.developer.infrastructure.EventTestFacade._
+import rr64.developer.infrastructure.DeveloperEventTestFacade._
 import rr64.developer.infrastructure.task.TaskTestFacade._
 
 import scala.concurrent.ExecutionContext
