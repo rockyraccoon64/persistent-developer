@@ -82,9 +82,11 @@ trait TaskInfoTestFacade {
  * */
 trait TaskRepositoryTestFacade {
 
-  /** Создать репозиторий задач на основе Slick */
-  def createTaskSlickRepository(database: Database): TaskSlickRepository =
-    new TaskSlickRepository(database, new TaskStatusCodec)
+  /** Создать тестовый репозиторий задач на основе Slick */
+  def createTestTaskSlickRepository(database: Database): TestTaskSlickRepository =
+    new TestTaskSlickRepository(
+      new TaskSlickRepository(database, new TaskStatusCodec)
+    )
 
   /** Простой in-memory репозиторий для задач */
   def simpleTaskRepository: TaskRepository[Any] =
@@ -102,7 +104,8 @@ trait TaskRepositoryTestFacade {
         Future.successful(tasks.values.toSeq)
     }
 
-  implicit class TestTaskRepository[Q](repository: TaskRepository[Q]) {
+  /** Тестовый репозиторий задач */
+  class TestTaskRepository[Q](repository: TaskRepository[Q]) {
 
     /** Сохранить задачу в репозитории */
     def save(task: TaskInfo): Future[_] =
@@ -136,7 +139,9 @@ trait TaskRepositoryTestFacade {
 
   }
 
-  implicit class TestTaskSlickRepository(repository: TaskSlickRepository) {
+  /** Тестовый репозиторий задач с использованием Slick */
+  class TestTaskSlickRepository(repository: TaskSlickRepository)
+    extends TestTaskRepository(repository) {
 
     /** Получить список задач из репозитория на основе Slick */
     def list(limit: Int, offset: Int)
@@ -153,7 +158,7 @@ trait TaskRepositoryTestFacade {
       expected: Seq[TaskInfo]
     )(implicit ec: ExecutionContext): Future[Assertion] =
       for {
-        _ <- repository.saveInSequence(initial)
+        _ <- saveInSequence(initial)
         list <- list(limit, offset)
       } yield {
         list should contain theSameElementsInOrderAs expected

@@ -18,7 +18,7 @@ class TaskSlickRepositoryTestSuite
     with BeforeAndAfterEach
     with Matchers {
 
-  private val repository = createTaskSlickRepository(database)
+  private val repository = createTestTaskSlickRepository(database)
 
   private val saveTasks = repository.saveInSequence _
   private val findTask = repository.find _
