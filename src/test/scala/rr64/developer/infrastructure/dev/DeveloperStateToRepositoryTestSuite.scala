@@ -55,14 +55,14 @@ class DeveloperStateToRepositoryTestSuite
 
     /** Создать проекцию на основе Source событий */
     protected def projectionFromSource =
-      EventProjectionTestFacade.projectionFromSource(handler, projectionId) _
+      EventProjectionTestFacade.projectionFromEventSource(handler, projectionId) _
 
     /** Создать проекцию из последовательности событий */
     protected def projectionFromEvents(
       events: Seq[Event],
       persistenceId: String = defaultPersistenceId
     ): TestProjection[Offset, EventEnvelope[Event]] =
-      EventProjectionTestFacade.projectionFromEvents(handler, projectionId)(events, persistenceId)
+      EventProjectionTestFacade.projectionFromEventSequence(handler, projectionId)(events, persistenceId)
 
     /** Проверить текущее состояние */
     protected def assertState(

@@ -42,14 +42,14 @@ class TaskToRepositoryTestSuite
 
     /** Создать проекцию на основе Source событий */
     protected def projectionFromSource =
-      EventProjectionTestFacade.projectionFromSource(handler, projectionId) _
+      EventProjectionTestFacade.projectionFromEventSource(handler, projectionId) _
 
     /** Проекция на основе последовательности событий */
     protected def projectionFromEvents(
       events: Seq[Event],
       persistenceId: String = "proj"
     ): TestProjection[Offset, EventEnvelope[Event]] =
-      EventProjectionTestFacade.projectionFromEvents(
+      EventProjectionTestFacade.projectionFromEventSequence(
         handler,
         projectionId
       )(

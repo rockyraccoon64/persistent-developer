@@ -12,7 +12,7 @@ import rr64.developer.infrastructure.dev.behavior.Event
 trait EventProjectionTestFacade {
 
   /** Проекция на основе Source событий */
-  def projectionFromSource(
+  def projectionFromEventSource(
     handler: Handler[EventEnvelope[Event]],
     projectionId: ProjectionId
   )(
@@ -25,7 +25,7 @@ trait EventProjectionTestFacade {
     )
 
   /** Проекция на основе последовательности событий */
-  def projectionFromEvents(
+  def projectionFromEventSequence(
     handler: Handler[EventEnvelope[Event]],
     projectionId: ProjectionId
   )(
@@ -33,7 +33,7 @@ trait EventProjectionTestFacade {
     persistenceId: String
   ): TestProjection[Offset, EventEnvelope[Event]] = {
     val source = ProjectionTestUtils.envelopeSource(events, persistenceId)
-    projectionFromSource(handler, projectionId)(source)
+    projectionFromEventSource(handler, projectionId)(source)
   }
 
 }
