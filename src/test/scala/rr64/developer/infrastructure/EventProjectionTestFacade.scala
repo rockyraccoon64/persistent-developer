@@ -8,12 +8,15 @@ import akka.projection.scaladsl.Handler
 import akka.projection.testkit.scaladsl.{TestProjection, TestSourceProvider}
 import akka.stream.scaladsl.Source
 
+/**
+ * Тестовый фасад для проекций событий
+ * */
 trait EventProjectionTestFacade {
 
   /**
    * Source событий для проекции на основе последовательности событий
    * @param events События
-   * @param persistenceId Persistence ID
+   * @param persistenceId Persistence ID актора, от которого поступили события
    * @param startOffset Offset первого события
    * */
   def envelopeSource[T](
@@ -41,7 +44,12 @@ trait EventProjectionTestFacade {
       (envelope: EventEnvelope[T]) => envelope.offset
     )
 
-  /** Проекция на основе Source событий */
+  /**
+   * Проекция на основе Source событий
+   * @param handler Обработчик проекции
+   * @param projectionId Идентификатор проекции
+   * @param source Источник событий
+   * */
   def projectionFromEventSource[T](
     handler: Handler[EventEnvelope[T]],
     projectionId: ProjectionId
@@ -54,7 +62,13 @@ trait EventProjectionTestFacade {
       handler = () => handler
     )
 
-  /** Проекция на основе последовательности событий */
+  /**
+   * Проекция на основе последовательности событий
+   * @param handler Обработчик событий
+   * @param projectionId Идентификатор проекции
+   * @param events Последовательность событий
+   * @param persistenceId PersistenceId актора, от которого поступили события
+   * */
   def projectionFromEventSequence[T](
     handler: Handler[EventEnvelope[T]],
     projectionId: ProjectionId
