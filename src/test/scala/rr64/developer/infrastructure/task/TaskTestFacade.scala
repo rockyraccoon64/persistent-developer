@@ -41,7 +41,7 @@ trait TaskTestFacade {
       acc.flatMap(_ => saveTaskToRepository(repository)(task))
     }
 
-  def findTaskInRepository(repository: TaskSlickRepository)(id: UUID)
+  def findTaskInRepository[Q](repository: TaskRepository[Q])(id: UUID)
       (implicit ec: ExecutionContext): Future[Option[TaskInfo]] =
     repository.findById(id)
 
@@ -53,7 +53,7 @@ trait TaskTestFacade {
   }
 
   /** Проверить, что задача существует в репозитории */
-  def assertTaskExistsInRepository(repository: TaskSlickRepository)
+  def assertTaskExistsInRepository[Q](repository: TaskRepository[Q])
       (task: TaskInfo)(implicit ec: ExecutionContext): Future[Assertion] =
     for (taskOpt <- findTaskInRepository(repository)(task.id)) yield
       taskOpt shouldEqual Some(task)

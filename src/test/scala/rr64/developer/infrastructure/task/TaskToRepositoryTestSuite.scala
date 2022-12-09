@@ -55,7 +55,7 @@ class TaskToRepositoryTestSuite
 
     /** Проверка состояния задачи */
     protected def assertInfo(taskInfo: TaskInfo): Assertion =
-      mockRepository.findById(taskInfo.id).futureValue shouldEqual Some(taskInfo)
+      assertTaskExistsInRepository(mockRepository)(taskInfo).futureValue
 
   }
 
