@@ -11,6 +11,9 @@ trait EventTestFacade {
   def taskQueuedEvent(taskWithId: TaskWithId): Event.TaskQueued =
     Event.TaskQueued(taskWithId)
 
+  def taskFinishedEvent(taskWithId: TaskWithId): Event.TaskFinished =
+    Event.TaskFinished(taskWithId)
+
 }
 
 object EventTestFacade
