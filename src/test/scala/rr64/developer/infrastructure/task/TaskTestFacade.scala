@@ -2,6 +2,7 @@ package rr64.developer.infrastructure.task
 
 import org.scalatest.Assertion
 import org.scalatest.matchers.should.Matchers.convertToAnyShouldWrapper
+import rr64.developer.domain.task.TaskInfo.TaskInfoFromTaskWithId
 import rr64.developer.domain.task.{Difficulty, TaskInfo, TaskStatus}
 import rr64.developer.infrastructure.task.query.LimitOffsetQueryTestFacade
 import slick.jdbc.PostgresProfile.api._
@@ -33,6 +34,11 @@ trait TaskTestFacade extends TaskStatusTestFacade {
     id = id,
     difficulty = difficulty
   )
+
+  implicit class TaskWithIdTransformers(taskWithId: TaskWithId) {
+    def withStatus(status: TaskStatus): TaskInfo =
+      new TaskInfoFromTaskWithId(taskWithId).withStatus(status)
+  }
 
   def createTaskInfo(
     id: String,
