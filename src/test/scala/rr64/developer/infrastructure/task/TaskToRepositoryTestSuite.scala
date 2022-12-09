@@ -20,6 +20,13 @@ class TaskToRepositoryTestSuite
   private val projectionTestKit = ProjectionTestKit(system)
   private implicit val ec: ExecutionContext = system.executionContext
 
+  /** Идентификатор проекции */
+  private val projectionId =
+    ProjectionId("task-proj-test", "0")
+
+  /** Persistence ID актора, от которого приходят события */
+  private val persistenceId = "test-id"
+
   /** Фикстура для тестирования обработчика проекции */
   private trait HandlerTest {
 
@@ -49,13 +56,6 @@ class TaskToRepositoryTestSuite
     /** Обработчик проекции */
     private val handler: ProjHandler =
       new TaskToRepository(mockRepository)
-
-    /** Идентификатор проекции */
-    private val projectionId =
-      ProjectionId("task-proj-test", "0")
-
-    /** Persistence ID актора, от которого приходят события */
-    private val persistenceId = "test-id"
 
     /** Проверка состояния задачи */
     private def assertInfo(taskInfo: TaskInfo): Assertion =
