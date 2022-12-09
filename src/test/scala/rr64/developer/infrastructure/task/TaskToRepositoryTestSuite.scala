@@ -71,7 +71,7 @@ class TaskToRepositoryTestSuite
   /** В начале работы над задачей информация о текущем статусе должна сохраняться в репозиторий */
   "The current task state" should "be saved to the repository when the task is started" in
     new HandlerTest {
-      val taskWithId = TaskWithId(90, "d4e174a6-eed3-4fc6-8708-1f2a290cec0c")
+      val taskWithId = createTaskWithId(90, "d4e174a6-eed3-4fc6-8708-1f2a290cec0c")
       val taskInfo = taskWithId.withStatus(TaskStatus.InProgress)
       val events = Event.TaskStarted(taskWithId) :: Nil
       val projection = projectionFromEvents(events)
@@ -81,7 +81,7 @@ class TaskToRepositoryTestSuite
   /** Когда задача ставится в очередь, её текущее состояние должно сохраняться в репозиторий */
   "The current task state" should "be saved to the repository when the task is queued" in
     new HandlerTest {
-      val taskWithId = TaskWithId(100, "6a03f38c-72c8-4a2d-be6f-d0b16c88fcae")
+      val taskWithId = createTaskWithId(100, "6a03f38c-72c8-4a2d-be6f-d0b16c88fcae")
       val taskInfo = taskWithId.withStatus(TaskStatus.Queued)
       val events = Event.TaskQueued(taskWithId) :: Nil
       val projection = projectionFromEvents(events)
@@ -91,7 +91,7 @@ class TaskToRepositoryTestSuite
   /** Когда задача завершена, её текущее состояние должно сохраняться в репозиторий */
   "The current task state" should "be saved to the repository when the task is finished" in
     new HandlerTest {
-      val taskWithId = TaskWithId(77, "ee53c62a-9b14-4969-ba3e-620fb42f30bc")
+      val taskWithId = createTaskWithId(77, "ee53c62a-9b14-4969-ba3e-620fb42f30bc")
       val taskInfo = taskWithId.withStatus(TaskStatus.Finished)
       val events = Event.TaskFinished(taskWithId) :: Nil
       val projection = projectionFromEvents(events)
@@ -101,7 +101,7 @@ class TaskToRepositoryTestSuite
   /** В начале работы над задачей после отдыха её статус должен сохраняться в репозиторий */
   "The current task state" should "be saved to the repository when the task is started after resting" in
     new HandlerTest {
-      val taskWithId = TaskWithId(35, "f33b67f0-2324-4c7d-8b5f-59ab8e4f5bd7")
+      val taskWithId = createTaskWithId(35, "f33b67f0-2324-4c7d-8b5f-59ab8e4f5bd7")
       val taskInfo = taskWithId.withStatus(TaskStatus.InProgress)
       val events = Event.Rested(Some(taskWithId)) :: Nil
       val projection = projectionFromEvents(events)
@@ -111,8 +111,8 @@ class TaskToRepositoryTestSuite
   /** Когда событие не связано с задачей, обновления не происходит */
   "The task state" should "not be updated when there's no task events" in
     new HandlerTest {
-      val taskWithId1 = TaskWithId(53, "ed03da50-6836-4f01-9c46-47775b419c3d")
-      val taskWithId2 = TaskWithId(10, "3ff6c9a5-8fd8-4e3a-840b-a3823e33fffa")
+      val taskWithId1 = createTaskWithId(53, "ed03da50-6836-4f01-9c46-47775b419c3d")
+      val taskWithId2 = createTaskWithId(10, "3ff6c9a5-8fd8-4e3a-840b-a3823e33fffa")
       val taskInfo1 = taskWithId1.withStatus(TaskStatus.Queued)
       val taskInfo2 = taskWithId2.withStatus(TaskStatus.Finished)
       val events = Event.TaskQueued(taskWithId1) ::

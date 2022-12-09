@@ -11,6 +11,14 @@ import scala.concurrent.{ExecutionContext, Future}
 
 trait TaskTestFacade {
 
+  def createTaskWithId(
+    difficulty: Int,
+    id: String
+  ): TaskWithId = TaskWithId(
+    id = id,
+    difficulty = difficulty
+  )
+
   def createTaskInfo(
     id: String,
     difficulty: Int,
