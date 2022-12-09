@@ -1,17 +1,13 @@
 package rr64.developer.infrastructure.task
 
 import akka.actor.testkit.typed.scaladsl.ScalaTestWithActorTestKit
-import akka.persistence.query.Offset
 import akka.projection.ProjectionId
-import akka.projection.eventsourced.EventEnvelope
-import akka.projection.scaladsl.Handler
-import akka.projection.testkit.scaladsl.{ProjectionTestKit, TestProjection}
+import akka.projection.testkit.scaladsl.ProjectionTestKit
 import org.scalatest.Assertion
 import org.scalatest.flatspec.AnyFlatSpecLike
 import rr64.developer.domain.task.TaskInfo.TaskInfoFromTaskWithId
 import rr64.developer.domain.task.{TaskInfo, TaskStatus}
-import rr64.developer.infrastructure.EventProjectionTestFacade._
-import rr64.developer.infrastructure.DeveloperEventTestFacade._
+import rr64.developer.infrastructure.DeveloperEventProjectionTestFacade._
 import rr64.developer.infrastructure.task.TaskTestFacade._
 
 import scala.concurrent.ExecutionContext
@@ -34,11 +30,12 @@ class TaskToRepositoryTestSuite
       simpleTaskRepository
 
     /** Обработчик проекции */
-    protected val handler: Handler[EventEnvelope[Event]] =
+    protected val handler: ProjHandler =
       new TaskToRepository(mockRepository)
 
     /** Идентификатор проекции */
-    private val projectionId = ProjectionId("task-proj-test", "0")
+    private val projectionId =
+      ProjectionId("task-proj-test", "0")
 
     /** Persistence ID актора, от которого пришли события */
     private val persistenceId = "test-id"
@@ -46,7 +43,7 @@ class TaskToRepositoryTestSuite
     /** Проекция на основе последовательности событий */
     protected def projectionFromEvents(
       events: Seq[Event]
-    ): TestProjection[Offset, EventEnvelope[Event]] =
+    ): TestProj =
       projectionFromEventSequence(
         handler,
         projectionId
@@ -59,7 +56,7 @@ class TaskToRepositoryTestSuite
     protected def assertInfo(taskInfo: TaskInfo): Assertion =
       assertTaskExistsInRepository(mockRepository)(taskInfo).futureValue
 
-    protected def projection: TestProjection[Offset, EventEnvelope[Event]]
+    protected def projection: TestProj
 
     protected def assertAllSaved(tasks: TaskInfo*): Unit =
       projectionTestKit.run(projection) {
