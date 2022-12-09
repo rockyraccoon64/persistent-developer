@@ -23,9 +23,9 @@ trait TaskStatusTestFacade {
 
 }
 
-trait TaskTestFacade extends TaskStatusTestFacade {
+trait TaskWithIdTestFacade {
 
-  type TaskInfo = rr64.developer.domain.task.TaskInfo
+  type TaskWithId = rr64.developer.infrastructure.task.TaskWithId
 
   def createTaskWithId(
     difficulty: Int,
@@ -39,6 +39,14 @@ trait TaskTestFacade extends TaskStatusTestFacade {
     def withStatus(status: TaskStatus): TaskInfo =
       new TaskInfoFromTaskWithId(taskWithId).withStatus(status)
   }
+
+}
+
+trait TaskTestFacade
+  extends TaskStatusTestFacade
+    with TaskWithIdTestFacade {
+
+  type TaskInfo = rr64.developer.domain.task.TaskInfo
 
   def createTaskInfo(
     id: String,
