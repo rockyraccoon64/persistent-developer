@@ -20,11 +20,6 @@ class TaskSlickRepositoryTestSuite
 
   private val repository = createTestTaskSlickRepository(database)
 
-  private val saveTasks = repository.saveInSequence _
-  private val findTask = repository.find _
-  private val assertSaved = repository.assertExists _
-  private val saveAndAssert = repository.saveAndAssert _
-
   private val queuedTask = createTaskInfo(
     id = "30dbff1f-88dc-4972-aa70-a057bf5f1c88",
     difficulty = 5,
@@ -73,15 +68,15 @@ class TaskSlickRepositoryTestSuite
 
   /** Репозиторий должен сохранять задачи со статусом "В очереди" */
   "The repository" should "save queued tasks" in
-    saveAndAssert(queuedTask)
+    repository.saveAndAssert(queuedTask)
 
   /** Репозиторий должен сохранять задачи со статусом "В разработке" */
   "The repository" should "save tasks in progress" in
-    saveAndAssert(taskInProgress)
+    repository.saveAndAssert(taskInProgress)
 
   /** Репозиторий должен сохранять задачи со статусом "Завершено" */
   "The repository" should "save finished tasks" in
-    saveAndAssert(finishedTask)
+    repository.saveAndAssert(finishedTask)
 
   /** Репозиторий должен обновлять статус у существующих задач */
   "The repository" should "update existing tasks' status" in {
@@ -92,8 +87,8 @@ class TaskSlickRepositoryTestSuite
     )
     val updatedTask = initialTask.withStatus(finishedTaskStatus)
     for {
-      _ <- saveTasks(initialTask :: updatedTask :: Nil)
-      succeeded <- assertSaved(updatedTask)
+      _ <- repository.saveInSequence(initialTask :: updatedTask :: Nil)
+      succeeded <- repository.assertExists(updatedTask)
     } yield succeeded
   }
 
@@ -106,8 +101,8 @@ class TaskSlickRepositoryTestSuite
     )
     val updatedTask = initialTask.withDifficulty(1)
     for {
-      _ <- saveTasks(initialTask :: updatedTask :: Nil)
-      succeeded <- assertSaved(initialTask)
+      _ <- repository.saveInSequence(initialTask :: updatedTask :: Nil)
+      succeeded <- repository.assertExists(initialTask)
     } yield succeeded
   }
 
@@ -115,7 +110,7 @@ class TaskSlickRepositoryTestSuite
   "The repository" should "not find nonexistent tasks" in {
     val nonexistentId = UUID.fromString("6b8a92d0-f331-410e-bd28-8c23f00ef285")
     for {
-      taskOpt <- findTask(nonexistentId)
+      taskOpt <- repository.find(nonexistentId)
     } yield taskOpt shouldEqual None
   }
 
