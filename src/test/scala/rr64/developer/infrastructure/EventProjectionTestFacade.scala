@@ -7,7 +7,6 @@ import akka.projection.eventsourced.EventEnvelope
 import akka.projection.scaladsl.Handler
 import akka.projection.testkit.scaladsl.{TestProjection, TestSourceProvider}
 import akka.stream.scaladsl.Source
-import rr64.developer.infrastructure.dev.behavior.Event
 
 trait EventProjectionTestFacade {
 
@@ -43,12 +42,12 @@ trait EventProjectionTestFacade {
     )
 
   /** Проекция на основе Source событий */
-  def projectionFromEventSource(
-    handler: Handler[EventEnvelope[Event]],
+  def projectionFromEventSource[T](
+    handler: Handler[EventEnvelope[T]],
     projectionId: ProjectionId
   )(
-    source: Source[EventEnvelope[Event], NotUsed]
-  ): TestProjection[Offset, EventEnvelope[Event]] =
+    source: Source[EventEnvelope[T], NotUsed]
+  ): TestProjection[Offset, EventEnvelope[T]] =
     TestProjection(
       projectionId = projectionId,
       sourceProvider = providerFromSource(source),
@@ -56,13 +55,13 @@ trait EventProjectionTestFacade {
     )
 
   /** Проекция на основе последовательности событий */
-  def projectionFromEventSequence(
-    handler: Handler[EventEnvelope[Event]],
+  def projectionFromEventSequence[T](
+    handler: Handler[EventEnvelope[T]],
     projectionId: ProjectionId
   )(
-    events: Seq[Event],
+    events: Seq[T],
     persistenceId: String
-  ): TestProjection[Offset, EventEnvelope[Event]] = {
+  ): TestProjection[Offset, EventEnvelope[T]] = {
     val source = envelopeSource(events, persistenceId)
     projectionFromEventSource(handler, projectionId)(source)
   }
