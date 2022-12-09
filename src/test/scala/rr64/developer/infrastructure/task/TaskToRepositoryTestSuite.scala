@@ -11,6 +11,7 @@ import org.scalatest.flatspec.AnyFlatSpecLike
 import rr64.developer.domain.task.TaskInfo.TaskInfoFromTaskWithId
 import rr64.developer.domain.task.{TaskInfo, TaskStatus}
 import rr64.developer.infrastructure.EventProjectionTestFacade._
+import rr64.developer.infrastructure.EventTestFacade._
 import rr64.developer.infrastructure.dev.behavior.Event
 import rr64.developer.infrastructure.task.TaskTestFacade._
 
@@ -73,7 +74,7 @@ class TaskToRepositoryTestSuite
     new HandlerTest {
       val taskWithId = createTaskWithId(90, "d4e174a6-eed3-4fc6-8708-1f2a290cec0c")
       val taskInfo = taskWithId.withStatus(TaskStatus.InProgress)
-      val events = Event.TaskStarted(taskWithId) :: Nil
+      val events = taskStartedEvent(taskWithId) :: Nil
       val projection = projectionFromEvents(events)
       assertAllSaved(taskInfo)
     }
