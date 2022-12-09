@@ -65,10 +65,7 @@ trait TaskInfoTestFacade {
 
 }
 
-trait TaskTestFacade
-  extends TaskStatusTestFacade
-    with TaskWithIdTestFacade
-    with TaskInfoTestFacade {
+trait TaskRepositoryTestFacade {
 
   def createTaskSlickRepository(database: Database): TaskSlickRepository =
     new TaskSlickRepository(database, new TaskStatusCodec)
@@ -124,6 +121,12 @@ trait TaskTestFacade
     }
 
 }
+
+trait TaskTestFacade
+  extends TaskStatusTestFacade
+    with TaskWithIdTestFacade
+    with TaskInfoTestFacade
+    with TaskRepositoryTestFacade
 
 object TaskTestFacade
   extends TaskTestFacade
