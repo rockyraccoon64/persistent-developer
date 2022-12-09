@@ -8,6 +8,9 @@ trait EventTestFacade {
   def taskStartedEvent(taskWithId: TaskWithId): Event.TaskStarted =
     Event.TaskStarted(taskWithId)
 
+  def taskQueuedEvent(taskWithId: TaskWithId): Event.TaskQueued =
+    Event.TaskQueued(taskWithId)
+
 }
 
 object EventTestFacade
