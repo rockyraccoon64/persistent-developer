@@ -1,9 +1,6 @@
 package rr64.developer.infrastructure.task
 
-import org.scalatest.Assertion
-import org.scalatest.matchers.should.Matchers._
 import rr64.developer.domain.task.{Difficulty, TaskInfo, TaskStatus}
-import rr64.developer.infrastructure.task.query.LimitOffsetQueryTestFacade
 import slick.jdbc.PostgresProfile.api._
 
 import java.util.UUID
@@ -82,7 +79,7 @@ trait TaskInfoTestFacade {
  * */
 trait TaskRepositoryTestFacade {
 
-  /** Создать тестовый репозиторий задач на основе Slick */
+  /** Тестовый репозиторий задач на основе Slick */
   def createTestTaskSlickRepository(database: Database): TestTaskSlickRepository =
     new TestTaskSlickRepository(
       new TaskSlickRepository(database, new TaskStatusCodec)
@@ -103,68 +100,6 @@ trait TaskRepositoryTestFacade {
           (implicit ec: ExecutionContext): Future[Seq[TaskInfo]] =
         Future.successful(tasks.values.toSeq)
     }
-
-  /** Тестовый репозиторий задач */
-  class TestTaskRepository[Q](repository: TaskRepository[Q]) {
-
-    /** Сохранить задачу в репозитории */
-    def save(task: TaskInfo): Future[_] =
-      repository.save(task)
-
-    /** Сохранить последовательность задач в репозитории */
-    def saveInSequence(tasks: Seq[TaskInfo])
-        (implicit ec: ExecutionContext): Future[Any] =
-      tasks.foldLeft[Future[Any]](Future.unit) { (acc, task) =>
-        acc.flatMap(_ => save(task))
-      }
-
-    /** Найти задачу в репозитории */
-    def find(id: UUID)
-        (implicit ec: ExecutionContext): Future[Option[TaskInfo]] =
-      repository.findById(id)
-
-    /** Проверить, что задача существует в репозитории */
-    def assertExists(task: TaskInfo)
-        (implicit ec: ExecutionContext): Future[Assertion] =
-      for (taskOpt <- find(task.id)) yield
-        taskOpt shouldEqual Some(task)
-
-    /** Сохранить задачу и проверить, что она сохранена */
-    def saveAndAssert(task: TaskInfo)
-        (implicit ec: ExecutionContext): Future[Assertion] =
-      for {
-        _ <- save(task)
-        succeeded <- assertExists(task)
-      } yield succeeded
-
-  }
-
-  /** Тестовый репозиторий задач с использованием Slick */
-  class TestTaskSlickRepository(repository: TaskSlickRepository)
-    extends TestTaskRepository(repository) {
-
-    /** Получить список задач из репозитория на основе Slick */
-    def list(limit: Int, offset: Int)
-        (implicit ec: ExecutionContext): Future[Seq[TaskInfo]] = {
-      val query = LimitOffsetQueryTestFacade.createQuery(limit, offset)
-      repository.list(query)
-    }
-
-    /** Тестирование запроса списка задач */
-    def testListQuery(
-      limit: Int,
-      offset: Int,
-      initial: Seq[TaskInfo],
-      expected: Seq[TaskInfo]
-    )(implicit ec: ExecutionContext): Future[Assertion] =
-      for {
-        _ <- saveInSequence(initial)
-        list <- list(limit, offset)
-      } yield {
-        list should contain theSameElementsInOrderAs expected
-      }
-
-  }
 
 }
 
