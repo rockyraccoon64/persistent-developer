@@ -66,6 +66,21 @@ trait TaskTestFacade {
       succeeded <- assertTaskExistsInRepository(repository)(task)
     } yield succeeded
 
+  def simpleTaskRepository: TaskRepository[Any] =
+    new TaskRepository[Any] {
+      private var tasks: Map[UUID, TaskInfo] = Map.empty
+      override def save(taskInfo: TaskInfo): Future[_] = {
+        tasks = tasks.updated(taskInfo.id, taskInfo)
+        Future.unit
+      }
+      override def findById(id: UUID)
+          (implicit ec: ExecutionContext): Future[Option[TaskInfo]] =
+        Future.successful(tasks.get(id))
+      override def list(query: Any)
+          (implicit ec: ExecutionContext): Future[Seq[TaskInfo]] =
+        Future.successful(tasks.values.toSeq)
+    }
+
 }
 
 object TaskTestFacade

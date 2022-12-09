@@ -14,9 +14,9 @@ import rr64.developer.domain.task.TaskInfo.TaskInfoFromTaskWithId
 import rr64.developer.domain.task.{TaskInfo, TaskStatus}
 import rr64.developer.infrastructure.ProjectionTestUtils
 import rr64.developer.infrastructure.dev.behavior.Event
+import rr64.developer.infrastructure.task.TaskTestFacade._
 
-import java.util.UUID
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.ExecutionContext
 
 /**
  * Тесты обработчика проекции задач
@@ -33,19 +33,7 @@ class TaskToRepositoryTestSuite
 
     /** Репозиторий, изначально пустой */
     protected val mockRepository: TaskRepository[Any] =
-      new TaskRepository[Any] {
-        private var tasks: Map[UUID, TaskInfo] = Map.empty
-        override def save(taskInfo: TaskInfo): Future[_] = {
-          tasks = tasks.updated(taskInfo.id, taskInfo)
-          Future.unit
-        }
-        override def findById(id: UUID)
-            (implicit ec: ExecutionContext): Future[Option[TaskInfo]] =
-          Future.successful(tasks.get(id))
-        override def list(query: Any)
-            (implicit ec: ExecutionContext): Future[Seq[TaskInfo]] =
-          Future.successful(tasks.values.toSeq)
-      }
+      simpleTaskRepository
 
     /** Обработчик проекции */
     protected val handler: Handler[EventEnvelope[Event]] =
