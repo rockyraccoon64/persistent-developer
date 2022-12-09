@@ -1,6 +1,6 @@
 package rr64.developer.infrastructure.task
 
-import rr64.developer.domain.task.{Difficulty, Task}
+import rr64.developer.domain.task.{Difficulty, Task, TaskInfo, TaskStatus}
 
 import java.util.UUID
 
@@ -13,6 +13,17 @@ case class TaskWithId(task: Task, id: UUID) {
 
   /** Сложность задачи */
   def difficulty: Difficulty = task.difficulty
+
+  /**
+   * Добавить к задаче статус
+   * @param status Статус задачи
+   * */
+  def withStatus(status: TaskStatus): TaskInfo =
+    TaskInfo(
+      id = id,
+      difficulty = difficulty,
+      status = status
+    )
 
 }
 
