@@ -9,7 +9,20 @@ import slick.jdbc.PostgresProfile.api._
 import java.util.UUID
 import scala.concurrent.{ExecutionContext, Future}
 
-trait TaskTestFacade {
+trait TaskStatusTestFacade {
+
+  def queuedTaskStatus: TaskStatus =
+    TaskStatus.Queued
+
+  def inProgressTaskStatus: TaskStatus =
+    TaskStatus.InProgress
+
+  def finishedTaskStatus: TaskStatus =
+    TaskStatus.Finished
+
+}
+
+trait TaskTestFacade extends TaskStatusTestFacade {
 
   type TaskInfo = rr64.developer.domain.task.TaskInfo
 
@@ -30,15 +43,6 @@ trait TaskTestFacade {
     difficulty = Difficulty(difficulty),
     status = status
   )
-
-  def finishedTaskStatus: TaskStatus =
-    TaskStatus.Finished
-
-  def queuedTaskStatus: TaskStatus =
-    TaskStatus.Queued
-
-  def inProgressTaskStatus: TaskStatus =
-    TaskStatus.InProgress
 
   implicit class TaskTransformers(task: TaskInfo) {
     def withDifficulty(difficulty: Int): TaskInfo =
