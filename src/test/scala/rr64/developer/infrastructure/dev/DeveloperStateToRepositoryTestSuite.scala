@@ -1,19 +1,17 @@
 package rr64.developer.infrastructure.dev
 
-import akka.NotUsed
 import akka.actor.testkit.typed.scaladsl.ScalaTestWithActorTestKit
 import akka.persistence.query.Offset
 import akka.projection.ProjectionId
 import akka.projection.eventsourced.EventEnvelope
 import akka.projection.scaladsl.Handler
 import akka.projection.testkit.scaladsl.{ProjectionTestKit, TestProjection}
-import akka.stream.scaladsl.Source
 import org.scalatest.Assertion
 import org.scalatest.wordspec.AnyWordSpecLike
 import rr64.developer.domain.dev.DeveloperState
-import rr64.developer.infrastructure.ProjectionTestUtils
 import rr64.developer.infrastructure.dev.behavior.Event
 import rr64.developer.infrastructure.task.TaskWithId
+import rr64.developer.infrastructure.{EventProjectionTestFacade, ProjectionTestUtils}
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -52,6 +50,13 @@ class DeveloperStateToRepositoryTestSuite
     private val handler: Handler[EventEnvelope[Event]] =
       new DeveloperStateToRepository(mockRepository)
 
+    /** Идентификатор проекции */
+    private val projectionId = ProjectionId("dev-proj-test", "0")
+
+    /** Создать проекцию на основе Source событий */
+    protected def projectionFromSource =
+      EventProjectionTestFacade.projectionFromSource(handler, projectionId) _
+
     /** Создать проекцию из последовательности событий */
     protected def projectionFromEvents(
       events: Seq[Event],
@@ -60,16 +65,6 @@ class DeveloperStateToRepositoryTestSuite
       val source = ProjectionTestUtils.envelopeSource(events, persistenceId)
       projectionFromSource(source)
     }
-
-    /** Создать проекцию из Source событий */
-    protected def projectionFromSource(
-      source: Source[EventEnvelope[Event], NotUsed]
-    ): TestProjection[Offset, EventEnvelope[Event]] =
-      TestProjection(
-        projectionId = ProjectionId("dev-proj-test", "0"),
-        sourceProvider = ProjectionTestUtils.providerFromSource(source),
-        handler = () => handler
-      )
 
     /** Проверить текущее состояние */
     protected def assertState(

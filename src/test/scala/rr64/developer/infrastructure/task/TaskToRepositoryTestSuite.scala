@@ -1,20 +1,18 @@
 package rr64.developer.infrastructure.task
 
-import akka.NotUsed
 import akka.actor.testkit.typed.scaladsl.ScalaTestWithActorTestKit
 import akka.persistence.query.Offset
 import akka.projection.ProjectionId
 import akka.projection.eventsourced.EventEnvelope
 import akka.projection.scaladsl.Handler
 import akka.projection.testkit.scaladsl.{ProjectionTestKit, TestProjection}
-import akka.stream.scaladsl.Source
 import org.scalatest.Assertion
 import org.scalatest.flatspec.AnyFlatSpecLike
 import rr64.developer.domain.task.TaskInfo.TaskInfoFromTaskWithId
 import rr64.developer.domain.task.{TaskInfo, TaskStatus}
-import rr64.developer.infrastructure.ProjectionTestUtils
 import rr64.developer.infrastructure.dev.behavior.Event
 import rr64.developer.infrastructure.task.TaskTestFacade._
+import rr64.developer.infrastructure.{EventProjectionTestFacade, ProjectionTestUtils}
 
 import scala.concurrent.ExecutionContext
 
@@ -39,6 +37,13 @@ class TaskToRepositoryTestSuite
     protected val handler: Handler[EventEnvelope[Event]] =
       new TaskToRepository(mockRepository)
 
+    /** Идентификатор проекции */
+    private val projectionId = ProjectionId("task-proj-test", "0")
+
+    /** Создать проекцию на основе Source событий */
+    protected def projectionFromSource =
+      EventProjectionTestFacade.projectionFromSource(handler, projectionId) _
+
     /** Проекция на основе последовательности событий */
     protected def projectionFromEvents(
       events: Seq[Event],
@@ -47,16 +52,6 @@ class TaskToRepositoryTestSuite
       val source = ProjectionTestUtils.envelopeSource(events, persistenceId)
       projectionFromSource(source)
     }
-
-    /** Проекция на основе Source событий */
-    protected def projectionFromSource(
-      source: Source[EventEnvelope[Event], NotUsed]
-    ): TestProjection[Offset, EventEnvelope[Event]] =
-      TestProjection(
-        projectionId = ProjectionId("task-proj-test", "0"),
-        sourceProvider = ProjectionTestUtils.providerFromSource(source),
-        handler = () => handler
-      )
 
     /** Проверка состояния задачи */
     protected def assertInfo(taskInfo: TaskInfo): Assertion =
