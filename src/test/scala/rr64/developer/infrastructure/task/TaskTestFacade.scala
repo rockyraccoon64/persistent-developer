@@ -42,9 +42,7 @@ trait TaskWithIdTestFacade {
 
 }
 
-trait TaskTestFacade
-  extends TaskStatusTestFacade
-    with TaskWithIdTestFacade {
+trait TaskInfoTestFacade {
 
   type TaskInfo = rr64.developer.domain.task.TaskInfo
 
@@ -58,12 +56,19 @@ trait TaskTestFacade
     status = status
   )
 
-  implicit class TaskTransformers(task: TaskInfo) {
+  implicit class TaskInfoTransformers(task: TaskInfo) {
     def withDifficulty(difficulty: Int): TaskInfo =
       task.copy(difficulty = Difficulty(difficulty))
     def withStatus(status: TaskStatus): TaskInfo =
       task.copy(status = status)
   }
+
+}
+
+trait TaskTestFacade
+  extends TaskStatusTestFacade
+    with TaskWithIdTestFacade
+    with TaskInfoTestFacade {
 
   def createTaskSlickRepository(database: Database): TaskSlickRepository =
     new TaskSlickRepository(database, new TaskStatusCodec)
