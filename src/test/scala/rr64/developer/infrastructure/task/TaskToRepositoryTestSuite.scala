@@ -23,25 +23,17 @@ class TaskToRepositoryTestSuite
   /** Фикстура для тестирования обработчика проекции */
   private trait HandlerTest {
 
-    /** Репозиторий, изначально пустой */
-    protected val mockRepository: TaskRepository[Any] =
-      simpleTaskRepository
+    /** События, на основе которых строится проекция */
+    protected def events: Seq[Event]
 
-    /** Обработчик проекции */
-    protected val handler: ProjHandler =
-      new TaskToRepository(mockRepository)
-
-    /** Идентификатор проекции */
-    private val projectionId =
-      ProjectionId("task-proj-test", "0")
-
-    /** Persistence ID актора, от которого пришли события */
-    private val persistenceId = "test-id"
+    /** Запуск проекции и проверка задач в репозитории */
+    protected def assertAllSaved(tasks: TaskInfo*): Unit =
+      projectionTestKit.run(projection) {
+        tasks.foreach(assertInfo)
+      }
 
     /** Проекция на основе последовательности событий */
-    protected def projectionFromEvents(
-      events: Seq[Event]
-    ): TestProj =
+    private lazy val projection: TestProj =
       projectionFromEventSequence(
         handler,
         projectionId
@@ -50,16 +42,24 @@ class TaskToRepositoryTestSuite
         persistenceId
       )
 
+    /** Репозиторий, изначально пустой */
+    private val mockRepository: TaskRepository[Any] =
+      simpleTaskRepository
+
+    /** Обработчик проекции */
+    private val handler: ProjHandler =
+      new TaskToRepository(mockRepository)
+
+    /** Идентификатор проекции */
+    private val projectionId =
+      ProjectionId("task-proj-test", "0")
+
+    /** Persistence ID актора, от которого приходят события */
+    private val persistenceId = "test-id"
+
     /** Проверка состояния задачи */
-    protected def assertInfo(taskInfo: TaskInfo): Assertion =
+    private def assertInfo(taskInfo: TaskInfo): Assertion =
       assertTaskExistsInRepository(mockRepository)(taskInfo).futureValue
-
-    protected def projection: TestProj
-
-    protected def assertAllSaved(tasks: TaskInfo*): Unit =
-      projectionTestKit.run(projection) {
-        tasks.foreach(assertInfo)
-      }
 
   }
 
@@ -69,7 +69,6 @@ class TaskToRepositoryTestSuite
       val taskWithId = createTaskWithId(90, "d4e174a6-eed3-4fc6-8708-1f2a290cec0c")
       val taskInfo = taskWithId.withStatus(inProgressTaskStatus)
       val events = taskStartedEvent(taskWithId) :: Nil
-      val projection = projectionFromEvents(events)
       assertAllSaved(taskInfo)
     }
 
@@ -79,7 +78,6 @@ class TaskToRepositoryTestSuite
       val taskWithId = createTaskWithId(100, "6a03f38c-72c8-4a2d-be6f-d0b16c88fcae")
       val taskInfo = taskWithId.withStatus(queuedTaskStatus)
       val events = taskQueuedEvent(taskWithId) :: Nil
-      val projection = projectionFromEvents(events)
       assertAllSaved(taskInfo)
     }
 
@@ -89,7 +87,6 @@ class TaskToRepositoryTestSuite
       val taskWithId = createTaskWithId(77, "ee53c62a-9b14-4969-ba3e-620fb42f30bc")
       val taskInfo = taskWithId.withStatus(finishedTaskStatus)
       val events = taskFinishedEvent(taskWithId) :: Nil
-      val projection = projectionFromEvents(events)
       assertAllSaved(taskInfo)
     }
 
@@ -99,7 +96,6 @@ class TaskToRepositoryTestSuite
       val taskWithId = createTaskWithId(35, "f33b67f0-2324-4c7d-8b5f-59ab8e4f5bd7")
       val taskInfo = taskWithId.withStatus(inProgressTaskStatus)
       val events = restedEvent(Some(taskWithId)) :: Nil
-      val projection = projectionFromEvents(events)
       assertAllSaved(taskInfo)
     }
 
@@ -114,7 +110,6 @@ class TaskToRepositoryTestSuite
         taskFinishedEvent(taskWithId2) ::
         restedEvent(None) ::
         Nil
-      val projection = projectionFromEvents(events)
       assertAllSaved(taskInfo1, taskInfo2)
     }
 
