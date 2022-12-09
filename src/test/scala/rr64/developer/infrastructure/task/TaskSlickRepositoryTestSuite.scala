@@ -3,7 +3,7 @@ package rr64.developer.infrastructure.task
 import org.scalatest.flatspec.AsyncFlatSpecLike
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.{Assertion, BeforeAndAfterEach}
-import rr64.developer.domain.task.{TaskInfo, TaskStatus}
+import rr64.developer.domain.task.TaskInfo
 import rr64.developer.infrastructure.PostgresSpec
 import rr64.developer.infrastructure.task.TaskTestFacade._
 import slick.jdbc.PostgresProfile.api._
@@ -31,19 +31,19 @@ class TaskSlickRepositoryTestSuite
   private val queuedTask = createTaskInfo(
     id = "30dbff1f-88dc-4972-aa70-a057bf5f1c88",
     difficulty = 5,
-    status = TaskStatus.Queued
+    status = queuedTaskStatus
   )
 
   private val taskInProgress = createTaskInfo(
     id = "959c3bee-9f0b-472e-b45b-1285aa78f215",
     difficulty = 38,
-    status = TaskStatus.InProgress
+    status = inProgressTaskStatus
   )
 
   private val finishedTask = createTaskInfo(
     id = "cc972e84-c43a-49dc-8ab2-3a2a36676ac8",
     difficulty = 100,
-    status = TaskStatus.InProgress
+    status = finishedTaskStatus
   )
 
   private val taskList = Seq(queuedTask, finishedTask, taskInProgress)
@@ -105,9 +105,9 @@ class TaskSlickRepositoryTestSuite
     val initialTask = createTaskInfo(
       id = "a67fb9da-9c25-4bce-ac57-abe4de23f208",
       difficulty = 50,
-      status = TaskStatus.InProgress
+      status = inProgressTaskStatus
     )
-    val updatedTask = initialTask.withStatus(TaskStatus.Finished)
+    val updatedTask = initialTask.withStatus(finishedTaskStatus)
     for {
       _ <- saveTasks(initialTask :: updatedTask :: Nil)
       succeeded <- assertSaved(updatedTask)
@@ -119,7 +119,7 @@ class TaskSlickRepositoryTestSuite
     val initialTask = createTaskInfo(
       id = "8d22593a-f477-48a2-be4a-79f2d8e34f91",
       difficulty = 15,
-      status = TaskStatus.InProgress
+      status = inProgressTaskStatus
     )
     val updatedTask = initialTask.withDifficulty(1)
     for {

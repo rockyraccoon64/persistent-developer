@@ -3,7 +3,6 @@ package rr64.developer.infrastructure.task
 import org.scalamock.scalatest.AsyncMockFactory
 import org.scalatest.flatspec.AsyncFlatSpecLike
 import org.scalatest.matchers.should.Matchers
-import rr64.developer.domain.task.TaskStatus
 import rr64.developer.infrastructure.task.TaskTestFacade._
 
 import java.util.UUID
@@ -20,11 +19,11 @@ class TasksFromRepositoryTestSuite
   private val task1 = createTaskInfo(
     id = "a68b3067-7ce1-4da2-9e2a-b8b38e9863d1",
     difficulty = 33,
-    status = TaskStatus.Queued)
+    status = queuedTaskStatus)
   private val task2 = createTaskInfo(
     id = "011a141e-d0a5-4693-9cd1-75a85c6284e1",
     difficulty = 85,
-    status = TaskStatus.InProgress)
+    status = inProgressTaskStatus)
 
   private val mockRepository = mock[TaskRepository[Any]]
   private val tasks = new TasksFromRepository(mockRepository)

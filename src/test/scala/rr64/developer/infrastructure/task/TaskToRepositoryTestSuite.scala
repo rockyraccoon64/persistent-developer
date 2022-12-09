@@ -5,8 +5,8 @@ import akka.projection.ProjectionId
 import akka.projection.testkit.scaladsl.ProjectionTestKit
 import org.scalatest.Assertion
 import org.scalatest.flatspec.AnyFlatSpecLike
+import rr64.developer.domain.task.TaskInfo
 import rr64.developer.domain.task.TaskInfo.TaskInfoFromTaskWithId
-import rr64.developer.domain.task.{TaskInfo, TaskStatus}
 import rr64.developer.infrastructure.DeveloperEventProjectionTestFacade._
 import rr64.developer.infrastructure.task.TaskTestFacade._
 
@@ -69,7 +69,7 @@ class TaskToRepositoryTestSuite
   "The current task state" should "be saved to the repository when the task is started" in
     new HandlerTest {
       val taskWithId = createTaskWithId(90, "d4e174a6-eed3-4fc6-8708-1f2a290cec0c")
-      val taskInfo = taskWithId.withStatus(TaskStatus.InProgress)
+      val taskInfo = taskWithId.withStatus(inProgressTaskStatus)
       val events = taskStartedEvent(taskWithId) :: Nil
       val projection = projectionFromEvents(events)
       assertAllSaved(taskInfo)
@@ -79,7 +79,7 @@ class TaskToRepositoryTestSuite
   "The current task state" should "be saved to the repository when the task is queued" in
     new HandlerTest {
       val taskWithId = createTaskWithId(100, "6a03f38c-72c8-4a2d-be6f-d0b16c88fcae")
-      val taskInfo = taskWithId.withStatus(TaskStatus.Queued)
+      val taskInfo = taskWithId.withStatus(queuedTaskStatus)
       val events = taskQueuedEvent(taskWithId) :: Nil
       val projection = projectionFromEvents(events)
       assertAllSaved(taskInfo)
@@ -89,7 +89,7 @@ class TaskToRepositoryTestSuite
   "The current task state" should "be saved to the repository when the task is finished" in
     new HandlerTest {
       val taskWithId = createTaskWithId(77, "ee53c62a-9b14-4969-ba3e-620fb42f30bc")
-      val taskInfo = taskWithId.withStatus(TaskStatus.Finished)
+      val taskInfo = taskWithId.withStatus(finishedTaskStatus)
       val events = taskFinishedEvent(taskWithId) :: Nil
       val projection = projectionFromEvents(events)
       assertAllSaved(taskInfo)
@@ -99,7 +99,7 @@ class TaskToRepositoryTestSuite
   "The current task state" should "be saved to the repository when the task is started after resting" in
     new HandlerTest {
       val taskWithId = createTaskWithId(35, "f33b67f0-2324-4c7d-8b5f-59ab8e4f5bd7")
-      val taskInfo = taskWithId.withStatus(TaskStatus.InProgress)
+      val taskInfo = taskWithId.withStatus(inProgressTaskStatus)
       val events = restedEvent(Some(taskWithId)) :: Nil
       val projection = projectionFromEvents(events)
       assertAllSaved(taskInfo)
@@ -110,8 +110,8 @@ class TaskToRepositoryTestSuite
     new HandlerTest {
       val taskWithId1 = createTaskWithId(53, "ed03da50-6836-4f01-9c46-47775b419c3d")
       val taskWithId2 = createTaskWithId(10, "3ff6c9a5-8fd8-4e3a-840b-a3823e33fffa")
-      val taskInfo1 = taskWithId1.withStatus(TaskStatus.Queued)
-      val taskInfo2 = taskWithId2.withStatus(TaskStatus.Finished)
+      val taskInfo1 = taskWithId1.withStatus(queuedTaskStatus)
+      val taskInfo2 = taskWithId2.withStatus(finishedTaskStatus)
       val events = taskQueuedEvent(taskWithId1) ::
         taskFinishedEvent(taskWithId2) ::
         restedEvent(None) ::

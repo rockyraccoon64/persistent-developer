@@ -29,6 +29,15 @@ trait TaskTestFacade {
     status = status
   )
 
+  def finishedTaskStatus: TaskStatus =
+    TaskStatus.Finished
+
+  def queuedTaskStatus: TaskStatus =
+    TaskStatus.Queued
+
+  def inProgressTaskStatus: TaskStatus =
+    TaskStatus.InProgress
+
   implicit class TaskTransformers(task: TaskInfo) {
     def withDifficulty(difficulty: Int): TaskInfo =
       task.copy(difficulty = Difficulty(difficulty))
