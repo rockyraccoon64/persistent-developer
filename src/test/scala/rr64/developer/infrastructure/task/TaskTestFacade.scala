@@ -9,23 +9,31 @@ import slick.jdbc.PostgresProfile.api._
 import java.util.UUID
 import scala.concurrent.{ExecutionContext, Future}
 
+/**
+ * Фасад для тестов с использованием статуса задач
+ */
 trait TaskStatusTestFacade {
 
+  /** Задача в очереди */
   def queuedTaskStatus: TaskStatus =
     TaskStatus.Queued
 
+  /** Задача в работе */
   def inProgressTaskStatus: TaskStatus =
     TaskStatus.InProgress
 
+  /** Задача завершена */
   def finishedTaskStatus: TaskStatus =
     TaskStatus.Finished
 
 }
 
+/**
+ * Фасад для тестов с использованием TaskWithId
+ */
 trait TaskWithIdTestFacade {
 
-  type TaskWithId = rr64.developer.infrastructure.task.TaskWithId
-
+  /** Создать задачу с идентификатором */
   def createTaskWithId(
     difficulty: Int,
     id: String
@@ -36,10 +44,15 @@ trait TaskWithIdTestFacade {
 
 }
 
+/**
+ * Фасад для тестов с использованием TaskInfo
+ * */
 trait TaskInfoTestFacade {
 
+  /** Информация о существующей задаче */
   type TaskInfo = rr64.developer.domain.task.TaskInfo
 
+  /** Создать объект с информацией о существующей задаче */
   def createTaskInfo(
     id: String,
     difficulty: Int,
@@ -51,26 +64,37 @@ trait TaskInfoTestFacade {
   )
 
   implicit class TaskInfoTransformers(task: TaskInfo) {
+
+    /** Задача с другой сложностью */
     def withDifficulty(difficulty: Int): TaskInfo =
       task.copy(difficulty = Difficulty(difficulty))
+
+    /** Задача с другим статусом */
     def withStatus(status: TaskStatus): TaskInfo =
       task.copy(status = status)
+
   }
 
 }
 
+/**
+ * Фасад для тестов с использованием репозитория задач
+ * */
 trait TaskRepositoryTestFacade {
 
+  /** Сохранить задачу в репозитории */
   def saveTaskToRepository[Q](repository: TaskRepository[Q])
       (task: TaskInfo): Future[_] =
     repository.save(task)
 
+  /** Сохранить последовательность задач в репозитории */
   def saveTasksToRepositoryInSequence[Q](repository: TaskRepository[Q])
       (tasks: Seq[TaskInfo])(implicit ec: ExecutionContext): Future[Any] =
     tasks.foldLeft[Future[Any]](Future.unit) { (acc, task) =>
       acc.flatMap(_ => saveTaskToRepository(repository)(task))
     }
 
+  /** Найти задачу в репозитории */
   def findTaskInRepository[Q](repository: TaskRepository[Q])(id: UUID)
       (implicit ec: ExecutionContext): Future[Option[TaskInfo]] =
     repository.findById(id)
@@ -89,9 +113,11 @@ trait TaskRepositoryTestFacade {
       succeeded <- assertTaskExistsInRepository(repository)(task)
     } yield succeeded
 
+  /** Создать репозиторий задач на основе Slick */
   def createTaskSlickRepository(database: Database): TaskSlickRepository =
     new TaskSlickRepository(database, new TaskStatusCodec)
 
+  /** Получить список задач из репозитория на основе Slick */
   def listTasksFromRepository(repository: TaskSlickRepository)
       (limit: Int, offset: Int)
       (implicit ec: ExecutionContext): Future[Seq[TaskInfo]] = {
@@ -99,6 +125,7 @@ trait TaskRepositoryTestFacade {
     repository.list(query)
   }
 
+  /** Простой in-memory репозиторий для задач */
   def simpleTaskRepository: TaskRepository[Any] =
     new TaskRepository[Any] {
       private var tasks: Map[UUID, TaskInfo] = Map.empty
@@ -116,6 +143,9 @@ trait TaskRepositoryTestFacade {
 
 }
 
+/**
+ * Фасад для тестов с использованием задач
+ * */
 trait TaskTestFacade
   extends TaskStatusTestFacade
     with TaskWithIdTestFacade
