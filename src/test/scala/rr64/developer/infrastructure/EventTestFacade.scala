@@ -14,6 +14,9 @@ trait EventTestFacade {
   def taskFinishedEvent(taskWithId: TaskWithId): Event.TaskFinished =
     Event.TaskFinished(taskWithId)
 
+  def restedEvent(nextTask: Option[TaskWithId]): Event.Rested =
+    Event.Rested(nextTask)
+
 }
 
 object EventTestFacade

@@ -104,7 +104,7 @@ class TaskToRepositoryTestSuite
     new HandlerTest {
       val taskWithId = createTaskWithId(35, "f33b67f0-2324-4c7d-8b5f-59ab8e4f5bd7")
       val taskInfo = taskWithId.withStatus(TaskStatus.InProgress)
-      val events = Event.Rested(Some(taskWithId)) :: Nil
+      val events = restedEvent(Some(taskWithId)) :: Nil
       val projection = projectionFromEvents(events)
       assertAllSaved(taskInfo)
     }
@@ -118,7 +118,7 @@ class TaskToRepositoryTestSuite
       val taskInfo2 = taskWithId2.withStatus(TaskStatus.Finished)
       val events = taskQueuedEvent(taskWithId1) ::
         taskFinishedEvent(taskWithId2) ::
-        Event.Rested(None) ::
+        restedEvent(None) ::
         Nil
       val projection = projectionFromEvents(events)
       assertAllSaved(taskInfo1, taskInfo2)
