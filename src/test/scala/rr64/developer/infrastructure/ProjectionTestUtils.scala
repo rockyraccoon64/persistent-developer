@@ -33,7 +33,7 @@ object ProjectionTestUtils {
       )
     }
 
-  /** Тестовый SourceProvider на основе Source */
+  /** Тестовый SourceProvider на основе Source событий */
   def providerFromSource[T](
     source: Source[EventEnvelope[T], NotUsed]
   ): TestSourceProvider[Offset, EventEnvelope[T]] =
