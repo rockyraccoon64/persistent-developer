@@ -3,7 +3,6 @@ package rr64.developer.infrastructure.task
 import org.scalatest.flatspec.AsyncFlatSpecLike
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.{Assertion, BeforeAndAfterEach}
-import rr64.developer.domain.task.TaskInfo
 import rr64.developer.infrastructure.PostgresSpec
 import rr64.developer.infrastructure.task.TaskTestFacade._
 import slick.jdbc.PostgresProfile.api._

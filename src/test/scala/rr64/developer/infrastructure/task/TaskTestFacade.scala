@@ -11,6 +11,8 @@ import scala.concurrent.{ExecutionContext, Future}
 
 trait TaskTestFacade {
 
+  type TaskInfo = rr64.developer.domain.task.TaskInfo
+
   def createTaskWithId(
     difficulty: Int,
     id: String
