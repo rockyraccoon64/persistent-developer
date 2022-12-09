@@ -59,6 +59,13 @@ class TaskToRepositoryTestSuite
     protected def assertInfo(taskInfo: TaskInfo): Assertion =
       assertTaskExistsInRepository(mockRepository)(taskInfo).futureValue
 
+    protected def projection: TestProjection[Offset, EventEnvelope[Event]]
+
+    protected def assertAllSaved(tasks: TaskInfo*): Unit =
+      projectionTestKit.run(projection) {
+        tasks.foreach(assertInfo)
+      }
+
   }
 
   /** В начале работы над задачей информация о текущем статусе должна сохраняться в репозиторий */
@@ -68,9 +75,7 @@ class TaskToRepositoryTestSuite
       val taskInfo = taskWithId.withStatus(TaskStatus.InProgress)
       val events = Event.TaskStarted(taskWithId) :: Nil
       val projection = projectionFromEvents(events)
-      projectionTestKit.run(projection) {
-        assertInfo(taskInfo)
-      }
+      assertAllSaved(taskInfo)
     }
 
   /** Когда задача ставится в очередь, её текущее состояние должно сохраняться в репозиторий */
@@ -80,9 +85,7 @@ class TaskToRepositoryTestSuite
       val taskInfo = taskWithId.withStatus(TaskStatus.Queued)
       val events = Event.TaskQueued(taskWithId) :: Nil
       val projection = projectionFromEvents(events)
-      projectionTestKit.run(projection) {
-        assertInfo(taskInfo)
-      }
+      assertAllSaved(taskInfo)
     }
 
   /** Когда задача завершена, её текущее состояние должно сохраняться в репозиторий */
@@ -92,9 +95,7 @@ class TaskToRepositoryTestSuite
       val taskInfo = taskWithId.withStatus(TaskStatus.Finished)
       val events = Event.TaskFinished(taskWithId) :: Nil
       val projection = projectionFromEvents(events)
-      projectionTestKit.run(projection) {
-        assertInfo(taskInfo)
-      }
+      assertAllSaved(taskInfo)
     }
 
   /** В начале работы над задачей после отдыха её статус должен сохраняться в репозиторий */
@@ -104,9 +105,7 @@ class TaskToRepositoryTestSuite
       val taskInfo = taskWithId.withStatus(TaskStatus.InProgress)
       val events = Event.Rested(Some(taskWithId)) :: Nil
       val projection = projectionFromEvents(events)
-      projectionTestKit.run(projection) {
-        assertInfo(taskInfo)
-      }
+      assertAllSaved(taskInfo)
     }
 
   /** Когда событие не связано с задачей, обновления не происходит */
@@ -121,10 +120,7 @@ class TaskToRepositoryTestSuite
         Event.Rested(None) ::
         Nil
       val projection = projectionFromEvents(events)
-      projectionTestKit.run(projection) {
-        assertInfo(taskInfo1)
-        assertInfo(taskInfo2)
-      }
+      assertAllSaved(taskInfo1, taskInfo2)
     }
 
 }
