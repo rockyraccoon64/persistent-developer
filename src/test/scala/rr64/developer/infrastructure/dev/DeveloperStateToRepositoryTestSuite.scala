@@ -9,9 +9,9 @@ import akka.projection.testkit.scaladsl.{ProjectionTestKit, TestProjection}
 import org.scalatest.Assertion
 import org.scalatest.wordspec.AnyWordSpecLike
 import rr64.developer.domain.dev.DeveloperState
+import rr64.developer.infrastructure.EventProjectionTestFacade._
 import rr64.developer.infrastructure.dev.behavior.Event
 import rr64.developer.infrastructure.task.TaskWithId
-import rr64.developer.infrastructure.{EventProjectionTestFacade, ProjectionTestUtils}
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -55,14 +55,14 @@ class DeveloperStateToRepositoryTestSuite
 
     /** Создать проекцию на основе Source событий */
     protected def projectionFromSource =
-      EventProjectionTestFacade.projectionFromEventSource(handler, projectionId) _
+      projectionFromEventSource(handler, projectionId) _
 
     /** Создать проекцию из последовательности событий */
     protected def projectionFromEvents(
       events: Seq[Event],
       persistenceId: String = defaultPersistenceId
     ): TestProjection[Offset, EventEnvelope[Event]] =
-      EventProjectionTestFacade.projectionFromEventSequence(handler, projectionId)(events, persistenceId)
+      projectionFromEventSequence(handler, projectionId)(events, persistenceId)
 
     /** Проверить текущее состояние */
     protected def assertState(
@@ -161,13 +161,13 @@ class DeveloperStateToRepositoryTestSuite
     "update states for different developers separately" in
       new HandlerTest {
         val differentPersistenceId = "test-id2"
-        val events1 = ProjectionTestUtils.envelopeSource[Event](
+        val events1 = envelopeSource[Event](
           events = Event.TaskStarted(defaultTask2) ::
             Event.TaskFinished(defaultTask2) ::
             Nil,
           persistenceId = defaultPersistenceId
         )
-        val events2 = ProjectionTestUtils.envelopeSource[Event](
+        val events2 = envelopeSource[Event](
           events = Event.TaskStarted(defaultTask1) :: Nil,
           persistenceId = differentPersistenceId,
           startOffset = 2
