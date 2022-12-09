@@ -82,37 +82,6 @@ trait TaskInfoTestFacade {
  * */
 trait TaskRepositoryTestFacade {
 
-  /** Сохранить задачу в репозитории */
-  def saveTaskToRepository[Q](repository: TaskRepository[Q])
-      (task: TaskInfo): Future[_] =
-    repository.save(task)
-
-  /** Сохранить последовательность задач в репозитории */
-  def saveTasksToRepositoryInSequence[Q](repository: TaskRepository[Q])
-      (tasks: Seq[TaskInfo])(implicit ec: ExecutionContext): Future[Any] =
-    tasks.foldLeft[Future[Any]](Future.unit) { (acc, task) =>
-      acc.flatMap(_ => saveTaskToRepository(repository)(task))
-    }
-
-  /** Найти задачу в репозитории */
-  def findTaskInRepository[Q](repository: TaskRepository[Q])(id: UUID)
-      (implicit ec: ExecutionContext): Future[Option[TaskInfo]] =
-    repository.findById(id)
-
-  /** Проверить, что задача существует в репозитории */
-  def assertTaskExistsInRepository[Q](repository: TaskRepository[Q])
-      (task: TaskInfo)(implicit ec: ExecutionContext): Future[Assertion] =
-    for (taskOpt <- findTaskInRepository(repository)(task.id)) yield
-      taskOpt shouldEqual Some(task)
-
-  /** Сохранить задачу и проверить, что она сохранена */
-  def saveTaskToRepositoryAndAssertSaved[Q](repository: TaskRepository[Q])
-    (task: TaskInfo)(implicit ec: ExecutionContext): Future[Assertion] =
-    for {
-      _ <- saveTaskToRepository(repository)(task)
-      succeeded <- assertTaskExistsInRepository(repository)(task)
-    } yield succeeded
-
   /** Создать репозиторий задач на основе Slick */
   def createTaskSlickRepository(database: Database): TaskSlickRepository =
     new TaskSlickRepository(database, new TaskStatusCodec)
@@ -133,6 +102,40 @@ trait TaskRepositoryTestFacade {
         Future.successful(tasks.values.toSeq)
     }
 
+  implicit class TestTaskRepository[Q](repository: TaskRepository[Q]) {
+
+    /** Сохранить задачу в репозитории */
+    def saveTaskToRepository(task: TaskInfo): Future[_] =
+      repository.save(task)
+
+    /** Сохранить последовательность задач в репозитории */
+    def saveTasksToRepositoryInSequence(tasks: Seq[TaskInfo])
+        (implicit ec: ExecutionContext): Future[Any] =
+      tasks.foldLeft[Future[Any]](Future.unit) { (acc, task) =>
+        acc.flatMap(_ => saveTaskToRepository(task))
+      }
+
+    /** Найти задачу в репозитории */
+    def findTaskInRepository(id: UUID)
+        (implicit ec: ExecutionContext): Future[Option[TaskInfo]] =
+      repository.findById(id)
+
+    /** Проверить, что задача существует в репозитории */
+    def assertTaskExistsInRepository(task: TaskInfo)
+        (implicit ec: ExecutionContext): Future[Assertion] =
+      for (taskOpt <- findTaskInRepository(task.id)) yield
+        taskOpt shouldEqual Some(task)
+
+    /** Сохранить задачу и проверить, что она сохранена */
+    def saveTaskToRepositoryAndAssertSaved(task: TaskInfo)
+        (implicit ec: ExecutionContext): Future[Assertion] =
+      for {
+        _ <- saveTaskToRepository(task)
+        succeeded <- assertTaskExistsInRepository(task)
+      } yield succeeded
+
+  }
+
   implicit class TestSlickRepository(repository: TaskSlickRepository) {
 
     /** Получить список задач из репозитория на основе Slick */
@@ -150,7 +153,7 @@ trait TaskRepositoryTestFacade {
       expected: Seq[TaskInfo]
     )(implicit ec: ExecutionContext): Future[Assertion] =
       for {
-        _ <- saveTasksToRepositoryInSequence(repository)(initial)
+        _ <- repository.saveTasksToRepositoryInSequence(initial)
         list <- listTasksFromRepository(limit, offset)
       } yield {
         list should contain theSameElementsInOrderAs expected
