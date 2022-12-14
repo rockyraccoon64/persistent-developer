@@ -7,6 +7,7 @@ import org.scalatest.Assertion
 import org.scalatest.flatspec.AnyFlatSpecLike
 import rr64.developer.infrastructure.facade.event.DeveloperEventProjectionTestFacade._
 import rr64.developer.infrastructure.facade.task.TaskTestFacade._
+import rr64.developer.infrastructure.facade.task.TestTaskRepository
 
 import scala.concurrent.ExecutionContext
 
