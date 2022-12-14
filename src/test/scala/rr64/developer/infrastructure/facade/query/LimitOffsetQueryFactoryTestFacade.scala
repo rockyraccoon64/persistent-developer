@@ -1,7 +1,8 @@
-package rr64.developer.infrastructure.task.query
+package rr64.developer.infrastructure.facade.query
 
 import org.scalamock.clazz.Mock
 import org.scalamock.matchers.MockParameter
+import rr64.developer.infrastructure.task.query.{LimitOffsetQuery, LimitOffsetQueryFactory, LimitOffsetQueryFactoryImpl}
 
 /**
  * Фасад для тестов с использованием

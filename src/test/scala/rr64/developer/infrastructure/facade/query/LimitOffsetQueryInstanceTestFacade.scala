@@ -1,4 +1,6 @@
-package rr64.developer.infrastructure.task.query
+package rr64.developer.infrastructure.facade.query
+
+import rr64.developer.infrastructure.task.query.LimitOffsetQuery
 
 /**
  * Фасад для тестов с использованием

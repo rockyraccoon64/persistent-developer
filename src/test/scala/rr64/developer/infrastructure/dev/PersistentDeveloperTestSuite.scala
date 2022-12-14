@@ -3,6 +3,8 @@ package rr64.developer.infrastructure.dev
 import akka.actor.testkit.typed.scaladsl.ScalaTestWithActorTestKit
 import akka.actor.typed.scaladsl.Behaviors
 import akka.actor.typed.{Behavior, Scheduler}
+import org.scalamock.scalatest.MockFactory
+import org.scalatest.Assertion
 import org.scalatest.flatspec.AsyncFlatSpecLike
 import rr64.developer.domain.dev.{DeveloperReply, DeveloperState}
 import rr64.developer.domain.task.Task
@@ -17,7 +19,8 @@ import scala.concurrent.{ExecutionContext, Future}
  */
 class PersistentDeveloperTestSuite
   extends ScalaTestWithActorTestKit
-    with AsyncFlatSpecLike {
+    with AsyncFlatSpecLike
+    with MockFactory {
 
   private implicit val ec: ExecutionContext = testKit.system.executionContext
   private implicit val scheduler: Scheduler = testKit.system.scheduler
@@ -37,15 +40,23 @@ class PersistentDeveloperTestSuite
     testKit.spawn(mockBehavior)
   }
 
-  /** Источник состояний, возвращающий конкретное значение */
-  private def mockProvider(stateResult: DeveloperState): DeveloperStateProvider =
-    (_: ExecutionContext) => Future.successful(stateResult)
-
   /** Создать PersistentDeveloper на основе актора и источника состояний */
   private def createDeveloper(
     developerRef: DeveloperRef = emptyRef,
     provider: DeveloperStateProvider = emptyProvider
   ) = PersistentDeveloper(developerRef, provider)
+
+  /** Проверить, что запрос на получение состояния перенаправляется провайдеру */
+  private def assertQueryRedirected(state: DeveloperState): Assertion = {
+    val mockProvider = mock[DeveloperStateProvider]
+    (mockProvider.state(_: ExecutionContext))
+      .expects(*)
+      .once()
+      .returning(Future.successful(state))
+
+    val dev = createDeveloper(provider = mockProvider)
+    dev.state.futureValue shouldEqual state
+  }
 
   /** Команда добавления задачи должна перенаправляться персистентному актору */
   "The Add Task command" should "be redirected to the persistent actor" in {
@@ -62,7 +73,7 @@ class PersistentDeveloperTestSuite
   /** Когда разработчик отвечает "Задача начата",
    * должно приходить соответствующее доменное сообщение */
   "When a task is started, there" should "be a corresponding domain message" in {
-    val id = UUID.randomUUID()
+    val id = UUID.fromString("cd9e1104-aff1-4085-b740-463f79376638")
     val mockActor = mockDeveloperRef {
       case Command.AddTask(_, replyTo) =>
         replyTo ! Replies.TaskStarted(id)
@@ -79,7 +90,7 @@ class PersistentDeveloperTestSuite
   /** Когда разработчик отвечает "Задача поставлена в очередь",
    * приходит соответствующее доменное сообщение */
   "When a task is queued, there" should "be a corresponding domain message" in {
-    val id = UUID.randomUUID()
+    val id = UUID.fromString("3427ee7f-6e97-4e60-bca9-ba10c29e33bc")
     val mockActor = mockDeveloperRef {
       case Command.AddTask(_, replyTo) =>
         replyTo ! Replies.TaskQueued(id)
@@ -95,21 +106,9 @@ class PersistentDeveloperTestSuite
 
   /** Запрос на получение состояния разработчика перенаправляется провайдеру */
   "The State query" should "be redirected to the developer state provider" in {
-    val working = DeveloperState.Working
-    val free = DeveloperState.Free
-
-    val provider1 = mockProvider(working)
-    val provider2 = mockProvider(free)
-    val dev1 = createDeveloper(provider = provider1)
-    val dev2 = createDeveloper(provider = provider2)
-
-    for {
-      state1 <- dev1.state
-      state2 <- dev2.state
-    } yield {
-      state1 shouldEqual working
-      state2 shouldEqual free
-    }
+    assertQueryRedirected(DeveloperState.Free)
+    assertQueryRedirected(DeveloperState.Working)
+    assertQueryRedirected(DeveloperState.Resting)
   }
 
 }

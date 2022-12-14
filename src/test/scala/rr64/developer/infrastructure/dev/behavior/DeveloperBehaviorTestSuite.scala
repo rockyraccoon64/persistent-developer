@@ -2,14 +2,10 @@ package rr64.developer.infrastructure.dev.behavior
 
 import akka.actor.testkit.typed.scaladsl.{ManualTime, ScalaTestWithActorTestKit}
 import akka.persistence.testkit.scaladsl.EventSourcedBehaviorTestKit
-import akka.persistence.testkit.scaladsl.EventSourcedBehaviorTestKit.SerializationSettings
-import akka.persistence.typed.PersistenceId
 import org.scalatest.BeforeAndAfterEach
-import org.scalatest.Inside.inside
 import org.scalatest.wordspec.AnyWordSpecLike
-import rr64.developer.domain.task.{Difficulty, Task}
-import rr64.developer.domain.timing.{Factor, Timing}
-import rr64.developer.infrastructure.task.TaskWithId
+import rr64.developer.infrastructure.facade.dev.DeveloperTestFacade
+import rr64.developer.infrastructure.facade.task.{TestTask, TestTaskWithId}
 
 import scala.concurrent.duration.{DurationInt, FiniteDuration}
 
@@ -23,281 +19,239 @@ class DeveloperBehaviorTestSuite
   ) with AnyWordSpecLike
     with BeforeAndAfterEach {
 
-  private type Kit = EventSourcedBehaviorTestKit[Command, Event, State]
-
   private val manualTime = ManualTime()
-
-  private val workFactor = Factor(10)
-  private val restFactor = Factor(5)
-  private val developerTestKit: Kit =
-    EventSourcedBehaviorTestKit(
-      system = system,
-      behavior = DeveloperBehavior(
-        persistenceId = PersistenceId.ofUniqueId("dev-test"),
-        workFactor = workFactor,
-        restFactor = restFactor
-      ),
-      SerializationSettings.disabled
-    )
+  private val developer = DeveloperTestFacade(
+    workFactor = 10,
+    restFactor = 5
+  )
 
   override protected def beforeEach(): Unit = {
     super.beforeEach()
-    developerTestKit.clear()
-  }
-
-  /** Поручить задачу */
-  private def addTask(task: Task) =
-    developerTestKit.runCommand(Command.AddTask(task, _))
-
-  /** Поставить задачу в очередь и получить идентификатор */
-  private def queueTask(task: Task): TaskWithId = {
-    val result = addTask(task)
-    val id = result.replyOfType[Replies.TaskQueued].id
-    TaskWithId(task, id)
+    developer.reset()
   }
 
   /** Расчитать время работы */
-  private def calculateWorkTime(difficulty: Difficulty): FiniteDuration =
-    Timing.calculateTime(difficulty, workFactor)
+  private def calculateWorkTime(task: TestTask): FiniteDuration =
+    developer.calculateWorkTime(task)
 
   /** Расчитать время отдыха */
-  private def calculateRestTime(difficulty: Difficulty): FiniteDuration =
-    Timing.calculateTime(difficulty, restFactor)
+  private def calculateRestTime(task: TestTask): FiniteDuration =
+    developer.calculateRestTime(task)
 
   /** Актор разработчика */
   "The developer" should {
 
     /** Начинает в свободном состоянии */
-    "start in a free state" in {
-      val state = developerTestKit.getState()
-      state shouldEqual State.Free
-    }
+    "start in a free state" in developer.shouldBeFree
 
     /** Когда разработчик свободен, он принимает задачу в работу */
     "accept the task he's given when he's free" in {
-      val task = Task(5)
-      val result = addTask(task)
-      val state = result.stateOfType[State.Working]
-      state.currentTask.task shouldEqual task
+      val task = TestTask(5)
+      developer.addTask(task)
+      developer.shouldBeWorkingOnTask(task)
     }
 
     /** Когда разработчик свободен, то при получении задачи
      * он присваивает ей идентификатор и отправляет его в ответе */
     "reply with a Task Started message when he's free" in {
-      val task = Task(15)
-      val result = addTask(task)
-      val reply = result.replyOfType[Replies.TaskStarted]
-      reply.id should not be null
-      result.stateOfType[State.Working].currentTask.id shouldEqual reply.id
+      val task = TestTask(15)
+      val result = developer.addTask(task)
+      result.taskShouldBeStarted
+      result.taskShouldHaveIdentifier
+      val id = result.taskId
+      developer.shouldBeWorkingOnTaskWithId(id)
     }
 
     /** До выполнения задачи разработчик работает */
     "work until the task is done" in {
-      val task = Task(20)
-      val workTime = calculateWorkTime(task.difficulty)
+      val task = TestTask(20)
+      val workTime = calculateWorkTime(task)
 
-      addTask(task)
+      developer.addTask(task)
 
       manualTime.timePasses(workTime - 1.millis)
-      inside(developerTestKit.getState()) {
-        case working: State.Working => working.currentTask.task shouldEqual task
-      }
-
+      developer.shouldBeWorkingOnTask(task)
       manualTime.timePasses(1.millis)
-      developerTestKit.getState() should not be a [State.Working]
+      developer.shouldNotBeWorking
     }
 
     /** Завершив задачу, разработчик делает перерыв */
     "rest after completing a task" in {
-      val task = Task(50)
-      val workTime = calculateWorkTime(task.difficulty)
+      val task = TestTask(50)
+      val workTime = calculateWorkTime(task)
 
-      addTask(task)
+      developer.addTask(task)
 
       manualTime.timePasses(workTime)
-      inside(developerTestKit.getState()) {
-        case resting: State.Resting =>
-          resting.lastCompleted.task shouldEqual task
-      }
+      developer.shouldBeRestingAfterCompletingTask(task)
     }
 
     /** Перерыв длится строго отведённое время */
     "only rest for a designated time period" in {
-      val task = Task(50)
-      val workTime = calculateWorkTime(task.difficulty)
-      val restTime = calculateRestTime(task.difficulty)
+      val task = TestTask(50)
+      val workTime = calculateWorkTime(task)
+      val restTime = calculateRestTime(task)
 
-      addTask(task)
+      developer.addTask(task)
 
       manualTime.timePasses(workTime)
       manualTime.timePasses(restTime)
 
-      developerTestKit.getState() should not be a [State.Resting]
+      developer.shouldNotBeResting
     }
 
     /** Когда разработчик работает над задачей,
      * то при получении новой задачи он присваивает ей идентификатор
      * и отправляет его в ответе */
     "reply with an identifier after receiving a new task while working" in {
-      val currentTask = TaskWithId(100, "f490d7ca-dcbf-4905-be03-ffd7bf90b513")
-      val newTask = Task(10)
-      developerTestKit.initialize(Event.TaskStarted(currentTask))
-      val result = addTask(newTask)
-      val reply = result.replyOfType[Replies.TaskQueued]
-      reply.id should not be null
+      val currentTask = TestTaskWithId(100, "f490d7ca-dcbf-4905-be03-ffd7bf90b513")
+      val newTask = TestTask(10)
+      developer.afterStartingTask(currentTask)
+      val result = developer.addTask(newTask)
+      result.taskShouldHaveIdentifier
     }
 
     /** Когда разработчик работает над задачей, новые задачи отправляются в очередь */
     "queue new tasks while working" in {
-      val firstTask = Task(100)
-      val secondTask = Task(50)
-      val thirdTask = Task(25)
+      val firstTask = TestTask(100)
+      val secondTask = TestTask(50)
+      val thirdTask = TestTask(25)
 
-      val firstResult = addTask(firstTask)
-      val secondResult = addTask(secondTask)
-      val thirdResult = addTask(thirdTask)
+      developer.addTask(firstTask)
+      developer.queueShouldEqual(Nil)
 
-      firstResult.stateOfType[State.Working].taskQueue shouldEqual Nil
+      developer.addTask(secondTask)
+      developer.queueShouldEqual(secondTask :: Nil)
 
-      inside(secondResult.stateOfType[State.Working].taskQueue) {
-        case Seq(taskWithId) =>
-          taskWithId.task shouldEqual secondTask
-      }
-
-      inside(thirdResult.stateOfType[State.Working].taskQueue) {
-        case Seq(taskWithId1, taskWithId2) =>
-          taskWithId1.task shouldEqual secondTask
-          taskWithId2.task shouldEqual thirdTask
-      }
+      developer.addTask(thirdTask)
+      developer.queueShouldEqual(secondTask :: thirdTask :: Nil)
     }
 
     /** После окончания работы над задачей очередь задач сохраняется */
-    "remain the same when a task is finished" in {
-      val firstTask = Task(100)
-      val secondTask = Task(50)
-      val thirdTask = Task(25)
+    "leave the queue the same after a task is finished" in {
+      val firstTask = TestTask(100)
+      val secondTask = TestTask(50)
+      val thirdTask = TestTask(25)
 
-      addTask(firstTask)
+      developer.addTask(firstTask)
+      developer.addTask(secondTask)
+      developer.addTask(thirdTask)
 
-      val secondTaskWithId = queueTask(secondTask)
-      val thirdTaskWithId = queueTask(thirdTask)
-
-      val workTime = calculateWorkTime(firstTask.difficulty)
-
+      val workTime = calculateWorkTime(firstTask)
       manualTime.timePasses(workTime)
 
-      inside(developerTestKit.getState()) {
-        case State.Resting(_, taskQueue) =>
-          taskQueue should contain theSameElementsInOrderAs Seq(secondTaskWithId, thirdTaskWithId)
-      }
+      developer.shouldBeResting
+      developer.queueShouldEqual(secondTask :: thirdTask :: Nil)
     }
 
     /** После отдыха берётся первая задача из очереди, если имеется */
     "take the first task from the queue when he's finished resting" in {
-      val firstTask = Task(100)
-      val secondTask = Task(90)
-      val thirdTask = Task(25)
+      val firstTask = TestTask(100)
+      val secondTask = TestTask(90)
+      val thirdTask = TestTask(25)
 
-      addTask(firstTask)
+      developer.addTask(firstTask)
+      developer.addTask(secondTask)
+      developer.addTask(thirdTask)
 
-      val secondTaskWithId = queueTask(secondTask)
-      val thirdTaskWithId = queueTask(thirdTask)
-
-      val workTime = calculateWorkTime(firstTask.difficulty)
-      val restTime = calculateRestTime(firstTask.difficulty)
+      val workTime = calculateWorkTime(firstTask)
+      val restTime = calculateRestTime(firstTask)
 
       manualTime.timePasses(workTime)
       manualTime.timePasses(restTime)
 
-      inside(developerTestKit.getState()) {
-        case State.Working(currentTask, taskQueue) =>
-          currentTask shouldEqual secondTaskWithId
-          taskQueue should contain theSameElementsInOrderAs Seq(thirdTaskWithId)
-      }
+      developer.shouldBeWorkingOnTask(secondTask)
+      developer.queueShouldEqual(thirdTask :: Nil)
     }
 
     /** Если задач в очереди нет, после отдыха разработчик возвращается в свободное состояние */
     "be free after resting if there are no more tasks in the queue" in {
-      val task = Task(50)
-      val workTime = calculateWorkTime(task.difficulty)
-      val restTime = calculateRestTime(task.difficulty)
+      val task = TestTask(50)
+      val workTime = calculateWorkTime(task)
+      val restTime = calculateRestTime(task)
 
-      addTask(task)
+      developer.addTask(task)
 
       manualTime.timePasses(workTime)
       manualTime.timePasses(restTime)
 
-      developerTestKit.getState() shouldEqual State.Free
+      developer.shouldBeFree
     }
 
     /** Если разработчик отдыхает, новые задачи ставятся в очередь */
     "queue tasks while resting" in {
-      val initialTask = Task(1)
-      val workTime = calculateWorkTime(initialTask.difficulty)
+      val initialTask = TestTask(1)
+      val workTime = calculateWorkTime(initialTask)
 
-      addTask(initialTask)
-
+      developer.addTask(initialTask)
       manualTime.timePasses(workTime)
 
-      developerTestKit.getState() shouldBe a [State.Resting]
+      developer.shouldBeResting
 
-      val taskWithId1 = queueTask(Task(10))
-      val taskWithId2 = queueTask(Task(5))
+      val secondTask = TestTask(10)
+      val thirdTask = TestTask(5)
 
-      inside(developerTestKit.getState()) {
-        case resting: State.Resting =>
-          resting.taskQueue should contain theSameElementsInOrderAs Seq(taskWithId1, taskWithId2)
-      }
+      developer.addTask(secondTask)
+      developer.addTask(thirdTask)
+
+      developer.queueShouldEqual(secondTask :: thirdTask :: Nil)
     }
 
     /** Если актор упал в рабочем состоянии, соответствующий таймер запускается по новой */
     "start the work timer when completing recovery in a Working state" in {
-      val taskWithId = TaskWithId(50, "92ac4c4b-622f-44ba-b331-f1cf40a27c58")
-      val workTime = calculateWorkTime(taskWithId.difficulty)
+      val taskWithId = TestTaskWithId(50, "92ac4c4b-622f-44ba-b331-f1cf40a27c58")
+      val task = taskWithId.toTask
+      val workTime = calculateWorkTime(task)
 
-      developerTestKit.initialize(Event.TaskStarted(taskWithId))
-      developerTestKit.restart()
+      developer.afterStartingTask(taskWithId)
+      developer.restart()
 
       manualTime.timePasses(workTime - 1.millis)
-      developerTestKit.getState() shouldBe a [State.Working]
+      developer.shouldBeWorkingOnTask(task)
 
       manualTime.timePasses(1.millis)
-      developerTestKit.getState() shouldBe a [State.Resting]
+      developer.shouldBeResting
     }
 
     /** Если актор упал в состоянии отдыха, соответствующий таймер запускается по новой */
     "start the rest timer when completing recovery in a Resting state" in {
-      val taskWithId = TaskWithId(10, "b807f5ff-6066-454e-8d53-2a90a3941cc4")
-      val restTime = calculateRestTime(taskWithId.difficulty)
+      val taskWithId = TestTaskWithId(10, "b807f5ff-6066-454e-8d53-2a90a3941cc4")
+      val restTime = calculateRestTime(taskWithId.toTask)
 
-      developerTestKit.initialize(Event.TaskStarted(taskWithId), Event.TaskFinished(taskWithId))
-      developerTestKit.restart()
+      developer.afterCompletingTask(taskWithId)
+      developer.restart()
 
       manualTime.timePasses(restTime - 1.millis)
-      developerTestKit.getState() shouldBe a [State.Resting]
+      developer.shouldBeResting
 
       manualTime.timePasses(1.millis)
-      developerTestKit.getState() shouldBe State.Free
+      developer.shouldBeFree
     }
 
     /** После отдыха разработчик выполняет следующую задачу из очереди до конца */
     "fully complete the next task in the queue after resting" in {
-      val lastCompleted = TaskWithId(12, "6bf0af94-4ee3-4857-9a38-3e31e529b37d")
-      val taskQueue = TaskWithId(35, "ba5be578-9af1-44a6-9b8b-0a11c340237b") ::
-        TaskWithId(19, "da2b386f-a53e-44a8-b943-8e7491d1010e") ::
+      val lastCompleted = TestTaskWithId(12, "6bf0af94-4ee3-4857-9a38-3e31e529b37d")
+      val taskQueue = TestTaskWithId(35, "ba5be578-9af1-44a6-9b8b-0a11c340237b") ::
+        TestTaskWithId(19, "da2b386f-a53e-44a8-b943-8e7491d1010e") ::
         Nil
-      val restTime = calculateRestTime(lastCompleted.difficulty)
-      val nextTask = taskQueue.head
-      val workTime = calculateWorkTime(nextTask.difficulty)
+      val restTime = calculateRestTime(lastCompleted.toTask)
+      val nextTask = taskQueue.head.toTask
+      val nextQueue = taskQueue.tail.map(_.toTask)
+      val workTime = calculateWorkTime(nextTask)
 
-      developerTestKit.initialize(State.Resting(lastCompleted, taskQueue))
+      developer.whileResting(lastCompleted, taskQueue)
 
       manualTime.timePasses(restTime)
-      developerTestKit.getState() shouldEqual State.Working(nextTask, taskQueue.tail)
+      developer.shouldBeWorkingOnTask(nextTask)
+      developer.queueShouldEqual(nextQueue)
+
       manualTime.timePasses(workTime - 1.millis)
-      developerTestKit.getState() shouldEqual State.Working(nextTask, taskQueue.tail)
+      developer.shouldBeWorkingOnTask(nextTask)
+      developer.queueShouldEqual(nextQueue)
+
       manualTime.timePasses(1.millis)
-      developerTestKit.getState() shouldEqual State.Resting(nextTask, taskQueue.tail)
+      developer.shouldBeRestingAfterCompletingTask(nextTask)
+      developer.queueShouldEqual(nextQueue)
     }
 
   }

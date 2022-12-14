@@ -1,9 +1,9 @@
 package rr64.developer.infrastructure.dev
 
-import org.scalatest.Assertion
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import rr64.developer.domain.dev.DeveloperState
+import rr64.developer.infrastructure.facade.CodecTestFacade._
 
 /**
  * Тесты кодека состояния разработчика
@@ -13,12 +13,7 @@ class DeveloperStateCodecTestSuite
     with Matchers {
 
   private val codec = new DeveloperStateCodec
-
-  /** Проверка симметричности кодирования и декодирования */
-  private def codecTest(state: DeveloperState): Assertion = {
-    val encoded = codec.encode(state)
-    state shouldEqual codec.decode(encoded)
-  }
+  private val codecTest = assertCodecSymmetrical(codec) _
 
   /** Кодек должен кодировать и декодировать состояние разработчика */
   "The developer state codec" should {

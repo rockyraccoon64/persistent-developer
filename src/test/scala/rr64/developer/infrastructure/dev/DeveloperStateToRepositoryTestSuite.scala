@@ -1,19 +1,17 @@
 package rr64.developer.infrastructure.dev
 
-import akka.NotUsed
 import akka.actor.testkit.typed.scaladsl.ScalaTestWithActorTestKit
 import akka.persistence.query.Offset
 import akka.projection.ProjectionId
 import akka.projection.eventsourced.EventEnvelope
 import akka.projection.scaladsl.Handler
 import akka.projection.testkit.scaladsl.{ProjectionTestKit, TestProjection}
-import akka.stream.scaladsl.Source
 import org.scalatest.Assertion
 import org.scalatest.wordspec.AnyWordSpecLike
 import rr64.developer.domain.dev.DeveloperState
-import rr64.developer.infrastructure.ProjectionTestUtils
-import rr64.developer.infrastructure.dev.behavior.Event
-import rr64.developer.infrastructure.task.TaskWithId
+import rr64.developer.infrastructure.facade.event.DeveloperEventTestFacade._
+import rr64.developer.infrastructure.facade.event.EventProjectionTestFacade._
+import rr64.developer.infrastructure.facade.task.TaskTestFacade.createTaskWithId
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -28,8 +26,8 @@ class DeveloperStateToRepositoryTestSuite
   private implicit val ec: ExecutionContext = system.executionContext
 
   private val defaultPersistenceId = "test-id"
-  private val defaultTask1 = TaskWithId(1, "ce85f496-4ef1-4407-af79-7bf6db56c0f3")
-  private val defaultTask2 = TaskWithId(5, "c525986e-2d9a-4c1d-8fcb-747a23a42118")
+  private val defaultTask1 = createTaskWithId(1, "ce85f496-4ef1-4407-af79-7bf6db56c0f3")
+  private val defaultTask2 = createTaskWithId(5, "c525986e-2d9a-4c1d-8fcb-747a23a42118")
 
   /** Фикстура для тестирования обработчика проекции */
   private trait HandlerTest {
@@ -52,24 +50,19 @@ class DeveloperStateToRepositoryTestSuite
     private val handler: Handler[EventEnvelope[Event]] =
       new DeveloperStateToRepository(mockRepository)
 
+    /** Идентификатор проекции */
+    private val projectionId = ProjectionId("dev-proj-test", "0")
+
+    /** Создать проекцию на основе Source событий */
+    protected def projectionFromSource =
+      projectionFromEventSource(handler, projectionId) _
+
     /** Создать проекцию из последовательности событий */
     protected def projectionFromEvents(
       events: Seq[Event],
       persistenceId: String = defaultPersistenceId
-    ): TestProjection[Offset, EventEnvelope[Event]] = {
-      val source = ProjectionTestUtils.envelopeSource(events, persistenceId)
-      projectionFromSource(source)
-    }
-
-    /** Создать проекцию из Source событий */
-    protected def projectionFromSource(
-      source: Source[EventEnvelope[Event], NotUsed]
     ): TestProjection[Offset, EventEnvelope[Event]] =
-      TestProjection(
-        projectionId = ProjectionId("dev-proj-test", "0"),
-        sourceProvider = ProjectionTestUtils.providerFromSource(source),
-        handler = () => handler
-      )
+      projectionFromEventSequence(handler, projectionId)(events, persistenceId)
 
     /** Проверить текущее состояние */
     protected def assertState(
@@ -86,7 +79,7 @@ class DeveloperStateToRepositoryTestSuite
     /** Должен обновлять состояние разработчика на "Работает", когда он начинает задачу */
     "update the developer state in the repository when a task is started" in
       new HandlerTest {
-        val events = Event.TaskStarted(defaultTask1) :: Nil
+        val events = taskStartedEvent(defaultTask1) :: Nil
         val projection = projectionFromEvents(events)
 
         projectionTestKit.run(projection) {
@@ -97,8 +90,8 @@ class DeveloperStateToRepositoryTestSuite
     /** Должен обновлять состояние разработчика на "Отдых", когда он заканчивает задачу */
     "update the developer state in the repository when a task is finished" in
       new HandlerTest {
-        val events = Event.TaskStarted(defaultTask1) ::
-          Event.TaskFinished(defaultTask1) :: Nil
+        val events = taskStartedEvent(defaultTask1) ::
+          taskFinishedEvent(defaultTask1) :: Nil
         val projection = projectionFromEvents(events)
 
         projectionTestKit.run(projection) {
@@ -110,9 +103,9 @@ class DeveloperStateToRepositoryTestSuite
      * когда он отдохнул и у него нет задач */
     "update the state to Free after the developer rests if he has no more tasks" in
       new HandlerTest {
-        val events = Event.TaskStarted(defaultTask1) ::
-          Event.TaskFinished(defaultTask1) ::
-          Event.Rested(None) ::
+        val events = taskStartedEvent(defaultTask1) ::
+          taskFinishedEvent(defaultTask1) ::
+          restedEvent(None) ::
           Nil
         val projection = projectionFromEvents(events)
 
@@ -125,10 +118,10 @@ class DeveloperStateToRepositoryTestSuite
      * когда он отдохнул и в очереди есть задача */
     "update the state to Working after the developer rests if there is a task in the queue" in
       new HandlerTest {
-        val events = Event.TaskStarted(defaultTask1) ::
-          Event.TaskQueued(defaultTask2) ::
-          Event.TaskFinished(defaultTask1) ::
-          Event.Rested(Some(defaultTask2)) ::
+        val events = taskStartedEvent(defaultTask1) ::
+          taskQueuedEvent(defaultTask2) ::
+          taskFinishedEvent(defaultTask1) ::
+          restedEvent(Some(defaultTask2)) ::
           Nil
         val projection = projectionFromEvents(events)
 
@@ -140,8 +133,8 @@ class DeveloperStateToRepositoryTestSuite
     /** Не должен обновлять состояние разработчика при получении задачи, когда он работает */
     "not update the state after receiving a new task while working" in
       new HandlerTest {
-        val events = Event.TaskStarted(defaultTask1) ::
-          Event.TaskQueued(defaultTask2) ::
+        val events = taskStartedEvent(defaultTask1) ::
+          taskQueuedEvent(defaultTask2) ::
           Nil
         val projection = projectionFromEvents(events)
 
@@ -153,9 +146,9 @@ class DeveloperStateToRepositoryTestSuite
     /** Не должен обновлять состояние разработчика при получении задачи, когда он отдыхает */
     "not update the state when the developer receives a new task while resting" in
       new HandlerTest {
-        val events = Event.TaskStarted(defaultTask1) ::
-          Event.TaskFinished(defaultTask1) ::
-          Event.TaskQueued(defaultTask2) ::
+        val events = taskStartedEvent(defaultTask1) ::
+          taskFinishedEvent(defaultTask1) ::
+          taskQueuedEvent(defaultTask2) ::
           Nil
         val projection = projectionFromEvents(events)
 
@@ -168,14 +161,14 @@ class DeveloperStateToRepositoryTestSuite
     "update states for different developers separately" in
       new HandlerTest {
         val differentPersistenceId = "test-id2"
-        val events1 = ProjectionTestUtils.envelopeSource[Event](
-          events = Event.TaskStarted(defaultTask2) ::
-            Event.TaskFinished(defaultTask2) ::
+        val events1 = envelopeSource[Event](
+          events = taskStartedEvent(defaultTask2) ::
+            taskFinishedEvent(defaultTask2) ::
             Nil,
           persistenceId = defaultPersistenceId
         )
-        val events2 = ProjectionTestUtils.envelopeSource[Event](
-          events = Event.TaskStarted(defaultTask1) :: Nil,
+        val events2 = envelopeSource[Event](
+          events = taskStartedEvent(defaultTask1) :: Nil,
           persistenceId = differentPersistenceId,
           startOffset = 2
         )
