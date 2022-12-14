@@ -8,25 +8,6 @@ import java.util.UUID
 import scala.concurrent.{ExecutionContext, Future}
 
 /**
- * Фасад для тестов с использованием статуса задач
- */
-trait TaskStatusTestFacade {
-
-  /** Задача в очереди */
-  def queuedTaskStatus: TaskStatus =
-    TaskStatus.Queued
-
-  /** Задача в работе */
-  def inProgressTaskStatus: TaskStatus =
-    TaskStatus.InProgress
-
-  /** Задача завершена */
-  def finishedTaskStatus: TaskStatus =
-    TaskStatus.Finished
-
-}
-
-/**
  * Фасад для тестов с использованием TaskWithId
  */
 trait TaskWithIdTestFacade {
