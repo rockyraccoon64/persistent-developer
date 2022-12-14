@@ -10,7 +10,7 @@ import org.scalatest.wordspec.AnyWordSpecLike
 import rr64.developer.domain.task.{Difficulty, Task}
 import rr64.developer.domain.timing.{Factor, Timing}
 import rr64.developer.infrastructure.DeveloperEventTestFacade._
-import rr64.developer.infrastructure.dev.behavior.facade.{TestDeveloper, TestTask}
+import rr64.developer.infrastructure.dev.behavior.facade.{DeveloperTestFacade, TestTask}
 import rr64.developer.infrastructure.task.TaskTestFacade.createTaskWithId
 import rr64.developer.infrastructure.task.TaskWithId
 
@@ -43,7 +43,7 @@ class DeveloperBehaviorTestSuite
       SerializationSettings.disabled
     )
 
-  private val testDeveloper = new TestDeveloper(workFactor = 10, restFactor = 5)
+  private val testDeveloper = new DeveloperTestFacade(workFactor = 10, restFactor = 5)
 
   override protected def beforeEach(): Unit = {
     super.beforeEach()

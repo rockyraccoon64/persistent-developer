@@ -12,8 +12,8 @@ import rr64.developer.infrastructure.DeveloperEventTestFacade.{Event, taskStarte
 import rr64.developer.infrastructure.dev.behavior.{Command, DeveloperBehavior, State}
 import rr64.developer.infrastructure.task.TaskWithId
 
-class TestDeveloper(workFactor: Int, restFactor: Int)
-                   (implicit system: ActorSystem[_]) {
+class DeveloperTestFacade(workFactor: Int, restFactor: Int)
+                         (implicit system: ActorSystem[_]) {
 
   private type Kit = EventSourcedBehaviorTestKit[Command, Event, State]
 
