@@ -16,8 +16,8 @@ class TestDeveloper(workFactor: Int, restFactor: Int)
 
   private type Kit = EventSourcedBehaviorTestKit[Command, Event, State]
 
-  private val _workFactor = Factor(10)
-  private val _restFactor = Factor(5)
+  private val _workFactor = Factor(workFactor)
+  private val _restFactor = Factor(restFactor)
   private val developerTestKit: Kit =
     EventSourcedBehaviorTestKit(
       system = system,
@@ -29,21 +29,28 @@ class TestDeveloper(workFactor: Int, restFactor: Int)
       SerializationSettings.disabled
     )
 
+  def reset(): Unit = developerTestKit.clear()
+
   def shouldBeFree: Assertion =
     developerTestKit.getState() shouldEqual State.Free
 
   def addTask(task: TestTask): Unit =
     developerTestKit.runCommand(Command.AddTask(task.toDomain, _))
 
-  def shouldBeWorkingOnTask(task: TestTask): Assertion = {
+  def shouldBeWorkingOnTask(task: TestTask): Assertion =
     inside(developerTestKit.getState()) {
-      case State.Working(currentTask, _) =>
-        currentTask.task shouldEqual task.toDomain
+      case working: State.Working =>
+        working.currentTask.task shouldEqual task.toDomain
     }
-  }
 
   def shouldNotBeWorking: Assertion =
     developerTestKit.getState() should not be a [State.Working]
+
+  def shouldRestAfterCompletingTask(task: TestTask): Assertion =
+    inside(developerTestKit.getState()) {
+      case resting: State.Resting =>
+        resting.lastCompleted.task shouldEqual task.toDomain
+    }
 
 }
 

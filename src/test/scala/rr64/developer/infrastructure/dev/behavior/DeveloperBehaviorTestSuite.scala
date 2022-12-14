@@ -46,6 +46,7 @@ class DeveloperBehaviorTestSuite
   override protected def beforeEach(): Unit = {
     super.beforeEach()
     developerTestKit.clear()
+    testDeveloper.reset()
   }
 
   /** Поручить задачу */
@@ -64,8 +65,8 @@ class DeveloperBehaviorTestSuite
     Timing.calculateTime(difficulty, workFactor)
 
   /** Расчитать время работы */
-  private def calculateWorkTime(difficulty: Int): FiniteDuration =
-    calculateWorkTime(Difficulty(difficulty))
+  private def calculateWorkTime(task: TestTask): FiniteDuration =
+    calculateWorkTime(Difficulty(task.difficulty))
 
   /** Расчитать время отдыха */
   private def calculateRestTime(difficulty: Difficulty): FiniteDuration =
@@ -97,7 +98,7 @@ class DeveloperBehaviorTestSuite
     /** До выполнения задачи разработчик работает */
     "work until the task is done" in {
       val task = TestTask(20)
-      val workTime = calculateWorkTime(task.difficulty)
+      val workTime = calculateWorkTime(task)
 
       testDeveloper.addTask(task)
 
@@ -109,16 +110,13 @@ class DeveloperBehaviorTestSuite
 
     /** Завершив задачу, разработчик делает перерыв */
     "rest after completing a task" in {
-      val task = Task(50)
-      val workTime = calculateWorkTime(task.difficulty)
+      val task = TestTask(50)
+      val workTime = calculateWorkTime(task)
 
-      addTask(task)
+      testDeveloper.addTask(task)
 
       manualTime.timePasses(workTime)
-      inside(developerTestKit.getState()) {
-        case resting: State.Resting =>
-          resting.lastCompleted.task shouldEqual task
-      }
+      testDeveloper.shouldRestAfterCompletingTask(task)
     }
 
     /** Перерыв длится строго отведённое время */
