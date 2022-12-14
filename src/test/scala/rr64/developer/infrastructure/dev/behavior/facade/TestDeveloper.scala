@@ -10,7 +10,7 @@ import org.scalatest.matchers.should.Matchers._
 import rr64.developer.domain.task.Task
 import rr64.developer.domain.timing.Factor
 import rr64.developer.infrastructure.DeveloperEventTestFacade.{Event, taskStartedEvent}
-import rr64.developer.infrastructure.dev.behavior.facade.TestAddTaskResult.Result
+import rr64.developer.infrastructure.dev.behavior.facade.TestAddTaskResult.AddTaskCommandResult
 import rr64.developer.infrastructure.dev.behavior.{Command, DeveloperBehavior, Replies, State}
 import rr64.developer.infrastructure.task.TaskWithId
 
@@ -79,7 +79,7 @@ class TestDeveloper(workFactor: Int, restFactor: Int)
 
 }
 
-class TestAddTaskResult private[facade](result: Result) {
+class TestAddTaskResult private[facade](result: AddTaskCommandResult) {
 
   def isQueued: Assertion =
     result.reply shouldBe a [Replies.TaskQueued]
@@ -101,7 +101,13 @@ class TestAddTaskResult private[facade](result: Result) {
 }
 
 object TestAddTaskResult {
-  private[facade] type Result = EventSourcedBehaviorTestKit.CommandResultWithReply[Command, Event, State, Replies.AddTaskResult]
+  private[facade] type AddTaskCommandResult =
+    EventSourcedBehaviorTestKit.CommandResultWithReply[
+      Command,
+      Event,
+      State,
+      Replies.AddTaskResult
+    ]
 }
 
 case class TestTask(difficulty: Int) {
