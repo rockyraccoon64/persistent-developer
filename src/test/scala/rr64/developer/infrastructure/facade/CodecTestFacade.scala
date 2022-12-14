@@ -1,6 +1,7 @@
-package rr64.developer.infrastructure
+package rr64.developer.infrastructure.facade
 
 import org.scalatest.matchers.should.Matchers.convertToAnyShouldWrapper
+import rr64.developer.infrastructure.Codec
 
 /**
  * Фасад для тестов с использованием кодеков

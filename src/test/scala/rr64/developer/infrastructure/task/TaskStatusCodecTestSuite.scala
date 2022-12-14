@@ -2,7 +2,7 @@ package rr64.developer.infrastructure.task
 
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
-import rr64.developer.infrastructure.CodecTestFacade._
+import rr64.developer.infrastructure.facade.CodecTestFacade._
 import rr64.developer.infrastructure.facade.task.TaskTestFacade._
 
 /**

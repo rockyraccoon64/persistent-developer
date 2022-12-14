@@ -3,7 +3,7 @@ package rr64.developer.infrastructure.dev
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import rr64.developer.domain.dev.DeveloperState
-import rr64.developer.infrastructure.CodecTestFacade._
+import rr64.developer.infrastructure.facade.CodecTestFacade._
 
 /**
  * Тесты кодека состояния разработчика
