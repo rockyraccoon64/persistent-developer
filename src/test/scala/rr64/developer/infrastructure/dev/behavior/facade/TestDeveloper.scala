@@ -7,14 +7,10 @@ import akka.persistence.typed.PersistenceId
 import org.scalatest.Assertion
 import org.scalatest.Inside.inside
 import org.scalatest.matchers.should.Matchers._
-import rr64.developer.domain.task.Task
 import rr64.developer.domain.timing.Factor
 import rr64.developer.infrastructure.DeveloperEventTestFacade.{Event, taskStartedEvent}
-import rr64.developer.infrastructure.dev.behavior.facade.TestAddTaskResult.AddTaskCommandResult
-import rr64.developer.infrastructure.dev.behavior.{Command, DeveloperBehavior, Replies, State}
+import rr64.developer.infrastructure.dev.behavior.{Command, DeveloperBehavior, State}
 import rr64.developer.infrastructure.task.TaskWithId
-
-import java.util.UUID
 
 class TestDeveloper(workFactor: Int, restFactor: Int)
                    (implicit system: ActorSystem[_]) {
@@ -77,39 +73,4 @@ class TestDeveloper(workFactor: Int, restFactor: Int)
     }
   }
 
-}
-
-class TestAddTaskResult private[facade](result: AddTaskCommandResult) {
-
-  def isQueued: Assertion =
-    result.reply shouldBe a [Replies.TaskQueued]
-
-  def isIdAssignedAfterQueueing: Assertion = {
-    val reply = result.replyOfType[Replies.TaskQueued]
-    reply.id should not be null
-  }
-
-  def taskShouldBeStarted: Assertion =
-    result.reply shouldBe a [Replies.TaskStarted]
-
-  def identifierAssignedAfterStarting: Assertion =
-    result.replyOfType[Replies.TaskStarted].id should not be null
-
-  private[facade] def id: UUID =
-    result.replyOfType[Replies.TaskStarted].id
-
-}
-
-object TestAddTaskResult {
-  private[facade] type AddTaskCommandResult =
-    EventSourcedBehaviorTestKit.CommandResultWithReply[
-      Command,
-      Event,
-      State,
-      Replies.AddTaskResult
-    ]
-}
-
-case class TestTask(difficulty: Int) {
-  private[facade] def toDomain: Task = Task(difficulty)
 }
