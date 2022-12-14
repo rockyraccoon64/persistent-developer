@@ -97,7 +97,7 @@ class DeveloperBehaviorTestSuite
       val task = TestTask(15)
       val result = testDeveloper.addTask(task)
       result.taskShouldBeStarted
-      result.startedTaskShouldBeAssignedId
+      result.taskShouldHaveIdentifier
       val id = result.id
       testDeveloper.workingOnTaskWithReturnedIdentifier(id)
     }
@@ -148,7 +148,7 @@ class DeveloperBehaviorTestSuite
       val newTask = TestTask(10)
       testDeveloper.afterStartingTask(currentTask)
       val result = testDeveloper.addTask(newTask)
-      result.queuedTaskShouldBeAssignedId
+      result.taskShouldHaveIdentifier
     }
 
     /** Когда разработчик работает над задачей, новые задачи отправляются в очередь */
