@@ -169,23 +169,19 @@ class DeveloperBehaviorTestSuite
 
     /** После окончания работы над задачей очередь задач сохраняется */
     "remain the same when a task is finished" in {
-      val firstTask = Task(100)
-      val secondTask = Task(50)
-      val thirdTask = Task(25)
+      val firstTask = TestTask(100)
+      val secondTask = TestTask(50)
+      val thirdTask = TestTask(25)
 
-      addTask(firstTask)
+      testDeveloper.addTask(firstTask)
+      testDeveloper.addTask(secondTask)
+      testDeveloper.addTask(thirdTask)
 
-      val secondTaskWithId = queueTask(secondTask)
-      val thirdTaskWithId = queueTask(thirdTask)
-
-      val workTime = calculateWorkTime(firstTask.difficulty)
-
+      val workTime = calculateWorkTime(firstTask)
       manualTime.timePasses(workTime)
 
-      inside(developerTestKit.getState()) {
-        case State.Resting(_, taskQueue) =>
-          taskQueue should contain theSameElementsInOrderAs Seq(secondTaskWithId, thirdTaskWithId)
-      }
+      testDeveloper.shouldBeResting
+      testDeveloper.queueShouldEqual(secondTask :: thirdTask :: Nil)
     }
 
     /** После отдыха берётся первая задача из очереди, если имеется */

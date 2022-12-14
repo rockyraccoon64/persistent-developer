@@ -50,6 +50,9 @@ class DeveloperTestFacade(workFactor: Int, restFactor: Int)
         resting.lastCompleted.task shouldEqual task.toDomain
     }
 
+  def shouldBeResting: Assertion =
+    developerTestKit.getState() shouldBe a [State.Resting]
+
   def shouldNotBeResting: Assertion =
     developerTestKit.getState() should not be a [State.Resting]
 
