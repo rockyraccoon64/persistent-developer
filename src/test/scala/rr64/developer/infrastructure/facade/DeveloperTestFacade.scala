@@ -7,9 +7,12 @@ import akka.persistence.typed.PersistenceId
 import org.scalatest.Assertion
 import org.scalatest.Inside.inside
 import org.scalatest.matchers.should.Matchers._
-import rr64.developer.domain.timing.Factor
+import rr64.developer.domain.task.Difficulty
+import rr64.developer.domain.timing.{Factor, Timing}
 import rr64.developer.infrastructure.DeveloperEventTestFacade.{Event, taskFinishedEvent, taskStartedEvent}
 import rr64.developer.infrastructure.dev.behavior.{Command, DeveloperBehavior, State}
+
+import scala.concurrent.duration.FiniteDuration
 
 class DeveloperTestFacade(workFactor: Int, restFactor: Int)
                          (implicit system: ActorSystem[_]) {
@@ -90,5 +93,13 @@ class DeveloperTestFacade(workFactor: Int, restFactor: Int)
     }
     queue.map(_.task) should contain theSameElementsInOrderAs tasks.map(_.toDomain)
   }
+
+  /** Расчитать время работы */
+  def calculateWorkTime(task: TestTask): FiniteDuration =
+    Timing.calculateTime(Difficulty(task.difficulty), _workFactor)
+
+  /** Расчитать время отдыха */
+  def calculateRestTime(task: TestTask): FiniteDuration =
+    Timing.calculateTime(Difficulty(task.difficulty), _restFactor)
 
 }

@@ -4,8 +4,6 @@ import akka.actor.testkit.typed.scaladsl.{ManualTime, ScalaTestWithActorTestKit}
 import akka.persistence.testkit.scaladsl.EventSourcedBehaviorTestKit
 import org.scalatest.BeforeAndAfterEach
 import org.scalatest.wordspec.AnyWordSpecLike
-import rr64.developer.domain.task.Difficulty
-import rr64.developer.domain.timing.{Factor, Timing}
 import rr64.developer.infrastructure.facade.{DeveloperTestFacade, TestTask, TestTaskWithId}
 
 import scala.concurrent.duration.{DurationInt, FiniteDuration}
@@ -22,12 +20,9 @@ class DeveloperBehaviorTestSuite
 
   private val manualTime = ManualTime()
 
-  private val workFactor = 10
-  private val restFactor = 5
-
   private val testDeveloper = new DeveloperTestFacade(
-    workFactor = workFactor,
-    restFactor = restFactor
+    workFactor = 10,
+    restFactor = 5
   )
 
   override protected def beforeEach(): Unit = {
@@ -37,11 +32,11 @@ class DeveloperBehaviorTestSuite
 
   /** Расчитать время работы */
   private def calculateWorkTime(task: TestTask): FiniteDuration =
-    Timing.calculateTime(Difficulty(task.difficulty), Factor(workFactor))
+    testDeveloper.calculateWorkTime(task)
 
   /** Расчитать время отдыха */
   private def calculateRestTime(task: TestTask): FiniteDuration =
-    Timing.calculateTime(Difficulty(task.difficulty), Factor(restFactor))
+    testDeveloper.calculateRestTime(task)
 
   /** Актор разработчика */
   "The developer" should {
