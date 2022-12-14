@@ -153,26 +153,18 @@ class DeveloperBehaviorTestSuite
 
     /** Когда разработчик работает над задачей, новые задачи отправляются в очередь */
     "queue new tasks while working" in {
-      val firstTask = Task(100)
-      val secondTask = Task(50)
-      val thirdTask = Task(25)
+      val firstTask = TestTask(100)
+      val secondTask = TestTask(50)
+      val thirdTask = TestTask(25)
 
-      val firstResult = addTask(firstTask)
-      val secondResult = addTask(secondTask)
-      val thirdResult = addTask(thirdTask)
+      testDeveloper.addTask(firstTask)
+      testDeveloper.queueShouldEqual(Nil)
 
-      firstResult.stateOfType[State.Working].taskQueue shouldEqual Nil
+      testDeveloper.addTask(secondTask)
+      testDeveloper.queueShouldEqual(secondTask :: Nil)
 
-      inside(secondResult.stateOfType[State.Working].taskQueue) {
-        case Seq(taskWithId) =>
-          taskWithId.task shouldEqual secondTask
-      }
-
-      inside(thirdResult.stateOfType[State.Working].taskQueue) {
-        case Seq(taskWithId1, taskWithId2) =>
-          taskWithId1.task shouldEqual secondTask
-          taskWithId2.task shouldEqual thirdTask
-      }
+      testDeveloper.addTask(thirdTask)
+      testDeveloper.queueShouldEqual(secondTask :: thirdTask :: Nil)
     }
 
     /** После окончания работы над задачей очередь задач сохраняется */

@@ -68,4 +68,12 @@ class DeveloperTestFacade(workFactor: Int, restFactor: Int)
     }
   }
 
+  def queueShouldEqual(tasks: Seq[TestTask]): Assertion = {
+    val queue = developerTestKit.getState() match {
+      case working: State.Working => working.taskQueue
+      case resting: State.Resting => resting.taskQueue
+    }
+    queue.map(_.task) shouldEqual tasks.map(_.toDomain)
+  }
+
 }
