@@ -36,8 +36,8 @@ class DeveloperTestFacade private(workFactor: Factor, restFactor: Factor)
   /** Вернуться в изначальное состояние */
   def reset(): Unit = developerTestKit.clear()
 
-  /** Перезапустить актора */ // TODO rename
-  def fail(): Unit = developerTestKit.restart()
+  /** Перезапустить актора */
+  def restart(): Unit = developerTestKit.restart()
 
   /** Поручить задачу */
   def addTask(task: TestTask): AddTaskResultTestFacade = {
@@ -57,12 +57,11 @@ class DeveloperTestFacade private(workFactor: Factor, restFactor: Factor)
     }
 
   /** Проверить, что разработчик в процессе выполнения задачи с конкретным идентификатором */
-  def workingOnTaskWithReturnedIdentifier(id: TestTaskIdentifier): Assertion = { // TODO rename
+  def shouldBeWorkingOnTaskWithId(id: TestTaskIdentifier): Assertion =
     inside(developerTestKit.getState()) {
       case working: State.Working =>
         working.currentTask.id shouldEqual id.id
     }
-  }
 
   /** Проверить, что разработчик не выполняет задачу в текущий момент */
   def shouldNotBeWorking: Assertion =

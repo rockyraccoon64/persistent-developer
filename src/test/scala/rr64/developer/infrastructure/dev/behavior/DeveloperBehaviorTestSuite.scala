@@ -60,7 +60,7 @@ class DeveloperBehaviorTestSuite
       result.taskShouldBeStarted
       result.taskShouldHaveIdentifier
       val id = result.taskId
-      testDeveloper.workingOnTaskWithReturnedIdentifier(id)
+      testDeveloper.shouldBeWorkingOnTaskWithId(id)
     }
 
     /** До выполнения задачи разработчик работает */
@@ -205,7 +205,7 @@ class DeveloperBehaviorTestSuite
       val workTime = calculateWorkTime(task)
 
       testDeveloper.afterStartingTask(taskWithId)
-      testDeveloper.fail()
+      testDeveloper.restart()
 
       manualTime.timePasses(workTime - 1.millis)
       testDeveloper.shouldBeWorkingOnTask(task)
@@ -220,7 +220,7 @@ class DeveloperBehaviorTestSuite
       val restTime = calculateRestTime(taskWithId.toTask)
 
       testDeveloper.afterCompletingTask(taskWithId)
-      testDeveloper.fail()
+      testDeveloper.restart()
 
       manualTime.timePasses(restTime - 1.millis)
       testDeveloper.shouldBeResting
