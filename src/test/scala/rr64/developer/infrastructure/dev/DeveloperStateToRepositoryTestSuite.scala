@@ -9,6 +9,7 @@ import akka.projection.testkit.scaladsl.{ProjectionTestKit, TestProjection}
 import org.scalatest.Assertion
 import org.scalatest.wordspec.AnyWordSpecLike
 import rr64.developer.domain.dev.DeveloperState
+import rr64.developer.infrastructure.DeveloperEventTestFacade.{restedEvent, taskFinishedEvent, taskQueuedEvent, taskStartedEvent}
 import rr64.developer.infrastructure.EventProjectionTestFacade._
 import rr64.developer.infrastructure.dev.behavior.Event
 import rr64.developer.infrastructure.task.TaskWithId
@@ -79,7 +80,7 @@ class DeveloperStateToRepositoryTestSuite
     /** Должен обновлять состояние разработчика на "Работает", когда он начинает задачу */
     "update the developer state in the repository when a task is started" in
       new HandlerTest {
-        val events = Event.TaskStarted(defaultTask1) :: Nil
+        val events = taskStartedEvent(defaultTask1) :: Nil
         val projection = projectionFromEvents(events)
 
         projectionTestKit.run(projection) {
@@ -90,8 +91,8 @@ class DeveloperStateToRepositoryTestSuite
     /** Должен обновлять состояние разработчика на "Отдых", когда он заканчивает задачу */
     "update the developer state in the repository when a task is finished" in
       new HandlerTest {
-        val events = Event.TaskStarted(defaultTask1) ::
-          Event.TaskFinished(defaultTask1) :: Nil
+        val events = taskStartedEvent(defaultTask1) ::
+          taskFinishedEvent(defaultTask1) :: Nil
         val projection = projectionFromEvents(events)
 
         projectionTestKit.run(projection) {
@@ -103,9 +104,9 @@ class DeveloperStateToRepositoryTestSuite
      * когда он отдохнул и у него нет задач */
     "update the state to Free after the developer rests if he has no more tasks" in
       new HandlerTest {
-        val events = Event.TaskStarted(defaultTask1) ::
-          Event.TaskFinished(defaultTask1) ::
-          Event.Rested(None) ::
+        val events = taskStartedEvent(defaultTask1) ::
+          taskFinishedEvent(defaultTask1) ::
+          restedEvent(None) ::
           Nil
         val projection = projectionFromEvents(events)
 
@@ -118,10 +119,10 @@ class DeveloperStateToRepositoryTestSuite
      * когда он отдохнул и в очереди есть задача */
     "update the state to Working after the developer rests if there is a task in the queue" in
       new HandlerTest {
-        val events = Event.TaskStarted(defaultTask1) ::
-          Event.TaskQueued(defaultTask2) ::
-          Event.TaskFinished(defaultTask1) ::
-          Event.Rested(Some(defaultTask2)) ::
+        val events = taskStartedEvent(defaultTask1) ::
+          taskQueuedEvent(defaultTask2) ::
+          taskFinishedEvent(defaultTask1) ::
+          restedEvent(Some(defaultTask2)) ::
           Nil
         val projection = projectionFromEvents(events)
 
@@ -133,8 +134,8 @@ class DeveloperStateToRepositoryTestSuite
     /** Не должен обновлять состояние разработчика при получении задачи, когда он работает */
     "not update the state after receiving a new task while working" in
       new HandlerTest {
-        val events = Event.TaskStarted(defaultTask1) ::
-          Event.TaskQueued(defaultTask2) ::
+        val events = taskStartedEvent(defaultTask1) ::
+          taskQueuedEvent(defaultTask2) ::
           Nil
         val projection = projectionFromEvents(events)
 
@@ -146,9 +147,9 @@ class DeveloperStateToRepositoryTestSuite
     /** Не должен обновлять состояние разработчика при получении задачи, когда он отдыхает */
     "not update the state when the developer receives a new task while resting" in
       new HandlerTest {
-        val events = Event.TaskStarted(defaultTask1) ::
-          Event.TaskFinished(defaultTask1) ::
-          Event.TaskQueued(defaultTask2) ::
+        val events = taskStartedEvent(defaultTask1) ::
+          taskFinishedEvent(defaultTask1) ::
+          taskQueuedEvent(defaultTask2) ::
           Nil
         val projection = projectionFromEvents(events)
 
@@ -162,13 +163,13 @@ class DeveloperStateToRepositoryTestSuite
       new HandlerTest {
         val differentPersistenceId = "test-id2"
         val events1 = envelopeSource[Event](
-          events = Event.TaskStarted(defaultTask2) ::
-            Event.TaskFinished(defaultTask2) ::
+          events = taskStartedEvent(defaultTask2) ::
+            taskFinishedEvent(defaultTask2) ::
             Nil,
           persistenceId = defaultPersistenceId
         )
         val events2 = envelopeSource[Event](
-          events = Event.TaskStarted(defaultTask1) :: Nil,
+          events = taskStartedEvent(defaultTask1) :: Nil,
           persistenceId = differentPersistenceId,
           startOffset = 2
         )
