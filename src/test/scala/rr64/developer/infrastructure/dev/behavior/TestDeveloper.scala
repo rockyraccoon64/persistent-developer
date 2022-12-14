@@ -4,6 +4,8 @@ import akka.actor.typed.ActorSystem
 import akka.persistence.testkit.scaladsl.EventSourcedBehaviorTestKit
 import akka.persistence.testkit.scaladsl.EventSourcedBehaviorTestKit.SerializationSettings
 import akka.persistence.typed.PersistenceId
+import org.scalatest.Assertion
+import org.scalatest.matchers.should.Matchers.convertToAnyShouldWrapper
 import rr64.developer.domain.timing.Factor
 import rr64.developer.infrastructure.DeveloperEventTestFacade.Event
 
@@ -24,5 +26,8 @@ class TestDeveloper(workFactor: Int, restFactor: Int)
       ),
       SerializationSettings.disabled
     )
+
+  def shouldBeFree: Assertion =
+    developerTestKit.getState() shouldEqual State.Free
 
 }

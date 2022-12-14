@@ -71,10 +71,7 @@ class DeveloperBehaviorTestSuite
   "The developer" should {
 
     /** Начинает в свободном состоянии */
-    "start in a free state" in {
-      val state = developerTestKit.getState()
-      state shouldEqual State.Free
-    }
+    "start in a free state" in testDeveloper.shouldBeFree
 
     /** Когда разработчик свободен, он принимает задачу в работу */
     "accept the task he's given when he's free" in {
