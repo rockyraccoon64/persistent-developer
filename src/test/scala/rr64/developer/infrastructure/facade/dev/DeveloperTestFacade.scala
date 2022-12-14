@@ -114,11 +114,11 @@ class DeveloperTestFacade private(workFactor: Factor, restFactor: Factor)
 
   /** Расчитать время работы */
   def calculateWorkTime(task: TestTask): FiniteDuration =
-    Timing.calculateTime(Difficulty(task.difficulty), workFactor)
+    calculateTime(task.difficulty, workFactor)
 
   /** Расчитать время отдыха */
   def calculateRestTime(task: TestTask): FiniteDuration =
-    Timing.calculateTime(Difficulty(task.difficulty), restFactor)
+    calculateTime(task.difficulty, restFactor)
 
   /** Текущее состояние */
   private def state: State = developerTestKit.getState()
@@ -128,6 +128,15 @@ class DeveloperTestFacade private(workFactor: Factor, restFactor: Factor)
     case working: State.Working => working.taskQueue
     case resting: State.Resting => resting.taskQueue
   }
+
+  /** Расчитать время работы или отдыха */
+  private def calculateTime(
+    difficulty: Int,
+    factor: Factor
+  ): FiniteDuration =
+    Timing.calculateTime(
+      Difficulty(difficulty), factor
+    )
 
 }
 
