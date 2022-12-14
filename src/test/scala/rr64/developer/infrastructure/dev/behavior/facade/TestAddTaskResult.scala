@@ -7,8 +7,6 @@ import rr64.developer.infrastructure.DeveloperEventTestFacade.Event
 import rr64.developer.infrastructure.dev.behavior.facade.TestAddTaskResult.AddTaskCommandResult
 import rr64.developer.infrastructure.dev.behavior.{Command, Replies, State}
 
-import java.util.UUID
-
 class TestAddTaskResult private[facade](result: AddTaskCommandResult) {
 
   def taskShouldBeQueued: Assertion =
@@ -25,8 +23,10 @@ class TestAddTaskResult private[facade](result: AddTaskCommandResult) {
   def startedTaskShouldBeAssignedId: Assertion =
     result.replyOfType[Replies.TaskStarted].id should not be null
 
-  private[facade] def id: UUID =
-    result.replyOfType[Replies.TaskStarted].id
+  def id: TestTaskIdentifier = {
+    val idResult = result.replyOfType[Replies.TaskStarted].id
+    new TestTaskIdentifier(idResult)
+  }
 
 }
 

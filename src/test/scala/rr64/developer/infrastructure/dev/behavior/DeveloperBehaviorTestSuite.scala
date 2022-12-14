@@ -98,7 +98,8 @@ class DeveloperBehaviorTestSuite
       val result = testDeveloper.addTask(task)
       result.taskShouldBeStarted
       result.startedTaskShouldBeAssignedId
-      testDeveloper.workingOnTaskWithReturnedIdentifier(result)
+      val id = result.id
+      testDeveloper.workingOnTaskWithReturnedIdentifier(id)
     }
 
     /** До выполнения задачи разработчик работает */

@@ -61,10 +61,10 @@ class TestDeveloper(workFactor: Int, restFactor: Int)
     new TestAddTaskResult(result)
   }
 
-  def workingOnTaskWithReturnedIdentifier(result: TestAddTaskResult): Assertion = {
+  def workingOnTaskWithReturnedIdentifier(id: TestTaskIdentifier): Assertion = {
     inside(developerTestKit.getState()) {
       case working: State.Working =>
-        working.currentTask.id shouldEqual result.id
+        working.currentTask.id shouldEqual id.id
     }
   }
 
