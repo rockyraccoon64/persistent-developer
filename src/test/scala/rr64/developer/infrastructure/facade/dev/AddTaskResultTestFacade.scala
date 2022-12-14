@@ -1,10 +1,10 @@
-package rr64.developer.infrastructure.facade
+package rr64.developer.infrastructure.facade.dev
 
 import akka.persistence.testkit.scaladsl.EventSourcedBehaviorTestKit
 import org.scalatest.Assertion
 import org.scalatest.matchers.should.Matchers._
 import rr64.developer.infrastructure.dev.behavior.{Command, Replies, State}
-import rr64.developer.infrastructure.facade.AddTaskResultTestFacade.AddTaskCommandResult
+import rr64.developer.infrastructure.facade.dev.AddTaskResultTestFacade.AddTaskCommandResult
 import rr64.developer.infrastructure.facade.event.DeveloperEventTestFacade.Event
 import rr64.developer.infrastructure.facade.task.TestTaskIdentifier
 

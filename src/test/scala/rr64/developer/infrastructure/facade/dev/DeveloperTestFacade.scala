@@ -10,7 +10,6 @@ import org.scalatest.matchers.should.Matchers._
 import rr64.developer.domain.task.Difficulty
 import rr64.developer.domain.timing.{Factor, Timing}
 import rr64.developer.infrastructure.dev.behavior.{Command, DeveloperBehavior, State}
-import rr64.developer.infrastructure.facade.AddTaskResultTestFacade
 import rr64.developer.infrastructure.facade.event.DeveloperEventTestFacade._
 import rr64.developer.infrastructure.facade.task.{TestTask, TestTaskIdentifier, TestTaskWithId}
 
