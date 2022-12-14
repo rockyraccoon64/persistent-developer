@@ -39,9 +39,6 @@ class TestDeveloper(workFactor: Int, restFactor: Int)
   def shouldBeFree: Assertion =
     developerTestKit.getState() shouldEqual State.Free
 
-  def addTask(task: TestTask): TestAddTaskResult =
-    addTaskWithResult(task)
-
   def shouldBeWorkingOnTask(task: TestTask): Assertion =
     inside(developerTestKit.getState()) {
       case working: State.Working =>
@@ -63,13 +60,13 @@ class TestDeveloper(workFactor: Int, restFactor: Int)
   def afterStartingTask(task: TaskWithId): Unit = // TODO Убрать TaskWithId
     developerTestKit.initialize(taskStartedEvent(task))
 
-  private def addTaskWithResult(task: TestTask): TestAddTaskResult = { // TODO delete
+  def addTask(task: TestTask): TestAddTaskResult = {
     val result = developerTestKit.runCommand(Command.AddTask(task.toDomain, _))
     new TestAddTaskResult(result)
   }
 
   def addsTaskAndRepliesWithIdentifier(newTask: TestTask): Assertion = {
-    val result = addTaskWithResult(newTask)
+    val result = addTask(newTask)
     result.isIdAssignedAfterQueueing
   }
 
