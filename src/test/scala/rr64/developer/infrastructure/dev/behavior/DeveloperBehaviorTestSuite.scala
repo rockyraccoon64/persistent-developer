@@ -254,17 +254,17 @@ class DeveloperBehaviorTestSuite
 
     /** Если актор упал в состоянии отдыха, соответствующий таймер запускается по новой */
     "start the rest timer when completing recovery in a Resting state" in {
-      val taskWithId = TaskWithId(10, "b807f5ff-6066-454e-8d53-2a90a3941cc4")
+      val taskWithId = createTaskWithId(10, "b807f5ff-6066-454e-8d53-2a90a3941cc4")
       val restTime = calculateRestTime(taskWithId.difficulty)
 
-      developerTestKit.initialize(taskStartedEvent(taskWithId), taskFinishedEvent(taskWithId))
-      developerTestKit.restart()
+      testDeveloper.afterCompletingTask(taskWithId)
+      testDeveloper.fail()
 
       manualTime.timePasses(restTime - 1.millis)
-      developerTestKit.getState() shouldBe a [State.Resting]
+      testDeveloper.shouldBeResting
 
       manualTime.timePasses(1.millis)
-      developerTestKit.getState() shouldBe State.Free
+      testDeveloper.shouldBeFree
     }
 
     /** После отдыха разработчик выполняет следующую задачу из очереди до конца */

@@ -8,7 +8,7 @@ import org.scalatest.Assertion
 import org.scalatest.Inside.inside
 import org.scalatest.matchers.should.Matchers._
 import rr64.developer.domain.timing.Factor
-import rr64.developer.infrastructure.DeveloperEventTestFacade.{Event, taskStartedEvent}
+import rr64.developer.infrastructure.DeveloperEventTestFacade.{Event, taskFinishedEvent, taskStartedEvent}
 import rr64.developer.infrastructure.dev.behavior.{Command, DeveloperBehavior, State}
 import rr64.developer.infrastructure.task.TaskWithId
 
@@ -60,6 +60,9 @@ class DeveloperTestFacade(workFactor: Int, restFactor: Int)
 
   def afterStartingTask(task: TaskWithId): Unit = // TODO Убрать TaskWithId
     developerTestKit.initialize(taskStartedEvent(task))
+
+  def afterCompletingTask(task: TaskWithId): Unit = // TODO Убрать TaskWithId
+    developerTestKit.initialize(taskStartedEvent(task), taskFinishedEvent(task))
 
   def addTask(task: TestTask): AddTaskResultTestFacade = {
     val result = developerTestKit.runCommand(Command.AddTask(task.toDomain, _))
