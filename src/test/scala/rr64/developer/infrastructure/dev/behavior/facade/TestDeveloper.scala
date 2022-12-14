@@ -1,4 +1,4 @@
-package rr64.developer.infrastructure.dev.behavior
+package rr64.developer.infrastructure.dev.behavior.facade
 
 import akka.actor.typed.ActorSystem
 import akka.persistence.testkit.scaladsl.EventSourcedBehaviorTestKit
@@ -10,7 +10,8 @@ import org.scalatest.matchers.should.Matchers._
 import rr64.developer.domain.task.Task
 import rr64.developer.domain.timing.Factor
 import rr64.developer.infrastructure.DeveloperEventTestFacade.{Event, taskStartedEvent}
-import rr64.developer.infrastructure.dev.behavior.TestAddTaskResult.Result
+import rr64.developer.infrastructure.dev.behavior.facade.TestAddTaskResult.Result
+import rr64.developer.infrastructure.dev.behavior.{Command, DeveloperBehavior, Replies, State}
 import rr64.developer.infrastructure.task.TaskWithId
 
 import java.util.UUID

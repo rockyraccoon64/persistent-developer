@@ -10,6 +10,7 @@ import org.scalatest.wordspec.AnyWordSpecLike
 import rr64.developer.domain.task.{Difficulty, Task}
 import rr64.developer.domain.timing.{Factor, Timing}
 import rr64.developer.infrastructure.DeveloperEventTestFacade._
+import rr64.developer.infrastructure.dev.behavior.facade.{TestDeveloper, TestTask}
 import rr64.developer.infrastructure.task.TaskTestFacade.createTaskWithId
 import rr64.developer.infrastructure.task.TaskWithId
 
