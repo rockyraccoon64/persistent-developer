@@ -1,5 +1,6 @@
 package rr64.developer.infrastructure.dev.behavior
 
+import org.scalatest.Assertion
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 import rr64.developer.infrastructure.DeveloperEventTestFacade._
@@ -13,7 +14,7 @@ class EventSerializerTestSuite extends AnyFlatSpec with Matchers {
   private val serializer = new EventSerializer
 
   /** Проверка симметричности сериализации и десериализации */
-  private def assertSerialized(event: Event) {
+  private def assertSerialized(event: Event): Assertion = {
     val bytes = serializer.toBinary(event)
     val manifest = serializer.manifest(event)
     serializer.fromBinary(bytes, manifest) shouldEqual event
