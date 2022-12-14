@@ -56,9 +56,9 @@ class TestDeveloper(workFactor: Int, restFactor: Int)
   def afterStartingTask(task: TaskWithId): Unit = // TODO Убрать TaskWithId
     developerTestKit.initialize(taskStartedEvent(task))
 
-  def addTask(task: TestTask): TestAddTaskResult = {
+  def addTask(task: TestTask): AddTaskResultTestFacade = {
     val result = developerTestKit.runCommand(Command.AddTask(task.toDomain, _))
-    new TestAddTaskResult(result)
+    new AddTaskResultTestFacade(result)
   }
 
   def workingOnTaskWithReturnedIdentifier(id: TestTaskIdentifier): Assertion = {

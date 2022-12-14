@@ -4,12 +4,12 @@ import akka.persistence.testkit.scaladsl.EventSourcedBehaviorTestKit
 import org.scalatest.Assertion
 import org.scalatest.matchers.should.Matchers._
 import rr64.developer.infrastructure.DeveloperEventTestFacade.Event
-import rr64.developer.infrastructure.dev.behavior.facade.TestAddTaskResult.AddTaskCommandResult
+import rr64.developer.infrastructure.dev.behavior.facade.AddTaskResultTestFacade.AddTaskCommandResult
 import rr64.developer.infrastructure.dev.behavior.{Command, Replies, State}
 
 import java.util.UUID
 
-class TestAddTaskResult private[facade](result: AddTaskCommandResult) {
+class AddTaskResultTestFacade private[facade](result: AddTaskCommandResult) {
 
   def taskShouldBeQueued: Assertion =
     result.reply shouldBe a [Replies.TaskQueued]
@@ -30,7 +30,7 @@ class TestAddTaskResult private[facade](result: AddTaskCommandResult) {
 
 }
 
-object TestAddTaskResult {
+object AddTaskResultTestFacade {
 
   private[facade] type AddTaskCommandResult =
     EventSourcedBehaviorTestKit.CommandResultWithReply[
