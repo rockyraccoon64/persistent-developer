@@ -6,7 +6,7 @@ import org.scalatest.BeforeAndAfterEach
 import org.scalatest.wordspec.AnyWordSpecLike
 import rr64.developer.domain.task.Difficulty
 import rr64.developer.domain.timing.{Factor, Timing}
-import rr64.developer.infrastructure.dev.behavior.facade.{DeveloperTestFacade, TestTask, TestTaskWithId}
+import rr64.developer.infrastructure.facade.{DeveloperTestFacade, TestTask, TestTaskWithId}
 
 import scala.concurrent.duration.{DurationInt, FiniteDuration}
 

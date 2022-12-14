@@ -1,4 +1,4 @@
-package rr64.developer.infrastructure.dev.behavior.facade
+package rr64.developer.infrastructure.facade
 
 import akka.actor.typed.ActorSystem
 import akka.persistence.testkit.scaladsl.EventSourcedBehaviorTestKit
