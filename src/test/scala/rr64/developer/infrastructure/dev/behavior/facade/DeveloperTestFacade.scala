@@ -76,7 +76,7 @@ class DeveloperTestFacade(workFactor: Int, restFactor: Int)
       case working: State.Working => working.taskQueue
       case resting: State.Resting => resting.taskQueue
     }
-    queue.map(_.task) shouldEqual tasks.map(_.toDomain)
+    queue.map(_.task) should contain theSameElementsInOrderAs tasks.map(_.toDomain)
   }
 
 }

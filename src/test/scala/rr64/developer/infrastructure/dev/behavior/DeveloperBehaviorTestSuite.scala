@@ -186,26 +186,22 @@ class DeveloperBehaviorTestSuite
 
     /** После отдыха берётся первая задача из очереди, если имеется */
     "take the first task from the queue when he's finished resting" in {
-      val firstTask = Task(100)
-      val secondTask = Task(90)
-      val thirdTask = Task(25)
+      val firstTask = TestTask(100)
+      val secondTask = TestTask(90)
+      val thirdTask = TestTask(25)
 
-      addTask(firstTask)
+      testDeveloper.addTask(firstTask)
+      testDeveloper.addTask(secondTask)
+      testDeveloper.addTask(thirdTask)
 
-      val secondTaskWithId = queueTask(secondTask)
-      val thirdTaskWithId = queueTask(thirdTask)
-
-      val workTime = calculateWorkTime(firstTask.difficulty)
-      val restTime = calculateRestTime(firstTask.difficulty)
+      val workTime = calculateWorkTime(firstTask)
+      val restTime = calculateRestTime(firstTask)
 
       manualTime.timePasses(workTime)
       manualTime.timePasses(restTime)
 
-      inside(developerTestKit.getState()) {
-        case State.Working(currentTask, taskQueue) =>
-          currentTask shouldEqual secondTaskWithId
-          taskQueue should contain theSameElementsInOrderAs Seq(thirdTaskWithId)
-      }
+      testDeveloper.shouldBeWorkingOnTask(secondTask)
+      testDeveloper.queueShouldEqual(thirdTask :: Nil)
     }
 
     /** Если задач в очереди нет, после отдыха разработчик возвращается в свободное состояние */
