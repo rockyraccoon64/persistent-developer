@@ -20,7 +20,7 @@ class AddTaskResultTestFacade private[facade](result: AddTaskCommandResult) {
   def taskShouldHaveIdentifier: Assertion =
     extractId should not be null
 
-  def id: TestTaskIdentifier =
+  def taskId: TestTaskIdentifier =
     new TestTaskIdentifier(extractId)
 
   private def extractId: UUID = result.reply match {
