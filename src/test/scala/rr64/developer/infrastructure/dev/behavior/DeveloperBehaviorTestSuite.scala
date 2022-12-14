@@ -22,10 +22,13 @@ class DeveloperBehaviorTestSuite
 
   private val manualTime = ManualTime()
 
-  private val workFactor = Factor(10)
-  private val restFactor = Factor(5)
+  private val workFactor = 10
+  private val restFactor = 5
 
-  private val testDeveloper = new DeveloperTestFacade(workFactor = 10, restFactor = 5)
+  private val testDeveloper = new DeveloperTestFacade(
+    workFactor = workFactor,
+    restFactor = restFactor
+  )
 
   override protected def beforeEach(): Unit = {
     super.beforeEach()
@@ -33,20 +36,12 @@ class DeveloperBehaviorTestSuite
   }
 
   /** Расчитать время работы */
-  private def calculateWorkTime(difficulty: Difficulty): FiniteDuration =
-    Timing.calculateTime(difficulty, workFactor)
-
-  /** Расчитать время работы */
   private def calculateWorkTime(task: TestTask): FiniteDuration =
-    calculateWorkTime(Difficulty(task.difficulty))
-
-  /** Расчитать время отдыха */
-  private def calculateRestTime(difficulty: Difficulty): FiniteDuration =
-    Timing.calculateTime(difficulty, restFactor)
+    Timing.calculateTime(Difficulty(task.difficulty), Factor(workFactor))
 
   /** Расчитать время отдыха */
   private def calculateRestTime(task: TestTask): FiniteDuration =
-    calculateRestTime(Difficulty(task.difficulty))
+    Timing.calculateTime(Difficulty(task.difficulty), Factor(restFactor))
 
   /** Актор разработчика */
   "The developer" should {
