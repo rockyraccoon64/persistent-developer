@@ -20,47 +20,46 @@ class DeveloperBehaviorTestSuite
     with BeforeAndAfterEach {
 
   private val manualTime = ManualTime()
-
-  private val testDeveloper = DeveloperTestFacade(
+  private val developer = DeveloperTestFacade(
     workFactor = 10,
     restFactor = 5
   )
 
   override protected def beforeEach(): Unit = {
     super.beforeEach()
-    testDeveloper.reset()
+    developer.reset()
   }
 
   /** Расчитать время работы */
   private def calculateWorkTime(task: TestTask): FiniteDuration =
-    testDeveloper.calculateWorkTime(task)
+    developer.calculateWorkTime(task)
 
   /** Расчитать время отдыха */
   private def calculateRestTime(task: TestTask): FiniteDuration =
-    testDeveloper.calculateRestTime(task)
+    developer.calculateRestTime(task)
 
   /** Актор разработчика */
   "The developer" should {
 
     /** Начинает в свободном состоянии */
-    "start in a free state" in testDeveloper.shouldBeFree
+    "start in a free state" in developer.shouldBeFree
 
     /** Когда разработчик свободен, он принимает задачу в работу */
     "accept the task he's given when he's free" in {
       val task = TestTask(5)
-      testDeveloper.addTask(task)
-      testDeveloper.shouldBeWorkingOnTask(task)
+      developer.addTask(task)
+      developer.shouldBeWorkingOnTask(task)
     }
 
     /** Когда разработчик свободен, то при получении задачи
      * он присваивает ей идентификатор и отправляет его в ответе */
     "reply with a Task Started message when he's free" in {
       val task = TestTask(15)
-      val result = testDeveloper.addTask(task)
+      val result = developer.addTask(task)
       result.taskShouldBeStarted
       result.taskShouldHaveIdentifier
       val id = result.taskId
-      testDeveloper.shouldBeWorkingOnTaskWithId(id)
+      developer.shouldBeWorkingOnTaskWithId(id)
     }
 
     /** До выполнения задачи разработчик работает */
@@ -68,12 +67,12 @@ class DeveloperBehaviorTestSuite
       val task = TestTask(20)
       val workTime = calculateWorkTime(task)
 
-      testDeveloper.addTask(task)
+      developer.addTask(task)
 
       manualTime.timePasses(workTime - 1.millis)
-      testDeveloper.shouldBeWorkingOnTask(task)
+      developer.shouldBeWorkingOnTask(task)
       manualTime.timePasses(1.millis)
-      testDeveloper.shouldNotBeWorking
+      developer.shouldNotBeWorking
     }
 
     /** Завершив задачу, разработчик делает перерыв */
@@ -81,10 +80,10 @@ class DeveloperBehaviorTestSuite
       val task = TestTask(50)
       val workTime = calculateWorkTime(task)
 
-      testDeveloper.addTask(task)
+      developer.addTask(task)
 
       manualTime.timePasses(workTime)
-      testDeveloper.shouldBeRestingAfterCompletingTask(task)
+      developer.shouldBeRestingAfterCompletingTask(task)
     }
 
     /** Перерыв длится строго отведённое время */
@@ -93,12 +92,12 @@ class DeveloperBehaviorTestSuite
       val workTime = calculateWorkTime(task)
       val restTime = calculateRestTime(task)
 
-      testDeveloper.addTask(task)
+      developer.addTask(task)
 
       manualTime.timePasses(workTime)
       manualTime.timePasses(restTime)
 
-      testDeveloper.shouldNotBeResting
+      developer.shouldNotBeResting
     }
 
     /** Когда разработчик работает над задачей,
@@ -107,8 +106,8 @@ class DeveloperBehaviorTestSuite
     "reply with an identifier after receiving a new task while working" in {
       val currentTask = TestTaskWithId(100, "f490d7ca-dcbf-4905-be03-ffd7bf90b513")
       val newTask = TestTask(10)
-      testDeveloper.afterStartingTask(currentTask)
-      val result = testDeveloper.addTask(newTask)
+      developer.afterStartingTask(currentTask)
+      val result = developer.addTask(newTask)
       result.taskShouldHaveIdentifier
     }
 
@@ -118,14 +117,14 @@ class DeveloperBehaviorTestSuite
       val secondTask = TestTask(50)
       val thirdTask = TestTask(25)
 
-      testDeveloper.addTask(firstTask)
-      testDeveloper.queueShouldEqual(Nil)
+      developer.addTask(firstTask)
+      developer.queueShouldEqual(Nil)
 
-      testDeveloper.addTask(secondTask)
-      testDeveloper.queueShouldEqual(secondTask :: Nil)
+      developer.addTask(secondTask)
+      developer.queueShouldEqual(secondTask :: Nil)
 
-      testDeveloper.addTask(thirdTask)
-      testDeveloper.queueShouldEqual(secondTask :: thirdTask :: Nil)
+      developer.addTask(thirdTask)
+      developer.queueShouldEqual(secondTask :: thirdTask :: Nil)
     }
 
     /** После окончания работы над задачей очередь задач сохраняется */
@@ -134,15 +133,15 @@ class DeveloperBehaviorTestSuite
       val secondTask = TestTask(50)
       val thirdTask = TestTask(25)
 
-      testDeveloper.addTask(firstTask)
-      testDeveloper.addTask(secondTask)
-      testDeveloper.addTask(thirdTask)
+      developer.addTask(firstTask)
+      developer.addTask(secondTask)
+      developer.addTask(thirdTask)
 
       val workTime = calculateWorkTime(firstTask)
       manualTime.timePasses(workTime)
 
-      testDeveloper.shouldBeResting
-      testDeveloper.queueShouldEqual(secondTask :: thirdTask :: Nil)
+      developer.shouldBeResting
+      developer.queueShouldEqual(secondTask :: thirdTask :: Nil)
     }
 
     /** После отдыха берётся первая задача из очереди, если имеется */
@@ -151,9 +150,9 @@ class DeveloperBehaviorTestSuite
       val secondTask = TestTask(90)
       val thirdTask = TestTask(25)
 
-      testDeveloper.addTask(firstTask)
-      testDeveloper.addTask(secondTask)
-      testDeveloper.addTask(thirdTask)
+      developer.addTask(firstTask)
+      developer.addTask(secondTask)
+      developer.addTask(thirdTask)
 
       val workTime = calculateWorkTime(firstTask)
       val restTime = calculateRestTime(firstTask)
@@ -161,8 +160,8 @@ class DeveloperBehaviorTestSuite
       manualTime.timePasses(workTime)
       manualTime.timePasses(restTime)
 
-      testDeveloper.shouldBeWorkingOnTask(secondTask)
-      testDeveloper.queueShouldEqual(thirdTask :: Nil)
+      developer.shouldBeWorkingOnTask(secondTask)
+      developer.queueShouldEqual(thirdTask :: Nil)
     }
 
     /** Если задач в очереди нет, после отдыха разработчик возвращается в свободное состояние */
@@ -171,12 +170,12 @@ class DeveloperBehaviorTestSuite
       val workTime = calculateWorkTime(task)
       val restTime = calculateRestTime(task)
 
-      testDeveloper.addTask(task)
+      developer.addTask(task)
 
       manualTime.timePasses(workTime)
       manualTime.timePasses(restTime)
 
-      testDeveloper.shouldBeFree
+      developer.shouldBeFree
     }
 
     /** Если разработчик отдыхает, новые задачи ставятся в очередь */
@@ -184,18 +183,18 @@ class DeveloperBehaviorTestSuite
       val initialTask = TestTask(1)
       val workTime = calculateWorkTime(initialTask)
 
-      testDeveloper.addTask(initialTask)
+      developer.addTask(initialTask)
       manualTime.timePasses(workTime)
 
-      testDeveloper.shouldBeResting
+      developer.shouldBeResting
 
       val secondTask = TestTask(10)
       val thirdTask = TestTask(5)
 
-      testDeveloper.addTask(secondTask)
-      testDeveloper.addTask(thirdTask)
+      developer.addTask(secondTask)
+      developer.addTask(thirdTask)
 
-      testDeveloper.queueShouldEqual(secondTask :: thirdTask :: Nil)
+      developer.queueShouldEqual(secondTask :: thirdTask :: Nil)
     }
 
     /** Если актор упал в рабочем состоянии, соответствующий таймер запускается по новой */
@@ -204,14 +203,14 @@ class DeveloperBehaviorTestSuite
       val task = taskWithId.toTask
       val workTime = calculateWorkTime(task)
 
-      testDeveloper.afterStartingTask(taskWithId)
-      testDeveloper.restart()
+      developer.afterStartingTask(taskWithId)
+      developer.restart()
 
       manualTime.timePasses(workTime - 1.millis)
-      testDeveloper.shouldBeWorkingOnTask(task)
+      developer.shouldBeWorkingOnTask(task)
 
       manualTime.timePasses(1.millis)
-      testDeveloper.shouldBeResting
+      developer.shouldBeResting
     }
 
     /** Если актор упал в состоянии отдыха, соответствующий таймер запускается по новой */
@@ -219,14 +218,14 @@ class DeveloperBehaviorTestSuite
       val taskWithId = TestTaskWithId(10, "b807f5ff-6066-454e-8d53-2a90a3941cc4")
       val restTime = calculateRestTime(taskWithId.toTask)
 
-      testDeveloper.afterCompletingTask(taskWithId)
-      testDeveloper.restart()
+      developer.afterCompletingTask(taskWithId)
+      developer.restart()
 
       manualTime.timePasses(restTime - 1.millis)
-      testDeveloper.shouldBeResting
+      developer.shouldBeResting
 
       manualTime.timePasses(1.millis)
-      testDeveloper.shouldBeFree
+      developer.shouldBeFree
     }
 
     /** После отдыха разработчик выполняет следующую задачу из очереди до конца */
@@ -240,19 +239,19 @@ class DeveloperBehaviorTestSuite
       val nextQueue = taskQueue.tail.map(_.toTask)
       val workTime = calculateWorkTime(nextTask)
 
-      testDeveloper.whileResting(lastCompleted, taskQueue)
+      developer.whileResting(lastCompleted, taskQueue)
 
       manualTime.timePasses(restTime)
-      testDeveloper.shouldBeWorkingOnTask(nextTask)
-      testDeveloper.queueShouldEqual(nextQueue)
+      developer.shouldBeWorkingOnTask(nextTask)
+      developer.queueShouldEqual(nextQueue)
 
       manualTime.timePasses(workTime - 1.millis)
-      testDeveloper.shouldBeWorkingOnTask(nextTask)
-      testDeveloper.queueShouldEqual(nextQueue)
+      developer.shouldBeWorkingOnTask(nextTask)
+      developer.queueShouldEqual(nextQueue)
 
       manualTime.timePasses(1.millis)
-      testDeveloper.shouldBeRestingAfterCompletingTask(nextTask)
-      testDeveloper.queueShouldEqual(nextQueue)
+      developer.shouldBeRestingAfterCompletingTask(nextTask)
+      developer.queueShouldEqual(nextQueue)
     }
 
   }
