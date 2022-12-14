@@ -238,17 +238,18 @@ class DeveloperBehaviorTestSuite
 
     /** Если актор упал в рабочем состоянии, соответствующий таймер запускается по новой */
     "start the work timer when completing recovery in a Working state" in {
-      val taskWithId = TaskWithId(50, "92ac4c4b-622f-44ba-b331-f1cf40a27c58")
+      val task = TestTask(50)
+      val taskWithId = createTaskWithId(50, "92ac4c4b-622f-44ba-b331-f1cf40a27c58")
       val workTime = calculateWorkTime(taskWithId.difficulty)
 
-      developerTestKit.initialize(taskStartedEvent(taskWithId))
-      developerTestKit.restart()
+      testDeveloper.afterStartingTask(taskWithId)
+      testDeveloper.fail()
 
       manualTime.timePasses(workTime - 1.millis)
-      developerTestKit.getState() shouldBe a [State.Working]
+      testDeveloper.shouldBeWorkingOnTask(task)
 
       manualTime.timePasses(1.millis)
-      developerTestKit.getState() shouldBe a [State.Resting]
+      testDeveloper.shouldBeResting
     }
 
     /** Если актор упал в состоянии отдыха, соответствующий таймер запускается по новой */

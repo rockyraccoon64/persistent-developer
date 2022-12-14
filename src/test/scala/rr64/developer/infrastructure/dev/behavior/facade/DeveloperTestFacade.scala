@@ -32,6 +32,8 @@ class DeveloperTestFacade(workFactor: Int, restFactor: Int)
 
   def reset(): Unit = developerTestKit.clear()
 
+  def fail(): Unit = developerTestKit.restart()
+
   def shouldBeFree: Assertion =
     developerTestKit.getState() shouldEqual State.Free
 
