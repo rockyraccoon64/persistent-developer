@@ -11,10 +11,10 @@ import java.util.UUID
 
 class TestAddTaskResult private[facade](result: AddTaskCommandResult) {
 
-  def isQueued: Assertion =
+  def taskShouldBeQueued: Assertion =
     result.reply shouldBe a [Replies.TaskQueued]
 
-  def isIdAssignedAfterQueueing: Assertion = {
+  def queuedTaskShouldBeAssignedId: Assertion = {
     val reply = result.replyOfType[Replies.TaskQueued]
     reply.id should not be null
   }
@@ -22,7 +22,7 @@ class TestAddTaskResult private[facade](result: AddTaskCommandResult) {
   def taskShouldBeStarted: Assertion =
     result.reply shouldBe a [Replies.TaskStarted]
 
-  def identifierAssignedAfterStarting: Assertion =
+  def startedTaskShouldBeAssignedId: Assertion =
     result.replyOfType[Replies.TaskStarted].id should not be null
 
   private[facade] def id: UUID =
