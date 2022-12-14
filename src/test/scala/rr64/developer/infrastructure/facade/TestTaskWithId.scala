@@ -1,6 +1,6 @@
 package rr64.developer.infrastructure.facade
 
-import rr64.developer.infrastructure.facade.task.TaskTestFacade
+import rr64.developer.infrastructure.facade.task.{TaskTestFacade, TestTask}
 import rr64.developer.infrastructure.task.TaskWithId
 
 case class TestTaskWithId(difficulty: Int, id: String) {
