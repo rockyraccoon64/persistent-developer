@@ -1,9 +1,10 @@
-package rr64.developer.infrastructure.task
+package rr64.developer.infrastructure.facade.task
 
 import org.scalatest.Assertion
 import org.scalatest.matchers.should.Matchers._
 import rr64.developer.domain.task.TaskInfo
 import rr64.developer.infrastructure.facade.query.LimitOffsetQueryTestFacade
+import rr64.developer.infrastructure.task.{TaskSlickRepository, TestTaskRepository}
 
 import scala.concurrent.{ExecutionContext, Future}
 
