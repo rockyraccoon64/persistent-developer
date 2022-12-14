@@ -75,10 +75,9 @@ class DeveloperBehaviorTestSuite
 
     /** Когда разработчик свободен, он принимает задачу в работу */
     "accept the task he's given when he's free" in {
-      val task = Task(5)
-      val result = addTask(task)
-      val state = result.stateOfType[State.Working]
-      state.currentTask.task shouldEqual task
+      val task = TestTask(5)
+      testDeveloper.addTask(task)
+      testDeveloper.shouldBeWorkingOnTask(task)
     }
 
     /** Когда разработчик свободен, то при получении задачи

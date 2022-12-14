@@ -5,7 +5,9 @@ import akka.persistence.testkit.scaladsl.EventSourcedBehaviorTestKit
 import akka.persistence.testkit.scaladsl.EventSourcedBehaviorTestKit.SerializationSettings
 import akka.persistence.typed.PersistenceId
 import org.scalatest.Assertion
-import org.scalatest.matchers.should.Matchers.convertToAnyShouldWrapper
+import org.scalatest.Inside.inside
+import org.scalatest.matchers.should.Matchers._
+import rr64.developer.domain.task.Task
 import rr64.developer.domain.timing.Factor
 import rr64.developer.infrastructure.DeveloperEventTestFacade.Event
 
@@ -30,4 +32,18 @@ class TestDeveloper(workFactor: Int, restFactor: Int)
   def shouldBeFree: Assertion =
     developerTestKit.getState() shouldEqual State.Free
 
+  def addTask(task: TestTask): Unit =
+    developerTestKit.runCommand(Command.AddTask(task.toDomain, _))
+
+  def shouldBeWorkingOnTask(task: TestTask): Assertion = {
+    inside(developerTestKit.getState()) {
+      case State.Working(currentTask, _) =>
+      currentTask.task shouldEqual task.toDomain
+    }
+  }
+
+}
+
+case class TestTask(difficulty: Int) {
+  def toDomain: Task = Task(difficulty)
 }
