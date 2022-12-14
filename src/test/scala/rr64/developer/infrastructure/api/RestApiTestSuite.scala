@@ -12,7 +12,7 @@ import rr64.developer.domain.dev.{DeveloperReply, DeveloperState}
 import rr64.developer.domain.service.DeveloperService
 import rr64.developer.domain.task.{Task, TaskStatus}
 import rr64.developer.infrastructure.api.model._
-import rr64.developer.infrastructure.facade.task.TaskTestFacade.createTaskInfo
+import rr64.developer.infrastructure.facade.task.TaskTestFacade._
 import spray.json.DefaultJsonProtocol.immSeqFormat
 import spray.json.JsObject
 
@@ -67,19 +67,19 @@ class RestApiTestSuite
       assertTaskInfoReturned(
         id = "6f9ed143-70f4-4406-9c6b-2d9ddd297304",
         difficulty = 35,
-        status = TaskStatus.InProgress,
+        status = inProgressTaskStatus,
         apiStatus = "InProgress"
       )
       assertTaskInfoReturned(
         id = "5f4e32f8-fc81-49c4-a05c-efbf5aa0d47d",
         difficulty = 99,
-        status = TaskStatus.Queued,
+        status = queuedTaskStatus,
         apiStatus = "Queued"
       )
       assertTaskInfoReturned(
         id = "374b7d13-8174-4476-b1d6-1d8759d2a6ed",
         difficulty = 1,
-        status = TaskStatus.Finished,
+        status = finishedTaskStatus,
         apiStatus = "Finished"
       )
     }
@@ -322,9 +322,9 @@ class RestApiTestSuite
 
     /** Возвращать список задач */
     "return the task list" in {
-      val domainTasks = createTaskInfo("8506c214-757c-46b8-8a97-b6a361b1470d", 99, TaskStatus.Finished) ::
-        createTaskInfo("a5cfdd2e-7dcf-43b1-8dd6-a38d6d568845", 51, TaskStatus.InProgress) ::
-        createTaskInfo("e85dda7f-391e-4fd7-87a6-201a2022675f", 65, TaskStatus.Queued) ::
+      val domainTasks = createTaskInfo("8506c214-757c-46b8-8a97-b6a361b1470d", 99, finishedTaskStatus) ::
+        createTaskInfo("a5cfdd2e-7dcf-43b1-8dd6-a38d6d568845", 51, inProgressTaskStatus) ::
+        createTaskInfo("e85dda7f-391e-4fd7-87a6-201a2022675f", 65, queuedTaskStatus) ::
         Nil
 
       val apiTasks = domainTasks.map(ApiTaskInfo.adapter.convert)
