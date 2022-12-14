@@ -206,16 +206,16 @@ class DeveloperBehaviorTestSuite
 
     /** Если задач в очереди нет, после отдыха разработчик возвращается в свободное состояние */
     "be free after resting if there are no more tasks in the queue" in {
-      val task = Task(50)
-      val workTime = calculateWorkTime(task.difficulty)
-      val restTime = calculateRestTime(task.difficulty)
+      val task = TestTask(50)
+      val workTime = calculateWorkTime(task)
+      val restTime = calculateRestTime(task)
 
-      addTask(task)
+      testDeveloper.addTask(task)
 
       manualTime.timePasses(workTime)
       manualTime.timePasses(restTime)
 
-      developerTestKit.getState() shouldEqual State.Free
+      testDeveloper.shouldBeFree
     }
 
     /** Если разработчик отдыхает, новые задачи ставятся в очередь */
