@@ -269,22 +269,28 @@ class DeveloperBehaviorTestSuite
 
     /** После отдыха разработчик выполняет следующую задачу из очереди до конца */
     "fully complete the next task in the queue after resting" in {
-      val lastCompleted = TaskWithId(12, "6bf0af94-4ee3-4857-9a38-3e31e529b37d")
-      val taskQueue = TaskWithId(35, "ba5be578-9af1-44a6-9b8b-0a11c340237b") ::
-        TaskWithId(19, "da2b386f-a53e-44a8-b943-8e7491d1010e") ::
+      val lastCompleted = createTaskWithId(12, "6bf0af94-4ee3-4857-9a38-3e31e529b37d")
+      val taskQueue = createTaskWithId(35, "ba5be578-9af1-44a6-9b8b-0a11c340237b") ::
+        createTaskWithId(19, "da2b386f-a53e-44a8-b943-8e7491d1010e") ::
         Nil
       val restTime = calculateRestTime(lastCompleted.difficulty)
-      val nextTask = taskQueue.head
-      val workTime = calculateWorkTime(nextTask.difficulty)
+      val nextTask = TestTask.fromTaskWithId(taskQueue.head)
+      val nextQueue = taskQueue.tail.map(TestTask.fromTaskWithId)
+      val workTime = calculateWorkTime(nextTask)
 
-      developerTestKit.initialize(State.Resting(lastCompleted, taskQueue))
+      testDeveloper.whileResting(lastCompleted, taskQueue)
 
       manualTime.timePasses(restTime)
-      developerTestKit.getState() shouldEqual State.Working(nextTask, taskQueue.tail)
+      testDeveloper.shouldBeWorkingOnTask(nextTask)
+      testDeveloper.queueShouldEqual(nextQueue)
+
       manualTime.timePasses(workTime - 1.millis)
-      developerTestKit.getState() shouldEqual State.Working(nextTask, taskQueue.tail)
+      testDeveloper.shouldBeWorkingOnTask(nextTask)
+      testDeveloper.queueShouldEqual(nextQueue)
+
       manualTime.timePasses(1.millis)
-      developerTestKit.getState() shouldEqual State.Resting(nextTask, taskQueue.tail)
+      testDeveloper.shouldRestAfterCompletingTask(nextTask)
+      testDeveloper.queueShouldEqual(nextQueue)
     }
 
   }

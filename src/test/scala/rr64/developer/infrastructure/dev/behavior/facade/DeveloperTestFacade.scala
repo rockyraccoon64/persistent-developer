@@ -64,6 +64,9 @@ class DeveloperTestFacade(workFactor: Int, restFactor: Int)
   def afterCompletingTask(task: TaskWithId): Unit = // TODO Убрать TaskWithId
     developerTestKit.initialize(taskStartedEvent(task), taskFinishedEvent(task))
 
+  def whileResting(lastCompleted: TaskWithId, taskQueue: Seq[TaskWithId]): Unit =
+    developerTestKit.initialize(State.Resting(lastCompleted, taskQueue))
+
   def addTask(task: TestTask): AddTaskResultTestFacade = {
     val result = developerTestKit.runCommand(Command.AddTask(task.toDomain, _))
     new AddTaskResultTestFacade(result)
