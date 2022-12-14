@@ -4,7 +4,7 @@ import akka.actor.testkit.typed.scaladsl.{ManualTime, ScalaTestWithActorTestKit}
 import akka.persistence.testkit.scaladsl.EventSourcedBehaviorTestKit
 import org.scalatest.BeforeAndAfterEach
 import org.scalatest.wordspec.AnyWordSpecLike
-import rr64.developer.infrastructure.facade.DeveloperTestFacade
+import rr64.developer.infrastructure.facade.dev.DeveloperTestFacade
 import rr64.developer.infrastructure.facade.task.{TestTask, TestTaskWithId}
 
 import scala.concurrent.duration.{DurationInt, FiniteDuration}
