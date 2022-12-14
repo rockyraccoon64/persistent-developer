@@ -9,6 +9,7 @@ import org.scalatest.Inside.inside
 import org.scalatest.wordspec.AnyWordSpecLike
 import rr64.developer.domain.task.{Difficulty, Task}
 import rr64.developer.domain.timing.{Factor, Timing}
+import rr64.developer.infrastructure.DeveloperEventTestFacade._
 import rr64.developer.infrastructure.task.TaskWithId
 
 import scala.concurrent.duration.{DurationInt, FiniteDuration}
@@ -141,7 +142,7 @@ class DeveloperBehaviorTestSuite
     "reply with an identifier after receiving a new task while working" in {
       val currentTask = TaskWithId(100, "f490d7ca-dcbf-4905-be03-ffd7bf90b513")
       val newTask = Task(10)
-      developerTestKit.initialize(Event.TaskStarted(currentTask))
+      developerTestKit.initialize(taskStartedEvent(currentTask))
       val result = addTask(newTask)
       val reply = result.replyOfType[Replies.TaskQueued]
       reply.id should not be null
@@ -255,7 +256,7 @@ class DeveloperBehaviorTestSuite
       val taskWithId = TaskWithId(50, "92ac4c4b-622f-44ba-b331-f1cf40a27c58")
       val workTime = calculateWorkTime(taskWithId.difficulty)
 
-      developerTestKit.initialize(Event.TaskStarted(taskWithId))
+      developerTestKit.initialize(taskStartedEvent(taskWithId))
       developerTestKit.restart()
 
       manualTime.timePasses(workTime - 1.millis)
@@ -270,7 +271,7 @@ class DeveloperBehaviorTestSuite
       val taskWithId = TaskWithId(10, "b807f5ff-6066-454e-8d53-2a90a3941cc4")
       val restTime = calculateRestTime(taskWithId.difficulty)
 
-      developerTestKit.initialize(Event.TaskStarted(taskWithId), Event.TaskFinished(taskWithId))
+      developerTestKit.initialize(taskStartedEvent(taskWithId), taskFinishedEvent(taskWithId))
       developerTestKit.restart()
 
       manualTime.timePasses(restTime - 1.millis)
