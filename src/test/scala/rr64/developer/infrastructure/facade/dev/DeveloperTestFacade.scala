@@ -82,6 +82,15 @@ class DeveloperTestFacade private(workFactor: Factor, restFactor: Factor)
   def shouldNotBeResting: Assertion =
     state should not be a [State.Resting]
 
+  /** Проверить содержимое очереди */
+  def queueShouldEqual(tasks: Seq[TestTask]): Assertion = {
+    val queue = state match {
+      case working: State.Working => working.taskQueue
+      case resting: State.Resting => resting.taskQueue
+    }
+    queue.map(_.task) should contain theSameElementsInOrderAs tasks.map(_.toDomain)
+  }
+
   /** Считать, что дальнейшие команды и запросы выполняются после начала работы над задачей */
   def afterStartingTask(task: TestTaskWithId): Unit =
     developerTestKit.initialize(taskStartedEvent(task.toDomain))
@@ -98,15 +107,6 @@ class DeveloperTestFacade private(workFactor: Factor, restFactor: Factor)
   /** Считать, что дальнейшие команды и запросы выполняются во время отдыха */
   def whileResting(lastCompleted: TestTaskWithId, taskQueue: Seq[TestTaskWithId]): Unit =
     developerTestKit.initialize(State.Resting(lastCompleted.toDomain, taskQueue.map(_.toDomain)))
-
-  /** Проверить содержимое очереди */
-  def queueShouldEqual(tasks: Seq[TestTask]): Assertion = {
-    val queue = state match {
-      case working: State.Working => working.taskQueue
-      case resting: State.Resting => resting.taskQueue
-    }
-    queue.map(_.task) should contain theSameElementsInOrderAs tasks.map(_.toDomain)
-  }
 
   /** Расчитать время работы */
   def calculateWorkTime(task: TestTask): FiniteDuration =
