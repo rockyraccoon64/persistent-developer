@@ -146,7 +146,8 @@ class DeveloperBehaviorTestSuite
       val currentTask = createTaskWithId(100, "f490d7ca-dcbf-4905-be03-ffd7bf90b513")
       val newTask = TestTask(10)
       testDeveloper.afterStartingTask(currentTask)
-      testDeveloper.addsTaskAndRepliesWithIdentifier(newTask)
+      val result = testDeveloper.addTask(newTask)
+      result.isIdAssignedAfterQueueing
     }
 
     /** Когда разработчик работает над задачей, новые задачи отправляются в очередь */

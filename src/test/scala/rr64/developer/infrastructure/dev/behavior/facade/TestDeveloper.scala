@@ -61,11 +61,6 @@ class TestDeveloper(workFactor: Int, restFactor: Int)
     new TestAddTaskResult(result)
   }
 
-  def addsTaskAndRepliesWithIdentifier(newTask: TestTask): Assertion = {
-    val result = addTask(newTask)
-    result.isIdAssignedAfterQueueing
-  }
-
   def workingOnTaskWithReturnedIdentifier(result: TestAddTaskResult): Assertion = {
     inside(developerTestKit.getState()) {
       case working: State.Working =>
