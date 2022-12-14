@@ -87,11 +87,13 @@ class DeveloperTestFacade private(workFactor: Factor, restFactor: Factor)
   def queueShouldEqual(tasks: Seq[TestTask]): Assertion =
     queue.map(_.task) should contain theSameElementsInOrderAs tasks.map(_.toDomain)
 
-  /** Считать, что дальнейшие команды и запросы выполняются после начала работы над задачей */
+  /** Считать, что дальнейшие команды и запросы
+   * выполняются после начала работы над задачей */
   def afterStartingTask(task: TestTaskWithId): Unit =
     developerTestKit.initialize(taskStartedEvent(task.toDomain))
 
-  /** Считать, что дальнейшие команды и запросы выполняются после завершения работы над задачей */
+  /** Считать, что дальнейшие команды и запросы
+   * выполняются после завершения работы над задачей */
   def afterCompletingTask(task: TestTaskWithId): Unit = {
     val domainTask = task.toDomain
     developerTestKit.initialize(
@@ -100,9 +102,15 @@ class DeveloperTestFacade private(workFactor: Factor, restFactor: Factor)
     )
   }
 
-  /** Считать, что дальнейшие команды и запросы выполняются во время отдыха */
-  def whileResting(lastCompleted: TestTaskWithId, taskQueue: Seq[TestTaskWithId]): Unit =
-    developerTestKit.initialize(State.Resting(lastCompleted.toDomain, taskQueue.map(_.toDomain)))
+  /** Считать, что дальнейшие команды и запросы
+   * выполняются во время отдыха */
+  def whileResting(
+    lastCompleted: TestTaskWithId,
+    taskQueue: Seq[TestTaskWithId]
+  ): Unit = developerTestKit.initialize(
+    State.Resting(
+      lastCompleted = lastCompleted.toDomain,
+      taskQueue = taskQueue.map(_.toDomain)))
 
   /** Расчитать время работы */
   def calculateWorkTime(task: TestTask): FiniteDuration =
