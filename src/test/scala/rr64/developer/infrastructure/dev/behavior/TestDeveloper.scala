@@ -13,6 +13,8 @@ import rr64.developer.infrastructure.DeveloperEventTestFacade.{Event, taskStarte
 import rr64.developer.infrastructure.dev.behavior.TestAddTaskResult.Result
 import rr64.developer.infrastructure.task.TaskWithId
 
+import java.util.UUID
+
 class TestDeveloper(workFactor: Int, restFactor: Int)
                    (implicit system: ActorSystem[_]) {
 
@@ -36,7 +38,7 @@ class TestDeveloper(workFactor: Int, restFactor: Int)
   def shouldBeFree: Assertion =
     developerTestKit.getState() shouldEqual State.Free
 
-  def addTask(task: TestTask): Unit =
+  def addTask(task: TestTask): TestAddTaskResult =
     addTaskWithResult(task)
 
   def shouldBeWorkingOnTask(task: TestTask): Assertion =
@@ -60,7 +62,7 @@ class TestDeveloper(workFactor: Int, restFactor: Int)
   def afterStartingTask(task: TaskWithId): Unit = // TODO Убрать TaskWithId
     developerTestKit.initialize(taskStartedEvent(task))
 
-  private def addTaskWithResult(task: TestTask): TestAddTaskResult = {
+  private def addTaskWithResult(task: TestTask): TestAddTaskResult = { // TODO delete
     val result = developerTestKit.runCommand(Command.AddTask(task.toDomain, _))
     new TestAddTaskResult(result)
   }
@@ -68,6 +70,13 @@ class TestDeveloper(workFactor: Int, restFactor: Int)
   def addsTaskAndRepliesWithIdentifier(newTask: TestTask): Assertion = {
     val result = addTaskWithResult(newTask)
     result.isIdAssignedAfterQueueing
+  }
+
+  def workingOnTaskWithReturnedIdentifier(result: TestAddTaskResult): Assertion = {
+    inside(developerTestKit.getState()) {
+      case working: State.Working =>
+        working.currentTask.id shouldEqual result.id
+    }
   }
 
 }
@@ -81,6 +90,14 @@ class TestAddTaskResult(result: Result) {
     val reply = result.replyOfType[Replies.TaskQueued]
     reply.id should not be null
   }
+
+  def taskShouldBeStarted: Assertion =
+    result.reply shouldBe a [Replies.TaskStarted]
+
+  def identifierAssignedAfterStarting: Assertion =
+    result.replyOfType[Replies.TaskStarted].id should not be null
+
+  def id: UUID = result.replyOfType[Replies.TaskStarted].id
 
 }
 

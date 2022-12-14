@@ -93,11 +93,11 @@ class DeveloperBehaviorTestSuite
     /** Когда разработчик свободен, то при получении задачи
      * он присваивает ей идентификатор и отправляет его в ответе */
     "reply with a Task Started message when he's free" in {
-      val task = Task(15)
-      val result = addTask(task)
-      val reply = result.replyOfType[Replies.TaskStarted]
-      reply.id should not be null
-      result.stateOfType[State.Working].currentTask.id shouldEqual reply.id
+      val task = TestTask(15)
+      val result = testDeveloper.addTask(task)
+      result.taskShouldBeStarted
+      result.identifierAssignedAfterStarting
+      testDeveloper.workingOnTaskWithReturnedIdentifier(result)
     }
 
     /** До выполнения задачи разработчик работает */
