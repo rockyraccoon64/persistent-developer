@@ -5,6 +5,7 @@ import org.scalatest.flatspec.AsyncFlatSpecLike
 import org.scalatest.matchers.should.Matchers
 import rr64.developer.infrastructure.PostgresSpec
 import rr64.developer.infrastructure.facade.task.TaskTestFacade._
+import rr64.developer.infrastructure.facade.task.TestTaskSlickRepository
 import slick.jdbc.PostgresProfile.api._
 
 import java.util.UUID

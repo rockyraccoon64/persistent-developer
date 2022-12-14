@@ -1,7 +1,7 @@
 package rr64.developer.infrastructure.facade.task
 
 import rr64.developer.domain.task.TaskInfo
-import rr64.developer.infrastructure.task.{TaskRepository, TaskSlickRepository, TaskStatusCodec, TestTaskSlickRepository}
+import rr64.developer.infrastructure.task.{TaskRepository, TaskSlickRepository, TaskStatusCodec}
 import slick.jdbc.PostgresProfile.api._
 
 import java.util.UUID
