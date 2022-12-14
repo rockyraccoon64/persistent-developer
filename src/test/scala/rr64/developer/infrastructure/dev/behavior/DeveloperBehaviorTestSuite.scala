@@ -63,6 +63,10 @@ class DeveloperBehaviorTestSuite
   private def calculateWorkTime(difficulty: Difficulty): FiniteDuration =
     Timing.calculateTime(difficulty, workFactor)
 
+  /** Расчитать время работы */
+  private def calculateWorkTime(difficulty: Int): FiniteDuration =
+    calculateWorkTime(Difficulty(difficulty))
+
   /** Расчитать время отдыха */
   private def calculateRestTime(difficulty: Difficulty): FiniteDuration =
     Timing.calculateTime(difficulty, restFactor)
@@ -92,18 +96,15 @@ class DeveloperBehaviorTestSuite
 
     /** До выполнения задачи разработчик работает */
     "work until the task is done" in {
-      val task = Task(20)
+      val task = TestTask(20)
       val workTime = calculateWorkTime(task.difficulty)
 
-      addTask(task)
+      testDeveloper.addTask(task)
 
       manualTime.timePasses(workTime - 1.millis)
-      inside(developerTestKit.getState()) {
-        case working: State.Working => working.currentTask.task shouldEqual task
-      }
-
+      testDeveloper.shouldBeWorkingOnTask(task)
       manualTime.timePasses(1.millis)
-      developerTestKit.getState() should not be a [State.Working]
+      testDeveloper.shouldNotBeWorking
     }
 
     /** Завершив задачу, разработчик делает перерыв */

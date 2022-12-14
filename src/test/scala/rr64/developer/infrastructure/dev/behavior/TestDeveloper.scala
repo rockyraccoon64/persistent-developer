@@ -38,9 +38,12 @@ class TestDeveloper(workFactor: Int, restFactor: Int)
   def shouldBeWorkingOnTask(task: TestTask): Assertion = {
     inside(developerTestKit.getState()) {
       case State.Working(currentTask, _) =>
-      currentTask.task shouldEqual task.toDomain
+        currentTask.task shouldEqual task.toDomain
     }
   }
+
+  def shouldNotBeWorking: Assertion =
+    developerTestKit.getState() should not be a [State.Working]
 
 }
 
