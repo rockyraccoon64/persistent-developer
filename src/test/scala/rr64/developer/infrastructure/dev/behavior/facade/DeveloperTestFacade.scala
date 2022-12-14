@@ -46,7 +46,7 @@ class DeveloperTestFacade(workFactor: Int, restFactor: Int)
   def shouldNotBeWorking: Assertion =
     developerTestKit.getState() should not be a [State.Working]
 
-  def shouldRestAfterCompletingTask(task: TestTask): Assertion =
+  def shouldBeRestingAfterCompletingTask(task: TestTask): Assertion =
     inside(developerTestKit.getState()) {
       case resting: State.Resting =>
         resting.lastCompleted.task shouldEqual task.toDomain

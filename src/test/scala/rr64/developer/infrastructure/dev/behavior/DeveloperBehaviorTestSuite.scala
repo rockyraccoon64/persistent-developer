@@ -122,7 +122,7 @@ class DeveloperBehaviorTestSuite
       testDeveloper.addTask(task)
 
       manualTime.timePasses(workTime)
-      testDeveloper.shouldRestAfterCompletingTask(task)
+      testDeveloper.shouldBeRestingAfterCompletingTask(task)
     }
 
     /** Перерыв длится строго отведённое время */
@@ -289,7 +289,7 @@ class DeveloperBehaviorTestSuite
       testDeveloper.queueShouldEqual(nextQueue)
 
       manualTime.timePasses(1.millis)
-      testDeveloper.shouldRestAfterCompletingTask(nextTask)
+      testDeveloper.shouldBeRestingAfterCompletingTask(nextTask)
       testDeveloper.queueShouldEqual(nextQueue)
     }
 
