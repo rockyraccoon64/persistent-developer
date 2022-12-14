@@ -6,8 +6,7 @@ import org.scalatest.BeforeAndAfterEach
 import org.scalatest.wordspec.AnyWordSpecLike
 import rr64.developer.domain.task.Difficulty
 import rr64.developer.domain.timing.{Factor, Timing}
-import rr64.developer.infrastructure.dev.behavior.facade.{DeveloperTestFacade, TestTask}
-import rr64.developer.infrastructure.task.TaskTestFacade.createTaskWithId
+import rr64.developer.infrastructure.dev.behavior.facade.{DeveloperTestFacade, TestTask, TestTaskWithId}
 
 import scala.concurrent.duration.{DurationInt, FiniteDuration}
 
@@ -115,7 +114,7 @@ class DeveloperBehaviorTestSuite
      * то при получении новой задачи он присваивает ей идентификатор
      * и отправляет его в ответе */
     "reply with an identifier after receiving a new task while working" in {
-      val currentTask = createTaskWithId(100, "f490d7ca-dcbf-4905-be03-ffd7bf90b513")
+      val currentTask = TestTaskWithId(100, "f490d7ca-dcbf-4905-be03-ffd7bf90b513")
       val newTask = TestTask(10)
       testDeveloper.afterStartingTask(currentTask)
       val result = testDeveloper.addTask(newTask)
@@ -210,9 +209,9 @@ class DeveloperBehaviorTestSuite
 
     /** Если актор упал в рабочем состоянии, соответствующий таймер запускается по новой */
     "start the work timer when completing recovery in a Working state" in {
-      val task = TestTask(50)
-      val taskWithId = createTaskWithId(50, "92ac4c4b-622f-44ba-b331-f1cf40a27c58")
-      val workTime = calculateWorkTime(taskWithId.difficulty)
+      val taskWithId = TestTaskWithId(50, "92ac4c4b-622f-44ba-b331-f1cf40a27c58")
+      val task = taskWithId.toTask
+      val workTime = calculateWorkTime(task)
 
       testDeveloper.afterStartingTask(taskWithId)
       testDeveloper.fail()
@@ -226,8 +225,8 @@ class DeveloperBehaviorTestSuite
 
     /** Если актор упал в состоянии отдыха, соответствующий таймер запускается по новой */
     "start the rest timer when completing recovery in a Resting state" in {
-      val taskWithId = createTaskWithId(10, "b807f5ff-6066-454e-8d53-2a90a3941cc4")
-      val restTime = calculateRestTime(taskWithId.difficulty)
+      val taskWithId = TestTaskWithId(10, "b807f5ff-6066-454e-8d53-2a90a3941cc4")
+      val restTime = calculateRestTime(taskWithId.toTask)
 
       testDeveloper.afterCompletingTask(taskWithId)
       testDeveloper.fail()
@@ -241,13 +240,13 @@ class DeveloperBehaviorTestSuite
 
     /** После отдыха разработчик выполняет следующую задачу из очереди до конца */
     "fully complete the next task in the queue after resting" in {
-      val lastCompleted = createTaskWithId(12, "6bf0af94-4ee3-4857-9a38-3e31e529b37d")
-      val taskQueue = createTaskWithId(35, "ba5be578-9af1-44a6-9b8b-0a11c340237b") ::
-        createTaskWithId(19, "da2b386f-a53e-44a8-b943-8e7491d1010e") ::
+      val lastCompleted = TestTaskWithId(12, "6bf0af94-4ee3-4857-9a38-3e31e529b37d")
+      val taskQueue = TestTaskWithId(35, "ba5be578-9af1-44a6-9b8b-0a11c340237b") ::
+        TestTaskWithId(19, "da2b386f-a53e-44a8-b943-8e7491d1010e") ::
         Nil
-      val restTime = calculateRestTime(lastCompleted.difficulty)
-      val nextTask = TestTask.fromTaskWithId(taskQueue.head)
-      val nextQueue = taskQueue.tail.map(TestTask.fromTaskWithId)
+      val restTime = calculateRestTime(lastCompleted.toTask)
+      val nextTask = taskQueue.head.toTask
+      val nextQueue = taskQueue.tail.map(_.toTask)
       val workTime = calculateWorkTime(nextTask)
 
       testDeveloper.whileResting(lastCompleted, taskQueue)

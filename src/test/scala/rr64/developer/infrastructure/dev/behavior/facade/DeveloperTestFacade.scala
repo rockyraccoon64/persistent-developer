@@ -10,7 +10,6 @@ import org.scalatest.matchers.should.Matchers._
 import rr64.developer.domain.timing.Factor
 import rr64.developer.infrastructure.DeveloperEventTestFacade.{Event, taskFinishedEvent, taskStartedEvent}
 import rr64.developer.infrastructure.dev.behavior.{Command, DeveloperBehavior, State}
-import rr64.developer.infrastructure.task.TaskWithId
 
 class DeveloperTestFacade(workFactor: Int, restFactor: Int)
                          (implicit system: ActorSystem[_]) {
@@ -58,14 +57,19 @@ class DeveloperTestFacade(workFactor: Int, restFactor: Int)
   def shouldNotBeResting: Assertion =
     developerTestKit.getState() should not be a [State.Resting]
 
-  def afterStartingTask(task: TaskWithId): Unit = // TODO Убрать TaskWithId
-    developerTestKit.initialize(taskStartedEvent(task))
+  def afterStartingTask(task: TestTaskWithId): Unit =
+    developerTestKit.initialize(taskStartedEvent(task.toDomain))
 
-  def afterCompletingTask(task: TaskWithId): Unit = // TODO Убрать TaskWithId
-    developerTestKit.initialize(taskStartedEvent(task), taskFinishedEvent(task))
+  def afterCompletingTask(task: TestTaskWithId): Unit = {
+    val domainTask = task.toDomain
+    developerTestKit.initialize(
+      taskStartedEvent(domainTask),
+      taskFinishedEvent(domainTask)
+    )
+  }
 
-  def whileResting(lastCompleted: TaskWithId, taskQueue: Seq[TaskWithId]): Unit =
-    developerTestKit.initialize(State.Resting(lastCompleted, taskQueue))
+  def whileResting(lastCompleted: TestTaskWithId, taskQueue: Seq[TestTaskWithId]): Unit =
+    developerTestKit.initialize(State.Resting(lastCompleted.toDomain, taskQueue.map(_.toDomain)))
 
   def addTask(task: TestTask): AddTaskResultTestFacade = {
     val result = developerTestKit.runCommand(Command.AddTask(task.toDomain, _))
