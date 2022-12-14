@@ -5,7 +5,6 @@ import akka.persistence.testkit.scaladsl.EventSourcedBehaviorTestKit
 import akka.persistence.testkit.scaladsl.EventSourcedBehaviorTestKit.SerializationSettings
 import akka.persistence.typed.PersistenceId
 import org.scalatest.BeforeAndAfterEach
-import org.scalatest.Inside.inside
 import org.scalatest.wordspec.AnyWordSpecLike
 import rr64.developer.domain.task.{Difficulty, Task}
 import rr64.developer.domain.timing.{Factor, Timing}
@@ -220,22 +219,21 @@ class DeveloperBehaviorTestSuite
 
     /** Если разработчик отдыхает, новые задачи ставятся в очередь */
     "queue tasks while resting" in {
-      val initialTask = Task(1)
-      val workTime = calculateWorkTime(initialTask.difficulty)
+      val initialTask = TestTask(1)
+      val workTime = calculateWorkTime(initialTask)
 
-      addTask(initialTask)
-
+      testDeveloper.addTask(initialTask)
       manualTime.timePasses(workTime)
 
-      developerTestKit.getState() shouldBe a [State.Resting]
+      testDeveloper.shouldBeResting
 
-      val taskWithId1 = queueTask(Task(10))
-      val taskWithId2 = queueTask(Task(5))
+      val secondTask = TestTask(10)
+      val thirdTask = TestTask(5)
 
-      inside(developerTestKit.getState()) {
-        case resting: State.Resting =>
-          resting.taskQueue should contain theSameElementsInOrderAs Seq(taskWithId1, taskWithId2)
-      }
+      testDeveloper.addTask(secondTask)
+      testDeveloper.addTask(thirdTask)
+
+      testDeveloper.queueShouldEqual(secondTask :: thirdTask :: Nil)
     }
 
     /** Если актор упал в рабочем состоянии, соответствующий таймер запускается по новой */
