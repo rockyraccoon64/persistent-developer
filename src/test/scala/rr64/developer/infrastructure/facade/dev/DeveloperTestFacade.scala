@@ -47,40 +47,40 @@ class DeveloperTestFacade private(workFactor: Factor, restFactor: Factor)
 
   /** Проверить, что разработчик в состоянии "Свободен" */
   def shouldBeFree: Assertion =
-    developerTestKit.getState() shouldEqual State.Free
+    state shouldEqual State.Free
 
   /** Проверить, что разработчик в процессе выполнения задачи */
   def shouldBeWorkingOnTask(task: TestTask): Assertion =
-    inside(developerTestKit.getState()) {
+    inside(state) {
       case working: State.Working =>
         working.currentTask.task shouldEqual task.toDomain
     }
 
   /** Проверить, что разработчик в процессе выполнения задачи с конкретным идентификатором */
   def shouldBeWorkingOnTaskWithId(id: TestTaskIdentifier): Assertion =
-    inside(developerTestKit.getState()) {
+    inside(state) {
       case working: State.Working =>
         working.currentTask.id shouldEqual id.id
     }
 
   /** Проверить, что разработчик не выполняет задачу в текущий момент */
   def shouldNotBeWorking: Assertion =
-    developerTestKit.getState() should not be a [State.Working]
+    state should not be a [State.Working]
 
   /** Проверить, что разработчик отдыхает */
   def shouldBeResting: Assertion =
-    developerTestKit.getState() shouldBe a [State.Resting]
+    state shouldBe a [State.Resting]
 
   /** Проверить, что разработчик отдыхает после выполнения конкретной задачи */
   def shouldBeRestingAfterCompletingTask(task: TestTask): Assertion =
-    inside(developerTestKit.getState()) {
+    inside(state) {
       case resting: State.Resting =>
         resting.lastCompleted.task shouldEqual task.toDomain
     }
 
   /** Проверить, что разработчик не отдыхает в текущий момент */
   def shouldNotBeResting: Assertion =
-    developerTestKit.getState() should not be a [State.Resting]
+    state should not be a [State.Resting]
 
   /** Считать, что дальнейшие команды и запросы выполняются после начала работы над задачей */
   def afterStartingTask(task: TestTaskWithId): Unit =
@@ -101,7 +101,7 @@ class DeveloperTestFacade private(workFactor: Factor, restFactor: Factor)
 
   /** Проверить содержимое очереди */
   def queueShouldEqual(tasks: Seq[TestTask]): Assertion = {
-    val queue = developerTestKit.getState() match {
+    val queue = state match {
       case working: State.Working => working.taskQueue
       case resting: State.Resting => resting.taskQueue
     }
@@ -115,6 +115,9 @@ class DeveloperTestFacade private(workFactor: Factor, restFactor: Factor)
   /** Расчитать время отдыха */
   def calculateRestTime(task: TestTask): FiniteDuration =
     Timing.calculateTime(Difficulty(task.difficulty), restFactor)
+
+  /** Текущее состояние */
+  private def state: State = developerTestKit.getState()
 
 }
 
