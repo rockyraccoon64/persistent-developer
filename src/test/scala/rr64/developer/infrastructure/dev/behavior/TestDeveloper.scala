@@ -52,6 +52,9 @@ class TestDeveloper(workFactor: Int, restFactor: Int)
         resting.lastCompleted.task shouldEqual task.toDomain
     }
 
+  def shouldNotBeResting: Assertion =
+    developerTestKit.getState() should not be a [State.Resting]
+
 }
 
 case class TestTask(difficulty: Int) {

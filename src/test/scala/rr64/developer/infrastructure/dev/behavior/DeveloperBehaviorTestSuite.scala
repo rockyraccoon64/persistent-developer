@@ -72,6 +72,10 @@ class DeveloperBehaviorTestSuite
   private def calculateRestTime(difficulty: Difficulty): FiniteDuration =
     Timing.calculateTime(difficulty, restFactor)
 
+  /** Расчитать время отдыха */
+  private def calculateRestTime(task: TestTask): FiniteDuration =
+    calculateRestTime(Difficulty(task.difficulty))
+
   /** Актор разработчика */
   "The developer" should {
 
@@ -121,16 +125,16 @@ class DeveloperBehaviorTestSuite
 
     /** Перерыв длится строго отведённое время */
     "only rest for a designated time period" in {
-      val task = Task(50)
-      val workTime = calculateWorkTime(task.difficulty)
-      val restTime = calculateRestTime(task.difficulty)
+      val task = TestTask(50)
+      val workTime = calculateWorkTime(task)
+      val restTime = calculateRestTime(task)
 
-      addTask(task)
+      testDeveloper.addTask(task)
 
       manualTime.timePasses(workTime)
       manualTime.timePasses(restTime)
 
-      developerTestKit.getState() should not be a [State.Resting]
+      testDeveloper.shouldNotBeResting
     }
 
     /** Когда разработчик работает над задачей,
