@@ -12,6 +12,7 @@ import rr64.developer.domain.timing.{Factor, Timing}
 import rr64.developer.infrastructure.dev.behavior.{Command, DeveloperBehavior, State}
 import rr64.developer.infrastructure.facade.event.DeveloperEventTestFacade._
 import rr64.developer.infrastructure.facade.task.{TestTask, TestTaskIdentifier, TestTaskWithId}
+import rr64.developer.infrastructure.task.TaskWithId
 
 import scala.concurrent.duration.FiniteDuration
 
@@ -83,13 +84,8 @@ class DeveloperTestFacade private(workFactor: Factor, restFactor: Factor)
     state should not be a [State.Resting]
 
   /** Проверить содержимое очереди */
-  def queueShouldEqual(tasks: Seq[TestTask]): Assertion = {
-    val queue = state match {
-      case working: State.Working => working.taskQueue
-      case resting: State.Resting => resting.taskQueue
-    }
+  def queueShouldEqual(tasks: Seq[TestTask]): Assertion =
     queue.map(_.task) should contain theSameElementsInOrderAs tasks.map(_.toDomain)
-  }
 
   /** Считать, что дальнейшие команды и запросы выполняются после начала работы над задачей */
   def afterStartingTask(task: TestTaskWithId): Unit =
@@ -118,6 +114,12 @@ class DeveloperTestFacade private(workFactor: Factor, restFactor: Factor)
 
   /** Текущее состояние */
   private def state: State = developerTestKit.getState()
+
+  /** Текущая очередь задач */
+  private def queue: Seq[TaskWithId] = state match {
+    case working: State.Working => working.taskQueue
+    case resting: State.Resting => resting.taskQueue
+  }
 
 }
 
