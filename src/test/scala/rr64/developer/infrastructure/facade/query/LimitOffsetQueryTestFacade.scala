@@ -1,4 +1,4 @@
-package rr64.developer.infrastructure.task.query
+package rr64.developer.infrastructure.facade.query
 
 /**
  * Фасад для тестов с использованием

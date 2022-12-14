@@ -1,6 +1,7 @@
-package rr64.developer.infrastructure.task.query
+package rr64.developer.infrastructure.facade.query
 
 import org.scalatest.EitherValues._
+import rr64.developer.infrastructure.task.query.{LimitOffsetQuery, LimitOffsetQueryFactory, LimitOffsetQueryStringExtractor}
 
 /**
  * Фасад для тестов с использованием
