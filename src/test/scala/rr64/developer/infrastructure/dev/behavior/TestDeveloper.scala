@@ -10,6 +10,7 @@ import org.scalatest.matchers.should.Matchers._
 import rr64.developer.domain.task.Task
 import rr64.developer.domain.timing.Factor
 import rr64.developer.infrastructure.DeveloperEventTestFacade.{Event, taskStartedEvent}
+import rr64.developer.infrastructure.dev.behavior.TestAddTaskResult.Result
 import rr64.developer.infrastructure.task.TaskWithId
 
 class TestDeveloper(workFactor: Int, restFactor: Int)
@@ -59,15 +60,32 @@ class TestDeveloper(workFactor: Int, restFactor: Int)
   def afterStartingTask(task: TaskWithId): Unit = // TODO Убрать TaskWithId
     developerTestKit.initialize(taskStartedEvent(task))
 
-  private def addTaskWithResult(task: TestTask) =
-    developerTestKit.runCommand(Command.AddTask(task.toDomain, _))
+  private def addTaskWithResult(task: TestTask): TestAddTaskResult = {
+    val result = developerTestKit.runCommand(Command.AddTask(task.toDomain, _))
+    new TestAddTaskResult(result)
+  }
 
   def addsTaskAndRepliesWithIdentifier(newTask: TestTask): Assertion = {
     val result = addTaskWithResult(newTask)
+    result.isIdAssignedAfterQueueing
+  }
+
+}
+
+class TestAddTaskResult(result: Result) {
+
+  def isQueued: Assertion =
+    result.reply shouldBe a [Replies.TaskQueued]
+
+  def isIdAssignedAfterQueueing: Assertion = {
     val reply = result.replyOfType[Replies.TaskQueued]
     reply.id should not be null
   }
 
+}
+
+object TestAddTaskResult {
+  type Result = EventSourcedBehaviorTestKit.CommandResultWithReply[Command, Event, State, Replies.AddTaskResult]
 }
 
 case class TestTask(difficulty: Int) {
