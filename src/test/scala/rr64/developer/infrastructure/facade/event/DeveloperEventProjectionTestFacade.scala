@@ -1,4 +1,4 @@
-package rr64.developer.infrastructure
+package rr64.developer.infrastructure.facade.event
 
 import akka.persistence.query.Offset
 import akka.projection.eventsourced.EventEnvelope

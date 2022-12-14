@@ -9,13 +9,13 @@ import org.scalatest.Inside.inside
 import org.scalatest.matchers.should.Matchers._
 import rr64.developer.domain.task.Difficulty
 import rr64.developer.domain.timing.{Factor, Timing}
-import rr64.developer.infrastructure.DeveloperEventTestFacade.{Event, taskFinishedEvent, taskStartedEvent}
 import rr64.developer.infrastructure.dev.behavior.{Command, DeveloperBehavior, State}
+import rr64.developer.infrastructure.facade.event.DeveloperEventTestFacade._
 
 import scala.concurrent.duration.FiniteDuration
 
 class DeveloperTestFacade(workFactor: Int, restFactor: Int)
-                         (implicit system: ActorSystem[_]) {
+    (implicit system: ActorSystem[_]) {
 
   private type Kit = EventSourcedBehaviorTestKit[Command, Event, State]
 

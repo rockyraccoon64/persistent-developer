@@ -3,7 +3,7 @@ package rr64.developer.infrastructure.dev.behavior
 import org.scalatest.Assertion
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
-import rr64.developer.infrastructure.DeveloperEventTestFacade._
+import rr64.developer.infrastructure.facade.event.DeveloperEventTestFacade._
 import rr64.developer.infrastructure.facade.task.TaskTestFacade._
 
 /**

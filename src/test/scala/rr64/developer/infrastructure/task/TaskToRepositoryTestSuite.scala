@@ -5,7 +5,7 @@ import akka.projection.ProjectionId
 import akka.projection.testkit.scaladsl.ProjectionTestKit
 import org.scalatest.Assertion
 import org.scalatest.flatspec.AnyFlatSpecLike
-import rr64.developer.infrastructure.DeveloperEventProjectionTestFacade._
+import rr64.developer.infrastructure.facade.event.DeveloperEventProjectionTestFacade._
 import rr64.developer.infrastructure.facade.task.TaskTestFacade._
 
 import scala.concurrent.ExecutionContext
