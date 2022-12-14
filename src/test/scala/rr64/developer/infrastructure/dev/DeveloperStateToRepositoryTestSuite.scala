@@ -11,7 +11,7 @@ import org.scalatest.wordspec.AnyWordSpecLike
 import rr64.developer.domain.dev.DeveloperState
 import rr64.developer.infrastructure.DeveloperEventTestFacade._
 import rr64.developer.infrastructure.EventProjectionTestFacade._
-import rr64.developer.infrastructure.task.TaskTestFacade.createTaskWithId
+import rr64.developer.infrastructure.facade.task.TaskTestFacade.createTaskWithId
 
 import scala.concurrent.{ExecutionContext, Future}
 

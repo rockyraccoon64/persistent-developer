@@ -3,7 +3,7 @@ package rr64.developer.infrastructure.task
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import rr64.developer.infrastructure.CodecTestFacade._
-import rr64.developer.infrastructure.task.TaskTestFacade._
+import rr64.developer.infrastructure.facade.task.TaskTestFacade._
 
 /**
  * Тесты кодека статусов задач

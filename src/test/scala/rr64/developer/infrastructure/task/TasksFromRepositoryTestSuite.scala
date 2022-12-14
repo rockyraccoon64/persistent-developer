@@ -3,7 +3,7 @@ package rr64.developer.infrastructure.task
 import org.scalamock.scalatest.AsyncMockFactory
 import org.scalatest.flatspec.AsyncFlatSpecLike
 import org.scalatest.matchers.should.Matchers
-import rr64.developer.infrastructure.task.TaskTestFacade._
+import rr64.developer.infrastructure.facade.task.TaskTestFacade._
 
 import java.util.UUID
 import scala.concurrent.{ExecutionContext, Future}

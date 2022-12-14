@@ -1,6 +1,7 @@
-package rr64.developer.infrastructure.task
+package rr64.developer.infrastructure.facade.task
 
 import rr64.developer.domain.task.{Difficulty, TaskInfo, TaskStatus}
+import rr64.developer.infrastructure.task._
 import slick.jdbc.PostgresProfile.api._
 
 import java.util.UUID

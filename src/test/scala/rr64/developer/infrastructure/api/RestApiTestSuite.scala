@@ -12,7 +12,7 @@ import rr64.developer.domain.dev.{DeveloperReply, DeveloperState}
 import rr64.developer.domain.service.DeveloperService
 import rr64.developer.domain.task.{Task, TaskStatus}
 import rr64.developer.infrastructure.api.model._
-import rr64.developer.infrastructure.task.TaskTestFacade.createTaskInfo
+import rr64.developer.infrastructure.facade.task.TaskTestFacade.createTaskInfo
 import spray.json.DefaultJsonProtocol.immSeqFormat
 import spray.json.JsObject
 
