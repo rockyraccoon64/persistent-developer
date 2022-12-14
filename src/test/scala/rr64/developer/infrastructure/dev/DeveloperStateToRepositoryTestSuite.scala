@@ -9,9 +9,8 @@ import akka.projection.testkit.scaladsl.{ProjectionTestKit, TestProjection}
 import org.scalatest.Assertion
 import org.scalatest.wordspec.AnyWordSpecLike
 import rr64.developer.domain.dev.DeveloperState
-import rr64.developer.infrastructure.DeveloperEventTestFacade.{restedEvent, taskFinishedEvent, taskQueuedEvent, taskStartedEvent}
+import rr64.developer.infrastructure.DeveloperEventTestFacade._
 import rr64.developer.infrastructure.EventProjectionTestFacade._
-import rr64.developer.infrastructure.dev.behavior.Event
 import rr64.developer.infrastructure.task.TaskTestFacade.createTaskWithId
 
 import scala.concurrent.{ExecutionContext, Future}
