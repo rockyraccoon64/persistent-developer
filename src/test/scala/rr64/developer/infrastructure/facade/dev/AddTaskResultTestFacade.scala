@@ -10,20 +10,28 @@ import rr64.developer.infrastructure.facade.task.TestTaskIdentifier
 
 import java.util.UUID
 
+/**
+ * Тестовый фасад результата поручения задачи разработчику
+ * */
 class AddTaskResultTestFacade private[facade](result: AddTaskCommandResult) {
 
+  /** Проверить, что задача поставлена в очередь */
   def taskShouldBeQueued: Assertion =
     result.reply shouldBe a [Replies.TaskQueued]
 
+  /** Проверить, что задача начата */
   def taskShouldBeStarted: Assertion =
     result.reply shouldBe a [Replies.TaskStarted]
 
+  /** Проверить, что задаче присвоен идентификатор */
   def taskShouldHaveIdentifier: Assertion =
     extractId should not be null
 
+  /** Идентификатор задачи */
   def taskId: TestTaskIdentifier =
     new TestTaskIdentifier(extractId)
 
+  /** Извлечь идентификатор, присвоенный задаче */
   private def extractId: UUID = result.reply match {
     case Replies.TaskStarted(id) => id
     case Replies.TaskQueued(id) => id
@@ -33,6 +41,7 @@ class AddTaskResultTestFacade private[facade](result: AddTaskCommandResult) {
 
 object AddTaskResultTestFacade {
 
+  /** Результат поручения задачи разработчику */
   private[facade] type AddTaskCommandResult =
     EventSourcedBehaviorTestKit.CommandResultWithReply[
       Command,
