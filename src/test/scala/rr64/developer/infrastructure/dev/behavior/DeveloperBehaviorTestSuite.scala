@@ -21,7 +21,7 @@ class DeveloperBehaviorTestSuite
 
   private val manualTime = ManualTime()
 
-  private val testDeveloper = new DeveloperTestFacade(
+  private val testDeveloper = DeveloperTestFacade(
     workFactor = 10,
     restFactor = 5
   )

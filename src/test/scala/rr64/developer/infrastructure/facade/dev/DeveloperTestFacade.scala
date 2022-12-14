@@ -15,20 +15,16 @@ import rr64.developer.infrastructure.facade.task.{TestTask, TestTaskIdentifier, 
 
 import scala.concurrent.duration.FiniteDuration
 
-class DeveloperTestFacade(workFactor: Int, restFactor: Int)
+class DeveloperTestFacade private(workFactor: Factor, restFactor: Factor)
     (implicit system: ActorSystem[_]) {
 
-  private type Kit = EventSourcedBehaviorTestKit[Command, Event, State]
-
-  private val _workFactor = Factor(workFactor)
-  private val _restFactor = Factor(restFactor)
-  private val developerTestKit: Kit =
+  private val developerTestKit: EventSourcedBehaviorTestKit[Command, Event, State] =
     EventSourcedBehaviorTestKit(
       system = system,
       behavior = DeveloperBehavior(
         persistenceId = PersistenceId.ofUniqueId("dev-test"),
-        workFactor = _workFactor,
-        restFactor = _restFactor
+        workFactor = workFactor,
+        restFactor = restFactor
       ),
       SerializationSettings.disabled
     )
@@ -97,10 +93,19 @@ class DeveloperTestFacade(workFactor: Int, restFactor: Int)
 
   /** Расчитать время работы */
   def calculateWorkTime(task: TestTask): FiniteDuration =
-    Timing.calculateTime(Difficulty(task.difficulty), _workFactor)
+    Timing.calculateTime(Difficulty(task.difficulty), workFactor)
 
   /** Расчитать время отдыха */
   def calculateRestTime(task: TestTask): FiniteDuration =
-    Timing.calculateTime(Difficulty(task.difficulty), _restFactor)
+    Timing.calculateTime(Difficulty(task.difficulty), restFactor)
 
+}
+
+object DeveloperTestFacade {
+  def apply(workFactor: Int, restFactor: Int)
+      (implicit system: ActorSystem[_]): DeveloperTestFacade = {
+    val _workFactor = Factor(workFactor)
+    val _restFactor = Factor(restFactor)
+    new DeveloperTestFacade(_workFactor, _restFactor)
+  }
 }
