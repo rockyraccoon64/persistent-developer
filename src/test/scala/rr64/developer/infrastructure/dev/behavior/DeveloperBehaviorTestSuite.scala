@@ -10,6 +10,7 @@ import org.scalatest.wordspec.AnyWordSpecLike
 import rr64.developer.domain.task.{Difficulty, Task}
 import rr64.developer.domain.timing.{Factor, Timing}
 import rr64.developer.infrastructure.DeveloperEventTestFacade._
+import rr64.developer.infrastructure.task.TaskTestFacade.createTaskWithId
 import rr64.developer.infrastructure.task.TaskWithId
 
 import scala.concurrent.duration.{DurationInt, FiniteDuration}
@@ -141,12 +142,10 @@ class DeveloperBehaviorTestSuite
      * то при получении новой задачи он присваивает ей идентификатор
      * и отправляет его в ответе */
     "reply with an identifier after receiving a new task while working" in {
-      val currentTask = TaskWithId(100, "f490d7ca-dcbf-4905-be03-ffd7bf90b513")
-      val newTask = Task(10)
-      developerTestKit.initialize(taskStartedEvent(currentTask))
-      val result = addTask(newTask)
-      val reply = result.replyOfType[Replies.TaskQueued]
-      reply.id should not be null
+      val currentTask = createTaskWithId(100, "f490d7ca-dcbf-4905-be03-ffd7bf90b513")
+      val newTask = TestTask(10)
+      testDeveloper.afterStartingTask(currentTask)
+      testDeveloper.addsTaskAndRepliesWithIdentifier(newTask)
     }
 
     /** Когда разработчик работает над задачей, новые задачи отправляются в очередь */

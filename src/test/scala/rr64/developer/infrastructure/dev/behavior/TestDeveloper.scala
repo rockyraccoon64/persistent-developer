@@ -9,7 +9,8 @@ import org.scalatest.Inside.inside
 import org.scalatest.matchers.should.Matchers._
 import rr64.developer.domain.task.Task
 import rr64.developer.domain.timing.Factor
-import rr64.developer.infrastructure.DeveloperEventTestFacade.Event
+import rr64.developer.infrastructure.DeveloperEventTestFacade.{Event, taskStartedEvent}
+import rr64.developer.infrastructure.task.TaskWithId
 
 class TestDeveloper(workFactor: Int, restFactor: Int)
                    (implicit system: ActorSystem[_]) {
@@ -35,7 +36,7 @@ class TestDeveloper(workFactor: Int, restFactor: Int)
     developerTestKit.getState() shouldEqual State.Free
 
   def addTask(task: TestTask): Unit =
-    developerTestKit.runCommand(Command.AddTask(task.toDomain, _))
+    addTaskWithResult(task)
 
   def shouldBeWorkingOnTask(task: TestTask): Assertion =
     inside(developerTestKit.getState()) {
@@ -54,6 +55,18 @@ class TestDeveloper(workFactor: Int, restFactor: Int)
 
   def shouldNotBeResting: Assertion =
     developerTestKit.getState() should not be a [State.Resting]
+
+  def afterStartingTask(task: TaskWithId): Unit = // TODO Убрать TaskWithId
+    developerTestKit.initialize(taskStartedEvent(task))
+
+  private def addTaskWithResult(task: TestTask) =
+    developerTestKit.runCommand(Command.AddTask(task.toDomain, _))
+
+  def addsTaskAndRepliesWithIdentifier(newTask: TestTask): Assertion = {
+    val result = addTaskWithResult(newTask)
+    val reply = result.replyOfType[Replies.TaskQueued]
+    reply.id should not be null
+  }
 
 }
 
