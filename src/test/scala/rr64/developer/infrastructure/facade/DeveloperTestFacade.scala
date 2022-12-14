@@ -11,7 +11,7 @@ import rr64.developer.domain.task.Difficulty
 import rr64.developer.domain.timing.{Factor, Timing}
 import rr64.developer.infrastructure.dev.behavior.{Command, DeveloperBehavior, State}
 import rr64.developer.infrastructure.facade.event.DeveloperEventTestFacade._
-import rr64.developer.infrastructure.facade.task.{TestTask, TestTaskIdentifier}
+import rr64.developer.infrastructure.facade.task.{TestTask, TestTaskIdentifier, TestTaskWithId}
 
 import scala.concurrent.duration.FiniteDuration
 
