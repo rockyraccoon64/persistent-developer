@@ -2,16 +2,12 @@ package rr64.developer.infrastructure.dev.behavior
 
 import akka.actor.testkit.typed.scaladsl.{ManualTime, ScalaTestWithActorTestKit}
 import akka.persistence.testkit.scaladsl.EventSourcedBehaviorTestKit
-import akka.persistence.testkit.scaladsl.EventSourcedBehaviorTestKit.SerializationSettings
-import akka.persistence.typed.PersistenceId
 import org.scalatest.BeforeAndAfterEach
 import org.scalatest.wordspec.AnyWordSpecLike
-import rr64.developer.domain.task.{Difficulty, Task}
+import rr64.developer.domain.task.Difficulty
 import rr64.developer.domain.timing.{Factor, Timing}
-import rr64.developer.infrastructure.DeveloperEventTestFacade._
 import rr64.developer.infrastructure.dev.behavior.facade.{DeveloperTestFacade, TestTask}
 import rr64.developer.infrastructure.task.TaskTestFacade.createTaskWithId
-import rr64.developer.infrastructure.task.TaskWithId
 
 import scala.concurrent.duration.{DurationInt, FiniteDuration}
 
@@ -25,40 +21,16 @@ class DeveloperBehaviorTestSuite
   ) with AnyWordSpecLike
     with BeforeAndAfterEach {
 
-  private type Kit = EventSourcedBehaviorTestKit[Command, Event, State]
-
   private val manualTime = ManualTime()
 
   private val workFactor = Factor(10)
   private val restFactor = Factor(5)
-  private val developerTestKit: Kit =
-    EventSourcedBehaviorTestKit(
-      system = system,
-      behavior = DeveloperBehavior(
-        persistenceId = PersistenceId.ofUniqueId("dev-test"),
-        workFactor = workFactor,
-        restFactor = restFactor
-      ),
-      SerializationSettings.disabled
-    )
 
   private val testDeveloper = new DeveloperTestFacade(workFactor = 10, restFactor = 5)
 
   override protected def beforeEach(): Unit = {
     super.beforeEach()
-    developerTestKit.clear()
     testDeveloper.reset()
-  }
-
-  /** Поручить задачу */
-  private def addTask(task: Task) =
-    developerTestKit.runCommand(Command.AddTask(task, _))
-
-  /** Поставить задачу в очередь и получить идентификатор */
-  private def queueTask(task: Task): TaskWithId = {
-    val result = addTask(task)
-    val id = result.replyOfType[Replies.TaskQueued].id
-    TaskWithId(task, id)
   }
 
   /** Расчитать время работы */
