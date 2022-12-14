@@ -168,7 +168,7 @@ class DeveloperBehaviorTestSuite
     }
 
     /** После окончания работы над задачей очередь задач сохраняется */
-    "remain the same when a task is finished" in {
+    "leave the queue the same after a task is finished" in {
       val firstTask = TestTask(100)
       val secondTask = TestTask(50)
       val thirdTask = TestTask(25)
