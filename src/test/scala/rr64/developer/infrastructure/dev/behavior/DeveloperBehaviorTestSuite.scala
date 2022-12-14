@@ -41,6 +41,8 @@ class DeveloperBehaviorTestSuite
       SerializationSettings.disabled
     )
 
+  private val testDeveloper = new TestDeveloper(workFactor = 10, restFactor = 5)
+
   override protected def beforeEach(): Unit = {
     super.beforeEach()
     developerTestKit.clear()
