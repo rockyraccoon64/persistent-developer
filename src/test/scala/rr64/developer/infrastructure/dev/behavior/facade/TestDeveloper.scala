@@ -82,7 +82,7 @@ class TestDeveloper(workFactor: Int, restFactor: Int)
 
 }
 
-class TestAddTaskResult(result: Result) {
+class TestAddTaskResult private[facade](result: Result) {
 
   def isQueued: Assertion =
     result.reply shouldBe a [Replies.TaskQueued]
@@ -98,14 +98,15 @@ class TestAddTaskResult(result: Result) {
   def identifierAssignedAfterStarting: Assertion =
     result.replyOfType[Replies.TaskStarted].id should not be null
 
-  def id: UUID = result.replyOfType[Replies.TaskStarted].id
+  private[facade] def id: UUID =
+    result.replyOfType[Replies.TaskStarted].id
 
 }
 
 object TestAddTaskResult {
-  type Result = EventSourcedBehaviorTestKit.CommandResultWithReply[Command, Event, State, Replies.AddTaskResult]
+  private[facade] type Result = EventSourcedBehaviorTestKit.CommandResultWithReply[Command, Event, State, Replies.AddTaskResult]
 }
 
 case class TestTask(difficulty: Int) {
-  def toDomain: Task = Task(difficulty)
+  private[facade] def toDomain: Task = Task(difficulty)
 }
